@@ -7,7 +7,7 @@ import subprocess
 
 SYSTEM = platform.system()
 if SYSTEM.lower() == 'windows':
-	raise ValueError('This script does NOT work with Windows systems for now...')
+    raise ValueError('This script does NOT work with Windows systems for now...')
 
 # Get user inputs
 parser = argparse.ArgumentParser(description='Script to annotate student answers')
@@ -19,17 +19,17 @@ args = parser.parse_args()
 # Sanity checks for user inputs
 assert os.path.isdir(args.root_dir)
 if not os.path.exists(args.output_dir):
-	os.makedirs(args.output_dir)
-	print('Created new folder for outputs: ', args.output_dir)
+    os.makedirs(args.output_dir)
+    print('Created new folder for outputs: ', args.output_dir)
 else:
-	print('Folder for outputs already exists: ', args.output_dir)
+    print('Folder for outputs already exists: ', args.output_dir)
 assert args.done_path.endswith('.txt')
 if not os.path.exists(args.done_path):
-	f = open(args.done_path, 'w')
-	done = []
+    f = open(args.done_path, 'w')
+    done = []
 else:
-	with open(args.done_path, 'r') as f:
-		done =  [line.rstrip() for line in f if line.rstrip() != '']
+    with open(args.done_path, 'r') as f:
+        done =  [line.rstrip() for line in f if line.rstrip() != '']
 
 print(done)
 
@@ -55,33 +55,33 @@ print('You might need to press [ENTER] occasionally if nothing is showing up...'
 print('------------------------------------------------------------------------')
 
 for submission_filename in tqdm(os.listdir(homework_path), desc='Annotating Student Submissions'):
-	if not submission_filename.endswith('.tex'):
-		print('Skipping submission file [%s] with extension other than .tex' % submission_filename)
-		continue
+    if not submission_filename.endswith('.tex'):
+        print('Skipping submission file [%s] with extension other than .tex' % submission_filename)
+        continue
 
-	# Get the path to the submission file
-	submission_filepath = os.path.join(homework_path, submission_filename)
-	if submission_filepath in done:
-		print('Skipping submission file [%s] since it is already annotated' % submission_filename)
-		continue
-	
-	# Convert .tex into PDF, save it in the specified output directory, and flash it on the screen
-	try:
-		subprocess.call('pdflatex -output-directory %s %s' % (args.output_dir, submission_filepath), shell=True, stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
-		subprocess.call('open %s' % os.path.join(args.output_dir, submission_filename.replace('.tex', '.pdf')), shell=True, stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
-	except:
-		print('Could not parse submission file [%s]' % submission_filename)
-		continue
+    # Get the path to the submission file
+    submission_filepath = os.path.join(homework_path, submission_filename)
+    if submission_filepath in done:
+        print('Skipping submission file [%s] since it is already annotated' % submission_filename)
+        continue
+    
+    # Convert .tex into PDF, save it in the specified output directory, and flash it on the screen
+    try:
+        subprocess.call('pdflatex -output-directory %s %s' % (args.output_dir, submission_filepath), shell=True, stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+        subprocess.call('open %s' % os.path.join(args.output_dir, submission_filename.replace('.tex', '.pdf')), shell=True, stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+    except:
+        print('Could not parse submission file [%s]' % submission_filename)
+        continue
 
-	# Get next operation from the user
-	op = input('Press [n/N] for next file if the current file is annotated or [q/Q] to exit the program: ')
-	if op.lower() == 'n':
-		done.append(submission_filepath)
-		continue
-	elif op.lower() == 'q':
-		break
+    # Get next operation from the user
+    op = input('Press [n/N] for next file if the current file is annotated or [q/Q] to exit the program: ')
+    if op.lower() == 'n':
+        done.append(submission_filepath)
+        continue
+    elif op.lower() == 'q':
+        break
 
 # Save the done list into the .txt specified
 with open(args.done_path, 'w') as f:
-	for item in done:
-		f.write('%s\n' % item)
+    for item in done:
+        f.write('%s\n' % item)
