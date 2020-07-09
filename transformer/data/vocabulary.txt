@@ -1,0 +1,16 @@
+T
+F
+p
+q
+r
+~
+∨
+∧
+(
+)
+→
+[CLS]
+[SEP]
+[MASK]
+[PAD]
+[UNK]
