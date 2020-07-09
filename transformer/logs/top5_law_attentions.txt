@@ -1,0 +1,19 @@
+K = 4, L = 4 (MLM)
+---------Top K=5 Law Attentions:--------
+                     0  1  2      3  4
+commutativity        q  p  r      ∨  T
+logical_equivalence  p  q  r      T  ∨
+associativity        q  p  r      ∨  T
+tautology            T  →  ∧  [SEP]  r
+demorgan             →  ∧  T      p  q
+identity             T  q  r      p  (
+
+K = 6, L = 6 (MLM + Classification)
+---------Top K=5 Law Attentions:--------
+                         0  1  2  3  4
+commutativity        [SEP]  ∨  →  ~  p
+logical_equivalence  [SEP]  →  ~  ∨  q
+associativity        [SEP]  →  ∨  ~  (
+tautology            [SEP]  →  ∨  ~  q
+demorgan             [SEP]  →  ∨  ~  ∧
+identity             [SEP]  ∨  ~  q  r
