@@ -26,9 +26,53 @@ Num. Layers: 6
 Num. Attention Heads: 6
 Pretraining Tasks: MLM
 Finetuning Tasks: Step Classification
-Feature Extraction Methodology: Pooled Output of [CLS] token
+Feature Extraction Methodology: Pooled Output of [CLS] token (DIMS: 192)
 Evaluation Methodology: Pooled Output + nn.Linear() + logSoftmax() + NLL()
 Accuracy on train set of 39778 points: 100%
 Accuracy on test set of 19593 points: 100%
+
+Experiment # 4:
+---------------
+Num. Layers: 6
+Num. Attention Heads: 6
+Pretraining Tasks: MLM
+Finetuning Tasks: -
+Feature Extraction Methodology: Use the flattened pooled output (DIMS: 192)
+Evaluation Methodology: KNN
+Accuracy on train set of 39778 points: 99.64%
+Accuracy on test set of 19593 points: 98.70%
+
+Experiment # 5:
+---------------
+Num. Layers: 6
+Num. Attention Heads: 6
+Pretraining Tasks: MLM
+Finetuning Tasks: -
+Feature Extraction Methodology: Use the flattened sequence output (DIMS: 48 x 192)
+Evaluation Methodology: KNN
+Accuracy on train set of 39778 points: 99.90%
+Accuracy on test set of 19593 points: 99.68%
+
+Experiment # 6:
+---------------
+Num. Layers: 6
+Num. Attention Heads: 6
+Pretraining Tasks: MLM
+Finetuning Tasks: Step Classification
+Feature Extraction Methodology: Use the flattened pooled output (DIMS: 192)
+Evaluation Methodology: KNN
+Accuracy on train set of 39778 points: 99.95%
+Accuracy on test set of 19593 points: 99.88%
+
+Experiment # 7:
+---------------
+Num. Layers: 6
+Num. Attention Heads: 6
+Pretraining Tasks: MLM
+Finetuning Tasks: Step Classification
+Feature Extraction Methodology: Use the flattened sequence output (DIMS: 48 x 192)
+Evaluation Methodology: KNN
+Accuracy on train set of 39778 points: 99.97%
+Accuracy on test set of 19593 points: 99.91%
 
 

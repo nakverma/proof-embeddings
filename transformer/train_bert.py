@@ -64,7 +64,7 @@ TOKENIZER = BertTokenizer(vocab_file=VOCABULARY_PATH,
                           mask_token='[MASK]')
 
 if PRETRAIN:
-    # Get (supervised) datasets and data collator for masked-language-modeling
+    # Get (self-supervised) datasets and data collator for masked-language-modeling
     train_dataset = LogicDataset(data_path=DATA_PATH,
                                  tokenizer=TOKENIZER,
                                  sequence_length=SEQUENCE_LENGTH,

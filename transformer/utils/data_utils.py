@@ -37,7 +37,7 @@ class LogicDataset(Dataset):
     """
     def __init__(self, data_path, tokenizer, sequence_length,
                  data_mode, supervision_mode, tokenization_mode='bert',
-                 split='train', split_ratio=0.33, specific_laws=None, seed=42):
+                 split='train', split_ratio=0.33, specific_laws=None, seed=42, logging=True):
         super(LogicDataset).__init__()
 
         self.tokenizer = tokenizer
@@ -52,7 +52,8 @@ class LogicDataset(Dataset):
         assert data_path.endswith('.pkl')
         X, Y = load_pickle_data(data_path=data_path,
                                 specific_laws=specific_laws,
-                                data_mode=data_mode)
+                                data_mode=data_mode,
+                                logging=logging)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
                                                             test_size=split_ratio,
                                                             random_state=seed)
@@ -64,9 +65,10 @@ class LogicDataset(Dataset):
         else:
             raise ValueError('Only allowed split configs are "train" and "test"!')
 
-        counts = np.bincount(self.labels)
-        ii = np.nonzero(counts)[0]
-        print('Label Distribution for %s: ' % split, list(zip(ii, counts[ii])))
+        if logging:
+            counts = np.bincount(self.labels)
+            ii = np.nonzero(counts)[0]
+            print('Label Distribution for %s: ' % split, list(zip(ii, counts[ii])))
 
     def get_num_labels(self):
         return len(np.unique(self.labels))
@@ -292,7 +294,7 @@ def get_features(input_ids, tokenizer, device):
         # NOTE: Due to randomized word policy in mask_tokens(), this is not guaranteed!
 
         # Get segment IDs -> all 0s for first expression until first [SEP], all 1s for the second
-        # sequence until second [SEP], and continues so on
+        # sequence until second [SEP], including first [SEP], and so on
         token_type_ids_example = [0] * sep_locs[0]
         for i in range(1, len(sep_locs)):
             token_type_ids_example.extend([i] * (sep_locs[i] - sep_locs[i-1]))
@@ -300,7 +302,8 @@ def get_features(input_ids, tokenizer, device):
         # Complete token type IDs to full length with the next-up segment ID
         extend_length = len(input_ids_example) - len(token_type_ids_example)
         # If the next-token for the last-[SEP] is [PAD], fill with the latest, max token type ID
-        if input_ids_example[sep_locs[-1] + 1] == padding_token_id:
+        # NOTE: If the last-[SEP] is the last token, we apply the same logic as above
+        if sep_locs[-1] + 1 == len(input_ids_example) or input_ids_example[sep_locs[-1] + 1] == padding_token_id:
             token_type_ids_example.extend([max(token_type_ids_example)] * extend_length)
         # Otherwise, fill with a new token type ID that is +1 than the latest one
         else:
