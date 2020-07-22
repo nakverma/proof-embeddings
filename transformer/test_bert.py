@@ -3,12 +3,15 @@ from tqdm import tqdm
 import pandas as pd
 import pickle
 from collections import defaultdict
+import argparse
 
 import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from pylmnn import LargeMarginNearestNeighbor
+from sklearn.svm import OneClassSVM
+from sklearn.ensemble import IsolationForest
+from sklearn.metrics import precision_recall_fscore_support, classification_report
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -20,61 +23,65 @@ from transformers import BertTokenizer, BertConfig, BertForMaskedLM, BertForSequ
 
 from utils.data_utils import LogicDataset, LogicMLMDataCollator
 from utils.logic_utils import LogicLawCodes
-from utils.model_utils import get_features, get_normalized_attention, PerformanceMetrics
+from utils.model_utils import knn_classifier_evaluation, get_features, get_normalized_attention, PerformanceMetrics
+
+# Variables for data ops.
+parser = argparse.ArgumentParser(description='Script to test a BERT model on logic data')
+parser.add_argument('--seed', type=int, default=42, help='Set seeds for reproducibility')
+parser.add_argument('--batch_size', type=int, default=32, help='Batch size to be used in training and testing')
+parser.add_argument('--split_ratio', type=float, default=0.33, help='Ratio for the test set, rest will become the train set')
+parser.add_argument('--data_source', type=str, default='synthetic', choices=['synthetic', 'real'], help='Select which data to work with')
+# Variables for the configuration of the BERT model
+parser.add_argument('--sequence_length', type=int, default=48, help='Sequence length to be used in the model')
+parser.add_argument('--hidden_size', type=int, default=192, help='Hidden dimension size for the encoders in BERT')
+parser.add_argument('--num_hidden_layers', type=int, default=6, help='Number of encoder layers in BERT')
+parser.add_argument('--num_attention_heads', type=int, default=6, help='Number of attention heads in BERT')
+# Variables for configuration of the testing tasks and applications
+parser.add_argument('--load_choice', type=str, default='finetuned', choices=['pretrained', 'finetuned'], help='Select which saved model to test')
+parser.add_argument('--generate_data', default=False, action='store_true', help='Specify to generate and save data, possibly overwriting .npy files')
+parser.add_argument('--feature_extraction_method', type=str, default='pooled', choices=['sequence', 'pooled'], help='Select which features to use')
+parser.add_argument('--evaluate', default=False, action='store_true', help='Specify to evaluate the learned representations on a classification task')
+parser.add_argument('--evaluation_method', default='knn', choices=['lmnn+knn', 'knn'], help='Select which method to evaluate by')
+parser.add_argument('--n_neighbors', type=int, default=3, help='Num. neighbors to use in LMNN (if applicable) and KNN')
+parser.add_argument('--density_analysis', default=False, action='store_true', help='Specify to perform density analysis in the learned representation space')
+parser.add_argument('--use_pca', default=False, action='store_true', help='Specify to use PCA to project down; preferred when dimensionality is high (before t-SNE)')
+parser.add_argument('--pca_n_components', type=int, default=50, help='Number of components (i.e. principal axes) to use in PCA when applicable')
+parser.add_argument('--tsne_n_components', type=int, default=2, help='Number of components (i.e. low-dimension axes) to use in t-SNE')
+parser.add_argument('--compute_attention', default=False, action='store_true', help='Specify to compute attentions')
+parser.add_argument('--attention_method', type=str, default='last_layer_heads_average_kth_token', help='Method to compute attentions with')
+parser.add_argument('--exclude_special_tokens', default=True, action='store_true', help='Specify to exclude [CLS] and [SEP] from attention computation')
+parser.add_argument('--anomaly_detection_method', default=None, choices=['autoencoder', 'oneclasssvm', 'isolationforest'], help='Select which AD method to use')
+parser.add_argument('--include_fallacies', default=False, action='store_true', help='Specify to add fallacy steps in the test set')
+args = parser.parse_args()
+print('ARGS: ', args)
 
 # Configure device
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 print('DEVICE: ', DEVICE)
 
-# Configure load paths and choice for which model to be used in analysis
+# Set seeds for reproducibility
+torch.manual_seed(args.seed)
+np.random.seed(args.seed)
+if DEVICE == torch.device('cuda'):
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+# Configure load paths
 PRETRAINED_MODEL_PATH = os.path.join('saved_models', 'pretrained')
 FINETUNED_MODEL_PATH = os.path.join('saved_models', 'finetuned', 'step_classifier.pt')
-LOAD_CHOICE = 'finetuned'
-
-# Set hyperparameters
-SPLIT_RATIO = 0.33
-SEED = 42
-SEQUENCE_LENGTH = 48
-HIDDEN_SIZE = 192
-NUM_HIDDEN_LAYERS = 6
-NUM_ATTENTION_HEADS = 6
-
-# Set the operations you want to perform to True
-GENERATE_DATA = True
-FEATURE_EXTRACTION_METHODOLOGY = 'sequence'
-
-EVALUATE = True
-EVALUATION_METHODOLOGY = 'knn'
-N_NEIGHBOURS = 3
-
-DIMENSION_ANALYSIS = True
-USE_PCA = False  # When dimensionality is high, PCA before T-SNE is preferred
-PCA_N_COMPONENTS = 50
-NUM_TSNE_COMPONENTS = 2
-
-COMPUTE_ATTENTION = False
-ATTENTION_COMPUTATION_METHOD = 'last_layer_heads_average_kth_token'
-EXCLUDE_SPECIAL_TOKENS = True  # exclude [CLS] and [SEP] tokens from attention computations
-
-UNSUPERVISED_ANOMALY_DETECTION = False
-
-# Sanity check
-assert FEATURE_EXTRACTION_METHODOLOGY in ['pooled', 'sequence']
-assert EVALUATION_METHODOLOGY in ['lmnn+knn', 'knn']
-
-# Log for visibility
-print('FEATURE EXTRACTION METHODOLOGY: %s' % FEATURE_EXTRACTION_METHODOLOGY)
-print('LOAD CHOICE: %s' % LOAD_CHOICE)
 
 # Configure paths to .txt files for vocabulary and get vocabulary size
 VOCABULARY_PATH = os.path.join('data', 'vocabulary.txt')
 VOCABULARY_SIZE = len(open(VOCABULARY_PATH, 'r').readlines())
-# Configure path to .pkl file for actual logic tree data
-DATA_PATH = os.path.join('data', 'T_flat_unigram_dataset.pkl')
+# Configure path to .pkl file for synthetic logic tree data or .tsv for real student answers
+if args.data_source == 'synthetic':
+    DATA_PATH = os.path.join('data', 'T_flat_unigram_dataset.pkl')
+elif args.data_source == 'real':
+    DATA_PATH = os.path.join('data', 'student_answers.tsv')
 
 # Configure the tokenizer
 TOKENIZER = BertTokenizer(vocab_file=VOCABULARY_PATH,
-                          model_max_length=SEQUENCE_LENGTH,
+                          model_max_length=args.sequence_length,
                           do_lower_case=False,  # NOTE: No lower-case for T and F
                           do_basic_tokenize=True,
                           unk_token='[UNK]',
@@ -86,22 +93,42 @@ TOKENIZER = BertTokenizer(vocab_file=VOCABULARY_PATH,
 # Get datasets
 train_dataset = LogicDataset(data_path=DATA_PATH,
                              tokenizer=TOKENIZER,
-                             sequence_length=SEQUENCE_LENGTH,
+                             sequence_length=args.sequence_length,
                              split='train',
-                             split_ratio=SPLIT_RATIO,
+                             split_ratio=args.split_ratio,
                              supervision_mode='supervised',
                              data_mode='pairs',
-                             seed=SEED,
-                             logging=False)
+                             data_source=args.data_source,
+                             seed=args.seed,
+                             logging=True)
 test_dataset = LogicDataset(data_path=DATA_PATH,
                             tokenizer=TOKENIZER,
-                            sequence_length=SEQUENCE_LENGTH,
+                            sequence_length=args.sequence_length,
                             split='test',
-                            split_ratio=SPLIT_RATIO,
+                            split_ratio=args.split_ratio,
                             supervision_mode='supervised',
                             data_mode='pairs',
-                            seed=SEED,
-                            logging=False)
+                            data_source=args.data_source,
+                            seed=args.seed,
+                            logging=True)
+assert train_dataset.get_num_labels() == test_dataset.get_num_labels()
+
+# Optionally append fallacies to the test set for the later analyses (e.g. anomaly detection)
+if args.include_fallacies:
+    if args.data_source == 'real':
+        raise ValueError('You are adding synthetic fallacy data on top of real student data! Labels will not match!')
+
+    fallacy_dataset = LogicDataset(data_path=os.path.join('data', 'F_flat_unigram_dataset.pkl'),
+                                   tokenizer=TOKENIZER,
+                                   sequence_length=args.sequence_length,
+                                   split='test',
+                                   split_ratio=args.split_ratio,
+                                   supervision_mode='supervised',
+                                   data_mode='pairs',
+                                   specific_laws=['fallacy'],
+                                   seed=args.seed)
+    test_dataset = ConcatDataset([test_dataset, fallacy_dataset])
+
 print('Num Training Examples: %d \t Num. Testing Examples: %d' % (len(train_dataset), len(test_dataset)))
 
 # Get dataloaders
@@ -114,50 +141,33 @@ test_loader = DataLoader(dataset=test_dataset,
                          pin_memory=True,
                          shuffle=False)
 
-# Load pretrained model with correct config - we have to add num. labels for classification task
-assert train_dataset.get_num_labels() == test_dataset.get_num_labels()
-
-
-def evaluate(X_train, Y_train, X_test, Y_test):
-    # Fit the nearest neighbors classifier
-    knn = KNeighborsClassifier(n_neighbors=N_NEIGHBOURS, n_jobs=-1)
-    knn.fit(X_train, Y_train)
-
-    acc = knn.score(X_train, Y_train)
-    print('Accuracy on train set of {} points: {:.4f}'.format(X_train.shape[0], acc))
-    acc = knn.score(X_test, Y_test)
-    print('Accuracy on test set of {} points: {:.4f}'.format(X_test.shape[0], acc))
-
-
-if LOAD_CHOICE == 'finetuned':
+if args.load_choice == 'finetuned':
     # Configure our own custom BERT -- should be the same config as in train_language_model.py
     # NOTE: Don't forget to set output_hidden_states and output_attentions to True!
     config = BertConfig(vocab_size=VOCABULARY_SIZE,
-                        hidden_size=HIDDEN_SIZE,
-                        num_hidden_layers=NUM_HIDDEN_LAYERS,
-                        num_attention_heads=NUM_ATTENTION_HEADS,
-                        max_position_embeddings=SEQUENCE_LENGTH,
+                        hidden_size=args.hidden_size,
+                        num_hidden_layers=args.num_hidden_layers,
+                        num_attention_heads=args.num_attention_heads,
+                        max_position_embeddings=args.sequence_length,
                         num_labels=train_dataset.get_num_labels(),
                         output_hidden_states=True,
                         output_attentions=True)
 
     model = BertForSequenceClassification(config=config)
     model.load_state_dict(torch.load(FINETUNED_MODEL_PATH, map_location=DEVICE))
-elif LOAD_CHOICE == 'pretrained':
+elif args.load_choice == 'pretrained':
     model = BertForSequenceClassification.from_pretrained(PRETRAINED_MODEL_PATH,
                                                           output_hidden_states=True,
                                                           output_attentions=True,
                                                           num_labels=train_dataset.get_num_labels())
     # NOTE: In the case of pretrained, we won't be making use num_labels and hence the
     #       classification head on top of the base BERT model (i.e. encoder layers)
-else:
-    raise ValueError('Load choice "%s" is not recognized!' % LOAD_CHOICE)
 
 print('BERT Num. Parameters: %d' % model.num_parameters())
 # Place model on device
 model = model.to(DEVICE)
 
-if GENERATE_DATA:
+if args.generate_data:
     X_train, Y_train = [], []
     for batch in tqdm(train_loader, desc='Extracting Features for Training Data'):
         x, y = batch
@@ -176,9 +186,9 @@ if GENERATE_DATA:
         flattened_sequence_output = sequence_output.view(-1).detach().numpy()
         flattened_pooled_output = pooled_output.view(-1).detach().numpy()
 
-        if FEATURE_EXTRACTION_METHODOLOGY == 'sequence':
+        if args.feature_extraction_method == 'sequence':
             X_train.append(flattened_sequence_output)
-        elif FEATURE_EXTRACTION_METHODOLOGY == 'pooled':
+        elif args.feature_extraction_method == 'pooled':
             X_train.append(flattened_pooled_output)
         Y_train.append(y.data[0])
 
@@ -200,56 +210,60 @@ if GENERATE_DATA:
         flattened_sequence_output = sequence_output.view(-1).detach().numpy()
         flattened_pooled_output = pooled_output.view(-1).detach().numpy()
 
-        if FEATURE_EXTRACTION_METHODOLOGY == 'sequence':
+        if args.feature_extraction_method == 'sequence':
             X_test.append(flattened_sequence_output)
-        elif FEATURE_EXTRACTION_METHODOLOGY == 'pooled':
+        elif args.feature_extraction_method == 'pooled':
             X_test.append(flattened_pooled_output)
         Y_test.append(y.data[0])
 
     # Convert to numpy array
     X_train, Y_train, X_test, Y_test = np.array(X_train), np.array(Y_train), np.array(X_test), np.array(Y_test)
-    np.save(os.path.join('data', 'X_train_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)), X_train)
-    np.save(os.path.join('data', 'Y_train_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)), Y_train)
-    np.save(os.path.join('data', 'X_test_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)), X_test)
-    np.save(os.path.join('data', 'Y_test_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)), Y_test)
+    # Sanity checks for data
+    assert X_test.shape[0] == Y_test.shape[0] and X_train.shape[0] == Y_train.shape[0]
+    assert X_train.shape[-1] == X_test.shape[-1]
+    # Save the data for later use
+    np.save(os.path.join('data', 'X_train_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)), X_train)
+    np.save(os.path.join('data', 'Y_train_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)), Y_train)
+    np.save(os.path.join('data', 'X_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)), X_test)
+    np.save(os.path.join('data', 'Y_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)), Y_test)
 
-if EVALUATE:
-    X_train = np.load(os.path.join('data', 'X_train_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
-    Y_train = np.load(os.path.join('data', 'Y_train_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
-    X_test = np.load(os.path.join('data', 'X_test_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
-    Y_test = np.load(os.path.join('data', 'Y_test_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
+if args.evaluate:
+    X_train = np.load(os.path.join('data', 'X_train_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
+    Y_train = np.load(os.path.join('data', 'Y_train_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
+    X_test = np.load(os.path.join('data', 'X_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
+    Y_test = np.load(os.path.join('data', 'Y_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
 
     # Sanity checks for data
     assert X_train.shape[0] == Y_train.shape[0] and X_test.shape[0] == Y_test.shape[0]
     assert X_train.shape[-1] == X_test.shape[-1]
 
     print('----------------EVALUATING-------------------')
-    if EVALUATION_METHODOLOGY == 'lmnn+knn':
-        lmnn = LargeMarginNearestNeighbor(n_neighbors=N_NEIGHBOURS, max_iter=50, n_components=X_train.shape[-1], verbose=1, n_jobs=-1)
+    if args.evaluation_method == 'lmnn+knn':
+        lmnn = LargeMarginNearestNeighbor(n_neighbors=args.n_neighbors, max_iter=50,
+                                          n_components=X_train.shape[-1], verbose=1,
+                                          random_state=args.seed, n_jobs=-1)
         lmnn.fit(X_train, Y_train)
-        print(evaluate(X_train=lmnn.transform(X_train), Y_train=Y_train, X_test=lmnn.transform(X_test), Y_test=Y_test))
-    elif EVALUATION_METHODOLOGY == 'knn':
-        print(evaluate(X_train=X_train, Y_train=Y_train, X_test=X_test, Y_test=Y_test))
+        knn_classifier_evaluation(X_train=lmnn.transform(X_train), Y_train=Y_train,
+                                  X_test=lmnn.transform(X_test), Y_test=Y_test,
+                                  n_neighbors=args.n_neighbors)
+    elif args.evaluation_method == 'knn':
+        knn_classifier_evaluation(X_train=X_train, Y_train=Y_train,
+                                  X_test=X_test, Y_test=Y_test,
+                                  n_neighbors=args.n_neighbors)
 
-if DIMENSION_ANALYSIS:
-    X_train = np.load(os.path.join('data', 'X_train_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
-    Y_train = np.load(os.path.join('data', 'Y_train_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
-    X_test = np.load(os.path.join('data', 'X_test_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
-    Y_test = np.load(os.path.join('data', 'Y_test_%s_%s.npy' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
-
-    # Sanity checks for data
-    assert X_train.shape[0] == Y_train.shape[0] and X_test.shape[0] == Y_test.shape[0]
-    assert X_train.shape[-1] == X_test.shape[-1]
+if args.density_analysis:
+    print('---------------DENSITY ANALYSIS----------------')
+    X_test = np.load(os.path.join('data', 'X_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
+    Y_test = np.load(os.path.join('data', 'Y_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
 
     test_df = pd.DataFrame({}, columns=['representation', 'label'])
     test_df['representation'] = X_test.tolist()
     test_df['label'] = Y_test.tolist()
 
-    print('---------------DIMENSION ANALYSIS----------------')
-    if USE_PCA:
-        pca = PCA(n_components=PCA_N_COMPONENTS)
+    if args.use_pca:
+        pca = PCA(n_components=args.pca_n_components, random_state=args.seed)
         X_test = pca.fit_transform(X_test)
-        for i in range(PCA_N_COMPONENTS):
+        for i in range(args.pca_n_components):
             test_df['pca-%d' % (i + 1)] = X_test[:, i]
         print('Explained variation per principal component: {}'.format(pca.explained_variance_ratio_))
 
@@ -263,11 +277,12 @@ if DIMENSION_ANALYSIS:
             legend='full',
             alpha=0.9
         )
-        plt.savefig(os.path.join('logs', 'Xtest_pca2d_%d_%s_%s.png' % (PCA_N_COMPONENTS, FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.savefig(os.path.join('logs', 'Xtest_pca2d_%d_%s_%s.png' % (args.pca_n_components, args.feature_extraction_method, args.load_choice)))
 
-    tsne = TSNE(n_components=NUM_TSNE_COMPONENTS, verbose=1, perplexity=40.0, n_iter=1000)
+    tsne = TSNE(n_components=args.tsne_n_components, verbose=1, perplexity=30.0, n_iter=1000, random_state=args.seed)
     X_test = tsne.fit_transform(X_test)
-    for i in range(NUM_TSNE_COMPONENTS):
+    for i in range(args.tsne_n_components):
         test_df['tsne-%d' % (i + 1)] = X_test[:, i]
 
     plt.figure(figsize=(16, 10))
@@ -280,9 +295,10 @@ if DIMENSION_ANALYSIS:
         legend='full',
         alpha=0.9
     )
-    plt.savefig(os.path.join('logs', 'Xtest_tsne2d_%s_%s.png' % (FEATURE_EXTRACTION_METHODOLOGY, LOAD_CHOICE)))
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.savefig(os.path.join('logs', 'Xtest_tsne2d_%s_%s.png' % (args.feature_extraction_method, args.load_choice)))
 
-if COMPUTE_ATTENTION:
+if args.compute_attention:
     # Put laws (i.e. labels) inside this dictionary
     law_attentions = defaultdict(lambda: defaultdict(float))
     law_token_counts = defaultdict(lambda: defaultdict(int))
@@ -301,9 +317,9 @@ if COMPUTE_ATTENTION:
         tokens_and_weights = get_normalized_attention(model=model,
                                                       tokenizer=TOKENIZER,
                                                       raw_sentence=raw,
-                                                      method=ATTENTION_COMPUTATION_METHOD,
+                                                      method=args.attention_method,
                                                       k=raw.split().index('[SEP]'),
-                                                      exclude_special_tokens=EXCLUDE_SPECIAL_TOKENS,
+                                                      exclude_special_tokens=args.exclude_special_tokens,
                                                       normalization_method='min-max',
                                                       device=DEVICE)
 
@@ -342,123 +358,145 @@ if COMPUTE_ATTENTION:
 # Try to free some memory up!
 del train_loader, train_dataset, test_loader, model
 
-if UNSUPERVISED_ANOMALY_DETECTION:
-    DATA_PATH = os.path.join('data', 'F_flat_unigram_dataset.pkl')
-    fallacy_dataset = LogicDataset(data_path=DATA_PATH,
-                                   tokenizer=TOKENIZER,
-                                   sequence_length=SEQUENCE_LENGTH,
-                                   split='test',
-                                   split_ratio=SPLIT_RATIO,
-                                   supervision_mode='supervised',
-                                   data_mode='pairs',
-                                   specific_laws=['fallacy'],
-                                   seed=SEED)
-    test_dataset = ConcatDataset([test_dataset, fallacy_dataset])
+if args.anomaly_detection_method:
+    print('-----------------------ANOMALY DETECTION------------------------')
+    if args.anomaly_detection_method == 'autoencoder':
+        # NOTE: BERT could be viewed as an autoencoder (AE) language model
+        # Get data collator, we will use this separately for each example
+        data_collator = LogicMLMDataCollator(tokenizer=TOKENIZER, mask_probability=0.0)
 
-    # Get data loaders
-    test_loader = DataLoader(dataset=test_dataset,
-                             batch_size=1,
-                             pin_memory=True,
-                             shuffle=True)
+        # Get the MLM model -- we will use the loss on CLOZE task to detect anomaly
+        model = BertForMaskedLM.from_pretrained(PRETRAINED_MODEL_PATH)
+        print('BERT Num. Parameters: %d' % model.num_parameters())
+        # Place model on device
+        model = model.to(DEVICE)
 
-    # Get data collator, we will use this separately for each example
-    data_collator = LogicMLMDataCollator(tokenizer=TOKENIZER, mask_probability=0.0)
+        # Store laws (i.e. labels) losses inside a dictionary (i.e. averaged over all law examples)
+        law_losses = defaultdict(list)
 
-    # Get the MLM model -- we will use the loss on CLOZE task to detect anomaly
-    model = BertForMaskedLM.from_pretrained(PRETRAINED_MODEL_PATH)
-    print('BERT Num. Parameters: %d' % model.num_parameters())
-    # Place model on device
-    model = model.to(DEVICE)
+        for batch in tqdm(test_loader, desc='Unsupervised Anomaly Detection for Test Examples'):
+            x, y = batch
+            # Work with B (batch size) = 1 for visualization
+            assert x.shape[0] == 1
 
-    # Store laws (i.e. labels) losses inside a dictionary (i.e. averaged over all law examples)
-    law_losses = defaultdict(list)
+            # Initialize reconstruction loss for the current example
+            # NOTE: Reconstruction loss will be defined as the sum of losses in sequential CLOZE task
+            # NOTE: backward() will not be called on this loss; it is simply used for anomaly detection
+            reconstruction_loss = 0.0
 
-    for batch in tqdm(test_loader, desc='Unsupervised Anomaly Detection for Test Examples'):
-        x, y = batch
-        # Work with B (batch size) = 1 for visualization
-        assert x.shape[0] == 1
+            # Remove 'F' token for now; fallacy was not included in the train set!
+            # TODO: Other strategies to try include i) replacing with [UNK] token, and ii)
+            #       ii) completely removing the token at that timestep.
+            x[x == TOKENIZER.convert_tokens_to_ids('F')] = TOKENIZER.convert_tokens_to_ids('T')
 
-        # Initialize reconstruction loss for the current example
-        # NOTE: Reconstruction loss will be defined as the sum of losses in sequential CLOZE task
-        # NOTE: backward() will not be called on this loss; it is simply used for anomaly detection
-        reconstruction_loss = 0.0
+            # Create list of input IDs and labels to sum the loss over
+            batch_input_ids, labels = data_collator.sequentially_mask_tokens(input_ids=x)
 
-        # Remove 'F' token for now; fallacy was not included in the train set!
-        # TODO: Other strategies to try include i) replacing with [UNK] token, and ii)
-        #       ii) completely removing the token at that timestep.
-        x[x == TOKENIZER.convert_tokens_to_ids('F')] = TOKENIZER.convert_tokens_to_ids('T')
+            for input_ids in batch_input_ids:
+                # Place examples & labels on device
+                input_ids, labels = input_ids.to(DEVICE), labels.to(DEVICE)
+                # Get corresponding additional features from the current batch
+                token_type_ids, attention_mask = get_features(input_ids=input_ids,
+                                                              tokenizer=TOKENIZER,
+                                                              device=DEVICE)
+                predictions = model(input_ids=input_ids,
+                                    token_type_ids=token_type_ids,
+                                    attention_mask=attention_mask,
+                                    masked_lm_labels=labels)
+                # NOTE: MLM loss is returned directly by the model
+                # TODO: Do this yourself!
+                loss = predictions[0]
+                reconstruction_loss += loss.item()
 
-        # Create list of input IDs and labels to sum the loss over
-        batch_input_ids, labels = data_collator.sequentially_mask_tokens(input_ids=x)
+            # Normalize reconstruction loss by the num. sequential examples (i.e. num masked tokens)
+            reconstruction_loss /= len(batch_input_ids)
+            # Update dictionaries for losses and counts
+            law_losses[LogicLawCodes().label2name(y.item())].append(reconstruction_loss)
 
-        for input_ids in batch_input_ids:
-            # Place examples & labels on device
-            input_ids, labels = input_ids.to(DEVICE), labels.to(DEVICE)
-            # Get corresponding additional features from the current batch
-            token_type_ids, attention_mask = get_features(input_ids=input_ids,
-                                                          tokenizer=TOKENIZER,
-                                                          device=DEVICE)
-            predictions = model(input_ids=input_ids,
-                                token_type_ids=token_type_ids,
-                                attention_mask=attention_mask,
-                                masked_lm_labels=labels)
-            # NOTE: MLM loss is returned directly by the model
-            # TODO: Do this yourself!
-            loss = predictions[0]
-            reconstruction_loss += loss.item()
+        # Print statistics for each law losses list
+        for law in law_losses:
+            print('Law: ', law)
+            print('--------------------------------')
+            print('MEAN: ', np.mean(law_losses[law]))
+            print('STD: ', np.std(law_losses[law]))
+            print('MIN: ', np.min(law_losses[law]))
+            print('MAX: ', np.max(law_losses[law]))
+            print('--------------------------------')
 
-        # Normalize reconstruction loss by the num. sequential examples (i.e. num masked tokens)
-        reconstruction_loss /= len(batch_input_ids)
-        # Update dictionaries for losses and counts
-        law_losses[LogicLawCodes().label2name(y.item())].append(reconstruction_loss)
+        # Save law losses for inspection!
+        with open('law_losses.pkl', 'wb') as f:
+            pickle.dump(law_losses, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    # Print statistics for each law losses list
-    for law in law_losses:
-        print('Law: ', law)
-        print('--------------------------------')
-        print('MEAN: ', np.mean(law_losses[law]))
-        print('STD: ', np.std(law_losses[law]))
-        print('MIN: ', np.min(law_losses[law]))
-        print('MAX: ', np.max(law_losses[law]))
-        print('--------------------------------')
+        # Compute accuracy for anomaly detection (i.e. fallacy vs. all) across different threshold
+        min_loss = np.min(law_losses['fallacy']) / 2
+        max_loss = min_loss + ((np.mean(law_losses['fallacy']) - np.min(law_losses['fallacy'])) / 2)
+        thresholds, num_steps = [], 10
+        for i in range(num_steps):
+            thresholds.append(min_loss + (((max_loss - min_loss) / num_steps) * i))
 
-    # Save law losses for inspection!
-    with open('law_losses.pkl', 'wb') as f:
-        pickle.dump(law_losses, f, protocol=pickle.HIGHEST_PROTOCOL)
+        for threshold in thresholds:
+            print('Evaluating Performance for Threshold: %0.4f' % threshold)
+            print('----------------------------------------------------------------------------------')
+            # Compute some metrics (positive class is 'fallacy', and all other laws are negative class)
+            TP, FP, TN, FN = 0, 0, 0, 0
 
-    # Compute accuracy for anomaly detection (i.e. fallacy vs. all) across different threshold
-    min_loss = np.min(law_losses['fallacy']) / 2
-    max_loss = min_loss + ((np.mean(law_losses['fallacy']) - np.min(law_losses['fallacy'])) / 2)
-    thresholds, num_steps = [], 10
-    for i in range(num_steps):
-        thresholds.append(min_loss + (((max_loss - min_loss) / num_steps) * i))
-
-    for threshold in thresholds:
-        print('Evaluating Performance for Threshold: %0.4f' % threshold)
-        print('----------------------------------------------------------------------------------')
-        # Compute some metrics (positive class is 'fallacy', and all other laws are negative class)
-        TP, FP, TN, FN = 0, 0, 0, 0
-
-        for law, losses in law_losses.items():
-            for loss in losses:
-                if law == 'fallacy':
-                    if loss > threshold:
+            for law, losses in law_losses.items():
+                for loss in losses:
+                    if law == 'fallacy' and loss > threshold:
                         TP += 1
-                    else:
+                    elif law == 'fallacy' and loss <= threshold:
                         FP += 1
-                else:
-                    if loss > threshold:
+                    elif law != 'fallacy' and loss > threshold:
                         FN += 1
-                    else:
+                    elif law != 'fallacy' and loss <= threshold:
                         TN += 1
 
-        metrics = PerformanceMetrics(true_positive=TP,
-                                     false_positive=FP,
-                                     true_negative=TN,
-                                     false_negative=FN)
+            metrics = PerformanceMetrics(true_positive=TP, false_positive=FP, true_negative=TN, false_negative=FN)
+
+            print('TP: %d \t FP: %d \t TN: %d \t FN: %d' %
+                  (TP, FP, TN, FN))
+            print('Accuracy: %0.4f \t Recall: %0.4f \t Precision: %0.4f \t F1 Score: %0.4f' %
+                  (metrics.accuracy(), metrics.recall(), metrics.precision(), metrics.f1()))
+            print('----------------------------------------------------------------------------------')
+
+    elif args.anomaly_detection_method in ['oneclasssvm', 'isolationforest']:
+        # Apply methodology only on test data to fairly assess capability of learned representations
+        X_test = np.load(os.path.join('data', 'X_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
+        Y_test = np.load(os.path.join('data', 'Y_test_%s_%s.npy' % (args.feature_extraction_method, args.load_choice)))
+
+        # Reformat the labels based on the definition by scikit-learn: 1 is for normal
+        # data instances and -1 is for anomaly/outlier/novel data instances
+        for law in LogicLawCodes.LAWS:
+            if law['name'] == 'fallacy':
+                Y_test[Y_test == law['label']] = -1
+            else:
+                Y_test[Y_test == law['label']] = 1
+
+        # Define the model -- OneClassSVM() and IsolationForest() are commonly used
+        # algorithms used for unsupervised outlier detection
+        if args.anomaly_detection_method == 'oneclasssvm':
+            clf = OneClassSVM(kernel='rbf', gamma='auto', verbose=True, random_state=args.seed)
+        elif args.anomaly_detection_method == 'isolationforest':
+            clf = IsolationForest(n_estimators=200, n_jobs=-1, random_state=args.seed, verbose=1)
+
+        # Fit the model on the test set examples, without exposing the labels
+        clf.fit(X_test)
+
+        # Compute some metrics (positive class is 'fallacy' (i.e. anomaly class), and all other laws are negative class)
+        TP, FP, TN, FN = 0, 0, 0, 0
+        for ground_truth, prediction in zip(Y_test, clf.predict(X_test)):
+            if prediction == -1 and ground_truth == -1:
+                TP += 1
+            elif prediction == -1 and ground_truth == 1:
+                FP += 1
+            elif prediction == 1 and ground_truth == 1:
+                TN += 1
+            elif prediction == 1 and ground_truth == -1:
+                FN += 1
+
+        metrics = PerformanceMetrics(true_positive=TP, false_positive=FP, true_negative=TN, false_negative=FN)
 
         print('TP: %d \t FP: %d \t TN: %d \t FN: %d' %
               (TP, FP, TN, FN))
         print('Accuracy: %0.4f \t Recall: %0.4f \t Precision: %0.4f \t F1 Score: %0.4f' %
               (metrics.accuracy(), metrics.recall(), metrics.precision(), metrics.f1()))
-        print('----------------------------------------------------------------------------------')

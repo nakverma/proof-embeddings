@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import Dataset
 
-from utils.logic_utils import load_pickle_data
+from utils.logic_utils import load_pickle_data, load_tsv_data
 
 
 class LogicDataset(Dataset):
@@ -36,7 +36,7 @@ class LogicDataset(Dataset):
     :param (int) seed: random state to be used while splitting the data into train and test splits
     """
     def __init__(self, data_path, tokenizer, sequence_length,
-                 data_mode, supervision_mode, tokenization_mode='bert',
+                 data_mode, supervision_mode, data_source='synthetic', tokenization_mode='bert',
                  split='train', split_ratio=0.33, specific_laws=None, seed=42, logging=True):
         super(LogicDataset).__init__()
 
@@ -49,11 +49,18 @@ class LogicDataset(Dataset):
         self.supervision_mode = supervision_mode
         self.tokenization_mode = tokenization_mode
 
-        assert data_path.endswith('.pkl')
-        X, Y = load_pickle_data(data_path=data_path,
-                                specific_laws=specific_laws,
-                                data_mode=data_mode,
-                                logging=logging)
+        if data_source == 'synthetic':
+            assert data_path.endswith('.pkl')
+            X, Y = load_pickle_data(data_path=data_path,
+                                    specific_laws=specific_laws,
+                                    data_mode=data_mode,
+                                    logging=logging)
+        elif data_source == 'real':
+            assert data_path.endswith('.tsv')
+            X, Y = load_tsv_data(data_path=data_path,
+                                 data_mode=data_mode,
+                                 logging=logging)
+
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
                                                             test_size=split_ratio,
                                                             random_state=seed)
@@ -167,6 +174,7 @@ class LogicMLMDataCollator(object):
         # Fill in special token indices with 0.0 - we don't want them masked
         probabilities.masked_fill_(special_indices, value=0.0)
 
+        # TODO: Modularize the special tokens here and also in the end of this function!
         # If a padding token (e.g. [PAD], <pad>, etc.) exists in the tokenizer
         if self.tokenizer._pad_token is not None:
             # Get the padding indices in the input IDs
@@ -196,6 +204,13 @@ class LogicMLMDataCollator(object):
         randomized_indices = torch.bernoulli(torch.full(size=labels.shape, fill_value=0.5)).bool()
         randomized_indices = randomized_indices & masked_indices & ~replaced_indices
         random_tokens = torch.randint(high=len(self.tokenizer), size=labels.shape, dtype=torch.long)
+        # Remove special tokens from the random tokens ([SEP] creates a problem in this project)
+        disallowed_token_ids = [self.tokenizer.sep_token_id]
+        allowed_token_ids = [i for i in range(len(self.tokenizer)) if i not in disallowed_token_ids]
+        for token_id in disallowed_token_ids:
+            replacement_token_id = np.random.choice(allowed_token_ids, size=1)
+            random_tokens[random_tokens == token_id] = torch.tensor(replacement_token_id, dtype=torch.long)
+
         input_ids[randomized_indices] = random_tokens[randomized_indices]
 
         # 10% of the time, we keep the remaining masked input tokens unchanged

@@ -3,7 +3,22 @@ import torch
 from tqdm import tqdm
 from utils.data_utils import get_features
 
+from sklearn.neighbors import KNeighborsClassifier
+
 from transformers import AdamW, get_linear_schedule_with_warmup
+
+
+def knn_classifier_evaluation(X_train, Y_train, X_test, Y_test, n_neighbors):
+    """
+    Function to fit a K-Nearest Neighbors (KNN) algorithm to evaluate the learned
+    representation space. The expectation is that same label instances will be located closer
+    to each other in the feature space.
+    """
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1)
+    knn.fit(X_train, Y_train)
+    train_acc, test_acc = knn.score(X_train, Y_train), knn.score(X_test, Y_test)
+    print('Accuracy on train set of %d points: %0.4f' % (X_train.shape[0], train_acc))
+    print('Accuracy on test set of %d points: %0.4f' % (X_test.shape[0], test_acc))
 
 
 def accuracy(y_pred, y_true):
