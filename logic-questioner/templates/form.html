@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<br/>
+<h1 class="latex" style="text-align: center">Logic Questioner</h1>
+<br/>
+
+{% from "includes/formhelpers.html" import render_field %}
+
+<h5 style="text-align: center">{{ form.question }}</h5>
+<form action="" method="POST" style="width: 50%; margin: 0 auto;">
+    {% for string_field in form.steps %}
+        <datalist id="autocomplete">
+            {% for option in string_field.options %}
+            <option> {{ option }} </option>
+            {% endfor %}
+        </datalist>
+        {{ string_field.hidden_tag() }}
+        {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
+        {{ render_field(string_field.step, class="form-control", autocomplete='off', list="autocomplete") }}
+    {% endfor %}
+    <br/>
+    <output style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">{{ form.output }}</output>
+    <br/>
+    <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
+        <button type="submit" class="btn btn-danger" name="next" value="NEXT" style="width: 25%;">NEW STEP</button>
+        <span style="width: 10px"></span>
+        <button type="submit" class="btn btn-danger" name="end" value="END" style="width: 25%;">END</button>
+    </div>
+
+</form>
+
+{% endblock body %}
+
+
