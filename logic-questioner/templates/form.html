@@ -9,7 +9,7 @@
 {% from "includes/formhelpers.html" import render_field %}
 
 <h5 style="text-align: center">{{ form.question }}</h5>
-<form action="" method="POST" style="width: 50%; margin: 0 auto;">
+<form action="" method="POST" style="width: 75%; margin: 0 auto;">
     {% for string_field in form.steps %}
         <datalist id="autocomplete">
             {% for option in string_field.options %}
@@ -18,18 +18,166 @@
         </datalist>
         {{ string_field.hidden_tag() }}
         {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
-        {{ render_field(string_field.step, class="form-control", autocomplete='off', list="autocomplete") }}
+
+        <div style="width:30%; margin-right:2%; float: left;">
+            {{ render_field(string_field.law, class="form-control") }}
+        </div>
+        <div style="width:65%; float: left;" class="autocomplete">
+            {% if string_field.error %}
+                {{ render_field(string_field.step, style="border-color: red", class="form-control", autocomplete="off", errors=string_field.error) }}
+            {% else %}
+                {{ render_field(string_field.step, class="form-control", autocomplete="off") }}
+            {% endif %}
+        </div>
+
     {% endfor %}
+
     <br/>
     <output style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">{{ form.output }}</output>
     <br/>
     <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
         <button type="submit" class="btn btn-danger" name="next" value="NEXT" style="width: 25%;">NEW STEP</button>
         <span style="width: 10px"></span>
-        <button type="submit" class="btn btn-danger" name="end" value="END" style="width: 25%;">END</button>
+        <button type="submit" class="btn btn-danger" name="end" value="END" style="width: 25%;">SUBMIT</button>
     </div>
 
 </form>
+
+<script>
+    function autocomplete(inp, arr) {
+        /* the autocomplete function takes two arguments, the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) {
+                return false;
+            }
+            currentFocus = -1;
+
+            arr = [];
+            var first_type_tokens = ["p", "q", "r"];
+            var second_type_tokens = ["v", "^"];
+            var last_token = this.value.substr(this.value.length - 1);
+            if (first_type_tokens.includes(last_token)) {
+                for (i = 0; i < second_type_tokens.length; i++) {
+                    arr.push(this.value + second_type_tokens[i]);
+                }
+                arr.push(this.value + ")");
+            } else if (second_type_tokens.includes(last_token)) {
+                for (i = 0; i < first_type_tokens.length; i++) {
+                    arr.push(this.value + first_type_tokens[i]);
+                }
+                arr.push(this.value + "(");
+            } else if (last_token == "(") {
+                for (i = 0; i < first_type_tokens.length; i++) {
+                    arr.push(this.value + first_type_tokens[i]);
+                }
+            } else if (last_token == ")") {
+                for (i = 0; i < second_type_tokens.length; i++) {
+                    arr.push(this.value + second_type_tokens[i]);
+                }
+            }
+
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        });
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script type="text/javascript">
+    var start_tokens = [")", "(", "~", "¬", "p", "q", "r"];
+    num_steps = document.querySelectorAll('.autocomplete').length;
+    for (i = 0; i < num_steps; i++) {
+        autocomplete(document.getElementById("steps-" + i.toString() + "-step"), start_tokens);
+    }
+</script>
 
 {% endblock body %}
 
