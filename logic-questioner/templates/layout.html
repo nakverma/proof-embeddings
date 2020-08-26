@@ -5,6 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"
 </head>
+<style>
+    .autocomplete {
+      /*the container must be positioned relative:*/
+      position: relative;
+      display: inline-block;
+    }
+
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid #d4d4d4;
+      border-bottom: none;
+      border-top: none;
+      z-index: 99;
+      /*position the autocomplete items to be the same width as the container:*/
+      top: 100%;
+      left: 0;
+      right: 0;
+    }
+    .autocomplete-items div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #fff;
+      border-bottom: 1px solid #d4d4d4;
+    }
+    .autocomplete-items div:hover {
+      /*when hovering an item:*/
+      background-color: #e9e9e9;
+    }
+    .autocomplete-active {
+      /*when navigating through the items using the arrow keys:*/
+      background-color: DodgerBlue !important;
+      color: #ffffff;
+    }
+</style>
 <body>
     <div class="container">
         {% include "includes/messages.html" %}
