@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, flash
-from wtforms import Form, StringField, validators, FormField, FieldList, Label, TextAreaField, SelectField
-from wtforms.validators import StopValidation, ValidationError, InputRequired
+from flask import Flask, render_template, request
+from wtforms import Form, StringField, FormField, FieldList, Label, SelectField
+from wtforms.validators import InputRequired
 from flask_wtf import FlaskForm
 import random
-from wtforms.compat import string_types, text_type
 
 from check_syntax import checkSyntax
 
@@ -17,7 +16,6 @@ questions = ["Prove that (p∨q)∨(p∨¬q) is a tautology.",
              "Prove that (¬(¬x))↔x is a tautology.",
              "Prove that ((p→q)∧(q→r))→(p→r) is a tautology."]
 random_question = random.choice(questions)
-start_tokens = ['(', '~', '¬', 'p', 'q', 'r']
 laws = ['', 'Identity', 'Tautology', 'Associativity', 'Commutativity', 'Logical Equivalence', 'DeMorgan', 'Fallacy']
 
 
@@ -37,7 +35,6 @@ class StepForm(FlaskForm):
     step = StringField(label="Step")
     law = SelectField(label="Law", validators=[InputRequired()], choices=laws)
     error = None
-    options = start_tokens
 
 
 class WireForm(Form):
@@ -86,4 +83,5 @@ def steps2output(steps):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Threaded option to enable multiple instances for multiple user access support
+    app.run(threaded=True)

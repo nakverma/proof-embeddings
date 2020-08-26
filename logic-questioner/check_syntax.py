@@ -4,7 +4,6 @@ from sly import Parser
 import re
 import sys
 
-
 class LogicLexer(Lexer):
     # Set of token names.   This is always required
 
