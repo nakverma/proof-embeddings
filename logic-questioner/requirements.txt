@@ -133,6 +133,7 @@ GPyOpt==1.2.6
 greenlet==0.4.15
 grip==4.5.2
 grpcio==1.24.3
+gunicorn==20.0.4
 gym==0.17.1
 h2o==3.24.0.5
 h5py==2.8.0
