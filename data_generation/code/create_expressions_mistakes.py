@@ -3187,163 +3187,15 @@ class LogicTreeTrainer():
 
 
 
-
-
-
-#
-#
-#
-#
-#
-# t = LogicTreeTrainer('~((p∧~r)∨(q∧~r)∨(~p∧~q))→r',expand=None)
-# t.increment_ops(2)
-#
-# seqs = t.get_sequences()
-#
-#
-# new_seqs = []
-# for seq in seqs:
-#     new_seq = []
-#     for (tree,op) in seq:
-#         # if seq[-1][0].parse_tree() == 'T':
-#         if seq[-1][1] == 58:
-#             expr = tree.parse_tree()
-#             new_seq.append((expr,op))
-#     if new_seq:
-#         new_seqs.append(new_seq)
-#
-# new_seqs
-#
-#
-# ((p∧~r)∨(q∧~r)∨(~p∧~q))∨r
-# ((p∧~r)∨(q∧~r)∨(~p∨~q))∨r
-#
-#
-# pf_strs = []
-# for t in trees:
-#     # for loc_parses in t.parse_tree():
-#     tree_strs.append(t.parse_tree())
-#
-#
-# len(tree_strs)
-#
-#
-#
-# tree_strs
-
-
-
-# op_seq=['ASSOCIATIVITY','COMMUTATIVITY','ASSOCIATIVITY','INDEMPOTENCE','COMMUTATIVITY','NEGATION','DOMINATION']
-# t = LogicTreeTrainer('(pvq)v(pv~q)', expand=None, op_seq=op_seq, op_pairs=False)
-#
-# t.increment_ops(7)
-# exps = [tr.parse_tree() for tr in t.get_trees()]
-#
-# exps
-
-
-
-
-
-
-
-# op_seq=['ASSOCIATIVITY','ASSOCIATIVITY','ASSOCIATIVITY']
-# t = LogicTreeTrainer('(~p∨p)∧(~p∨p)', expand=None, op_seq=['DISTRIBUTIVITY'], op_pairs=False)
-# t.increment_ops()
-#
-# seqs = t.get_sequences()
-# new_seqs = []
-# exprs2 = []
-# for seq in seqs:
-#     new_seq = []
-#     # if seq[-1][0].parse_tree() == 'T':
-#     for (tree,op) in seq:
-#         expr = tree.parse_tree()
-#         new_seq.append((expr,op))
-#         if expr != 'p∨q∨p∨~q':
-#             exprs2.append(expr)
-#     new_seqs.append(new_seq)
-#
-# new_seqs
-
-
-
-
-
-
-
-
-
-
-
-# st = LogicTreeTrainer('p↔p', False)
-#
-# t.increment_ops()
-#
-# [a.parse_tree() for a in t.get_trees()]
-#
-#
-#
-# p1 = '(pvq)v(pv~q)'
-# p2 = '((p→r)^(q→r)^(pvq))→r'
-# p3 = '~(~p)->p'
-#
-# trainer = LogicTreeTrainer(p3, expand=False)
-#
-#
-# trainer.increment_ops(5)
-#
-# # trees = trainer.get_trees()
-# # exprs = [tree.parse_tree() for tree in trees]
-#
-# seqs = trainer.get_tree_sequences()
-#
-# type(seqs[0][1])
-#
-#
-#
-# exprs = []
-# for tup in seqs:
-#     ops = [tup[1][i][1] for i in range(len(tup[1]))]
-#     es = [tup[1][i][0].parse_tree() for i in range(len(tup[1]))]
-#
-#     # if 54 in ops:
-#     # if tup[1][-1][0].parse_tree() == 'T':
-#     if 1:
-#     # has_f = False
-#     # for e in es:
-#     #     if F in e:
-#     #         has_f = True
-#     # if has_f:
-#         seq = tup[1]
-#         new_seq = []
-#         for pair in seq:
-#             new_seq.append((pair[0].parse_tree(), pair[1]))
-#             # new_seq.append((pair[0], pair[1]))
-#         exprs.append(new_seq)
-#
-# exprs
-
-
-
-
-# trainer = LogicTreeTrainer('T')
-# trainer.increment_ops(3)
-# synth_mistks = trainer.generate_mistakes(20)
-#
-# synth_mistks
-
-
 if __name__ == '__main__':
 
-    # trainer = LogicTreeTrainer('T', expand=True)
-    # trainer.increment_ops(4)
+    trainer = LogicTreeTrainer('T', expand=None)
+    trainer.increment_ops(1)
     #
     # save = '../data/unduped/T_unduped_mistakes.pkl'
     # pkl.dump(trainer, open(save,'wb'))
 
-
-
+    """
     trainers = []
 
     starting_exprs = ['~(~p)↔p']
@@ -3358,7 +3210,7 @@ if __name__ == '__main__':
         seed = starting_exprs[i]
         save = '../data/unduped/' + seed + '_unduped_mistakes.pkl'
         pkl.dump(trainer, open(save, 'wb'))
-
+    """
 
 
 
