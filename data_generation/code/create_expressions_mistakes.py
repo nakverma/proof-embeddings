@@ -14,6 +14,7 @@ import pickle as pkl
 import copy
 import numpy as np
 import sys
+import ast
 import random
 import math
 from collections import Iterable
@@ -24,6 +25,7 @@ from parsing_logic.scan_parse import *
 
 import networkx as nx
 
+from sympy import *
 
 
 """
@@ -1853,7 +1855,6 @@ class LogicTree():
         node.parent = self
         self.root = node
 
-
     def construct_tree(self, logexpr):
         lexer = LogicLexer()
         parser = LogicParser()
@@ -1921,8 +1922,6 @@ class LogicTree():
                 sys.exit()
 
         self.set_root(construct_helper(ast))
-
-
 
     def set_computed_ops(self, ops):
         self.computed_ops = ops
@@ -2047,7 +2046,6 @@ class LogicTree():
         deep_ops_helper(self, self)
         return new_trees
 
-
     def parse_tree(self):
         if isinstance(self.root, BinaryNode) or isinstance(self.root, N_aryNode):
             tmp_str = self.root.parse()
@@ -2118,6 +2116,43 @@ class LogicTree():
 
         make_helper(self.root)
         return G
+
+    def make_sympy(self):
+
+        p,q,r = symbols('p,q,r')
+
+        def make_helper(node):
+
+            if isinstance(node, PNode):
+                return p
+            elif isinstance(node, QNode):
+                return q
+            elif isinstance(node, RNode):
+                return r
+            elif isinstance(node, TrueNode):
+                return sympy.true
+            elif isinstance(node, FalseNode):
+                return sympy.false
+            elif isinstance(node, NotNode):
+                return Not(make_helper(node.arg))
+            elif isinstance(node, OrNode):
+                oplst = []
+                for op in node.operands:
+                    oplst.append(make_helper(op))
+                return Or(*oplst)
+            elif isinstance(node, AndNode):
+                oplst = []
+                for op in node.operands:
+                    oplst.append(make_helper(op))
+                return And(*oplst)
+            elif isinstance(node, ImplicationNode):
+                return Implies(node.left, node.right)
+            elif isinstance(node, DblimplicationNode):
+                return And(node.left>>node.right, node.left<<node)
+
+        return make_helper(self.root)
+
+
 
 
 class LogicTreeTrainer():
@@ -3152,15 +3187,177 @@ class LogicTreeTrainer():
 
 
 
+
+
+
+#
+#
+#
+#
+#
+# t = LogicTreeTrainer('~((p∧~r)∨(q∧~r)∨(~p∧~q))→r',expand=None)
+# t.increment_ops(2)
+#
+# seqs = t.get_sequences()
+#
+#
+# new_seqs = []
+# for seq in seqs:
+#     new_seq = []
+#     for (tree,op) in seq:
+#         # if seq[-1][0].parse_tree() == 'T':
+#         if seq[-1][1] == 58:
+#             expr = tree.parse_tree()
+#             new_seq.append((expr,op))
+#     if new_seq:
+#         new_seqs.append(new_seq)
+#
+# new_seqs
+#
+#
+# ((p∧~r)∨(q∧~r)∨(~p∧~q))∨r
+# ((p∧~r)∨(q∧~r)∨(~p∨~q))∨r
+#
+#
+# pf_strs = []
+# for t in trees:
+#     # for loc_parses in t.parse_tree():
+#     tree_strs.append(t.parse_tree())
+#
+#
+# len(tree_strs)
+#
+#
+#
+# tree_strs
+
+
+
+# op_seq=['ASSOCIATIVITY','COMMUTATIVITY','ASSOCIATIVITY','INDEMPOTENCE','COMMUTATIVITY','NEGATION','DOMINATION']
+# t = LogicTreeTrainer('(pvq)v(pv~q)', expand=None, op_seq=op_seq, op_pairs=False)
+#
+# t.increment_ops(7)
+# exps = [tr.parse_tree() for tr in t.get_trees()]
+#
+# exps
+
+
+
+
+
+
+
+# op_seq=['ASSOCIATIVITY','ASSOCIATIVITY','ASSOCIATIVITY']
+# t = LogicTreeTrainer('(~p∨p)∧(~p∨p)', expand=None, op_seq=['DISTRIBUTIVITY'], op_pairs=False)
+# t.increment_ops()
+#
+# seqs = t.get_sequences()
+# new_seqs = []
+# exprs2 = []
+# for seq in seqs:
+#     new_seq = []
+#     # if seq[-1][0].parse_tree() == 'T':
+#     for (tree,op) in seq:
+#         expr = tree.parse_tree()
+#         new_seq.append((expr,op))
+#         if expr != 'p∨q∨p∨~q':
+#             exprs2.append(expr)
+#     new_seqs.append(new_seq)
+#
+# new_seqs
+
+
+
+
+
+
+
+
+
+
+
+# st = LogicTreeTrainer('p↔p', False)
+#
+# t.increment_ops()
+#
+# [a.parse_tree() for a in t.get_trees()]
+#
+#
+#
+# p1 = '(pvq)v(pv~q)'
+# p2 = '((p→r)^(q→r)^(pvq))→r'
+# p3 = '~(~p)->p'
+#
+# trainer = LogicTreeTrainer(p3, expand=False)
+#
+#
+# trainer.increment_ops(5)
+#
+# # trees = trainer.get_trees()
+# # exprs = [tree.parse_tree() for tree in trees]
+#
+# seqs = trainer.get_tree_sequences()
+#
+# type(seqs[0][1])
+#
+#
+#
+# exprs = []
+# for tup in seqs:
+#     ops = [tup[1][i][1] for i in range(len(tup[1]))]
+#     es = [tup[1][i][0].parse_tree() for i in range(len(tup[1]))]
+#
+#     # if 54 in ops:
+#     # if tup[1][-1][0].parse_tree() == 'T':
+#     if 1:
+#     # has_f = False
+#     # for e in es:
+#     #     if F in e:
+#     #         has_f = True
+#     # if has_f:
+#         seq = tup[1]
+#         new_seq = []
+#         for pair in seq:
+#             new_seq.append((pair[0].parse_tree(), pair[1]))
+#             # new_seq.append((pair[0], pair[1]))
+#         exprs.append(new_seq)
+#
+# exprs
+
+
+
+
+# trainer = LogicTreeTrainer('T')
+# trainer.increment_ops(3)
+# synth_mistks = trainer.generate_mistakes(20)
+#
+# synth_mistks
+
+
 if __name__ == '__main__':
 
-    trainer = LogicTreeTrainer('T', expand=True)
-    trainer.increment_ops(4)
-    
-    save = '../data/T_trainer.pkl'
-    pkl.dump(trainer, open(save,'wb'))
+    # trainer = LogicTreeTrainer('T', expand=True)
+    # trainer.increment_ops(4)
+    #
+    # save = '../data/unduped/T_unduped_mistakes.pkl'
+    # pkl.dump(trainer, open(save,'wb'))
 
 
+
+    trainers = []
+
+    starting_exprs = ['~(~p)↔p']
+    for expr in starting_exprs:
+        print("building trees from " + expr)
+        trainer = LogicTreeTrainer(expr,expand=None)
+        trainer.increment_ops(4)
+        trainers.append(trainer)
+
+    for i in range(len(trainers)):
+        trainer = trainers[i]
+        seed = starting_exprs[i]
+        save = '../data/unduped/' + seed + '_unduped_mistakes.pkl'
+        pkl.dump(trainer, open(save, 'wb'))
 
 
 
