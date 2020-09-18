@@ -153,7 +153,7 @@ StudentID   |   Skipped_Steps   |   Ammended_Steps  |   Ammended_Step_Types
 
 test = [correct_responses[0]]
 
-
+print("Ammending", len(correct_responses), "responses")
 for (response,id) in correct_responses:
 
     ammended = []
