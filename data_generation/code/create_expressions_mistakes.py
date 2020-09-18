@@ -3193,14 +3193,13 @@ class LogicTreeTrainer():
 
 if __name__ == '__main__':
 
-    # trainer = LogicTreeTrainer('T', expand=True)
-    # trainer.increment_ops(4)
+    trainer = LogicTreeTrainer('T', expand=None)
+    trainer.increment_ops(1)
     #
     # save = '../data/unduped/T_unduped_mistakes.pkl'
     # pkl.dump(trainer, open(save,'wb'))
 
-
-
+    """
     trainers = []
 
     starting_exprs = ['~(~p)↔p']
@@ -3215,6 +3214,6 @@ if __name__ == '__main__':
         seed = starting_exprs[i]
         save = '../data/unduped/' + seed + '_unduped_mistakes.pkl'
         pkl.dump(trainer, open(save, 'wb'))
-
+    """
 
 # comment

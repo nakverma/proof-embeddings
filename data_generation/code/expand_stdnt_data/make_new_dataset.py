@@ -17,16 +17,6 @@ from collections import defaultdict
 import random
 from random import shuffle
 
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
-from sklearn.manifold import TSNE
-
-
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
-
-
-
 
 
 class BOW_exprs():
@@ -119,12 +109,10 @@ def convert_to_logic_symbols(expr):
 
 df = pd.read_csv('../../data/student_responses/student_answers.csv')
 
-q_ids = ['F19_HW2_Q3_P1', ]
 
 correct_responses = []
 for i in range(len(df)):
-    if int(df['Answer Correct/Incorrect'][i]) and \
-                df['QuestionID'][i] == 'F19_HW2_Q3_P1':
+    if int(df['Answer Correct/Incorrect'][i]):
         rspons = list(map(convert_to_logic_symbols, \
                     ast.literal_eval(df['Student Response'][i])))
 
@@ -165,7 +153,7 @@ StudentID   |   Skipped_Steps   |   Ammended_Steps  |   Ammended_Step_Types
 
 test = [correct_responses[0]]
 
-
+print("Ammending", len(correct_responses), "responses")
 for (response,id) in correct_responses:
 
     ammended = []
