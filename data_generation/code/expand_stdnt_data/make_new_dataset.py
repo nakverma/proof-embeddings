@@ -107,7 +107,7 @@ def convert_to_logic_symbols(expr):
     return new_expr
 
 
-df = pd.read_csv('../../data/student_responses/student_answers.csv')
+df = pd.read_csv('../../data/student_responses/student_answers_complex.csv')
 
 
 correct_responses = []
@@ -250,9 +250,7 @@ for indxx in range(len(correct_responses)):
     for i in range(len(new_steps)):
         data_lst.append((id, response, new_steps[i], new_ops[i]))
 
-
-
-pkl.dump(data_lst, open('./data.pkl', 'wb'))
+    pkl.dump(data_lst, open('./data.pkl', 'wb'))
 
 
 
