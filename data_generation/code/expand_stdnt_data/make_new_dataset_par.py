@@ -118,7 +118,7 @@ def convert_to_logic_symbols(expr):
     return new_expr
 
 
-df = pd.read_csv('../../data/student_responses/student_answers.csv')
+df = pd.read_csv('../../data/student_responses/student_answers_complex.csv')
 
 q_ids = ['F19_HW2_Q3_P1', 'F19_HW2_Q3_P2', 'F19_HW2_Q3_P3', 'S19_HW2_Q3_P2']
 
