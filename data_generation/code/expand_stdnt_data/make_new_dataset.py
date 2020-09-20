@@ -154,7 +154,9 @@ StudentID   |   Skipped_Steps   |   Ammended_Steps  |   Ammended_Step_Types
 test = [correct_responses[0]]
 
 print("Ammending", len(correct_responses), "responses")
-for (response,id) in correct_responses:
+for indxx in range(len(correct_responses)):
+    print("response #", indxx)
+    response, id = correct_responses[indxx]
 
     ammended = []
 

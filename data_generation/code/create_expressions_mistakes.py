@@ -1935,6 +1935,8 @@ class LogicTree():
         return new_tree
 
     def deep_ops(self,expand):
+        deleted_objs = gc.collect()
+        print("Doing deep_ops, deleted",deleted_objs,"objects")
 
         original_tree = self.copy()
         self.computed_ops += 1
@@ -1968,8 +1970,7 @@ class LogicTree():
             if isinstance(node, PNode) or \
                 isinstance(node, QNode) or \
                 isinstance(node, RNode):
-                deleted_objs = gc.collect()
-                # print("Doing deep_ops, deleted",deleted_objs,"objects")
+                pass
                 # MAY NEED TO HAVE A BASE CASE HERE...
 
             # IF THE NODE IS THE LOGICTREE
