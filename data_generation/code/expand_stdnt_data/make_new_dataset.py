@@ -125,6 +125,9 @@ for i in range(len(df)):
 st = []
 st.append(convert_to_logic_symbols("(pvq)v(pv~q)"))
 st.append(convert_to_logic_symbols("((p->r)^(q->r)^(pvq))->r"))
+st.append(convert_to_logic_symbols("(~(~x))<->x"))
+st.append(convert_to_logic_symbols("((p->q)^(q->r))->(p->r)"))
+
 correct_responses = [r for r in correct_responses if r[0][0] in st]
 
 all_symbols = list(bow.symbols.keys())
