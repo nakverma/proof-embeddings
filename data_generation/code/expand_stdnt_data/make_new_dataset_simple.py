@@ -233,10 +233,11 @@ for indxx in range(len(correct_responses)):
             new_ops = []
 
             for i in range(len(tmp_steps)):
-                tstps = tmp_steps[i].copy()
-                tops = tmp_ops[i].copy()
-
                 for j in range(len(steps)):
+                    tstps = tmp_steps[i].copy()
+                    tops = tmp_ops[i].copy()
+
+
                     nstps = steps[j][1:]
                     nops = ops[j][1:]
 
