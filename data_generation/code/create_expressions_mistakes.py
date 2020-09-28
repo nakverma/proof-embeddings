@@ -1935,8 +1935,7 @@ class LogicTree():
         return new_tree
 
     def deep_ops(self,expand):
-        deleted_objs = gc.collect()
-        print("Doing deep_ops, deleted",deleted_objs,"objects")
+        #deleted_objs = gc.collect()
 
         original_tree = self.copy()
         self.computed_ops += 1
@@ -2265,7 +2264,7 @@ class LogicTreeTrainer():
             print(len(self.trees))
 
             deleted = gc.collect()
-            # print("Doing increment_ops, deleted",deleted,"objects")
+            print("Doing increment_ops, deleted",deleted,"objects")
 
 
     def duplicates_info(self):
