@@ -7,7 +7,7 @@ checking student response deterministically
 import sys
 sys.path.append('../')
 from create_expressions_mistakes import *
-
+from bow_representation import BOW_exprs
 
 import pandas as pd
 import numpy as np
@@ -18,7 +18,7 @@ import random
 from random import shuffle
 
 
-
+"""
 class BOW_exprs():
 
     def __init__(self, source=None, out=None):
@@ -95,6 +95,9 @@ class BOW_exprs():
             return self.bow_unigram(expr) + self.bow_bigram(expr)
         else:
             return self.bow_unigram(expr) + self.bow_bigram(expr) + self.bow_trigram(expr)
+
+"""
+
 bow = BOW_exprs()
 
 
@@ -103,11 +106,13 @@ def convert_to_logic_symbols(expr):
     logic_symbols = ['∧', '∨', '→', '~']
     new_expr = expr.replace('^', '∧')
     new_expr = new_expr.replace('v', '∨')
+    new_expr = new_expr.replace('<->', '↔')
     new_expr = new_expr.replace('->', '→')
+    new_expr = new_expr.replace('x', 'p')
     return new_expr
 
 
-df = pd.read_csv('../../data/student_responses/student_answers.csv')
+df = pd.read_csv('../../data/student_responses/student_answers_simple.csv')
 
 
 correct_responses = []
@@ -251,7 +256,7 @@ for indxx in range(len(correct_responses)):
     for i in range(len(new_steps)):
         data_lst.append((id, response, new_steps[i], new_ops[i]))
 
-    pkl.dump(data_lst, open('./data_simp.pkl', 'wb'))
+    pkl.dump(data_lst, open('./data_simp2.pkl', 'wb'))
 
 
 

@@ -955,7 +955,7 @@ class AndNode(N_aryNode):
                     andnode = AndNode(self.parent)
                     andnode.set_operands(new_operands)
 
-                    return ornode
+                    return andnode
             return False
 
     def reduce_identity(self):
