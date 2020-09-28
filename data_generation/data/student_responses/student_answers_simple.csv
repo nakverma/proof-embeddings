@@ -1,0 +1,234 @@
+QuestionID,AnswerID,Answer Correct/Incorrect,TA Feedback,Student Response,Error Steps,Error Type,Syntax Correction,,Notes From Mich or Uzay,,Notes From Dev
+F19_HW2_Q3_P2,34,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't forget the question and don't skip steps
+F19_HW2_Q3_P2,460,0,,"[""(~(~x))<->x"",""(~~x->x)^(x->~~x)"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""TvT"",""T""]","3,4",Other,,,,,Don't accidentally switch your operations
+F19_HW2_Q3_P2,46,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,275,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,196,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,182,0,,"[""(~(~x))<->x"",""x->x"",""T""]","0,1",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,160,1,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,89,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,176,1,,"[""(~(~x))<->x"",""~~x<->x"",""x<->x"",""T""]",,,,,,,
+F19_HW2_Q3_P2,352,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,317,1,,"[""(~(~x))<->x"",""~~x<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,222,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,416,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,402,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,14,1,,"[""(~(~x))<->x"",""x<->x"",""x->x^x->x"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,91,0,,"[""(~(~x))<->x"",""x<->x""]","0,1",Other,,,,,Complete the question
+F19_HW2_Q3_P2,129,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,315,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,232,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,208,0,,"[""(~(~x))<->x"",""(x)<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,54,1,,"[""(~~x)<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,356,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,263,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,230,1,,"[""(~(~x))<->x"",""(~~x)<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,271,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,42,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""((~xvx)^~x)v((~xvx)^x)"",""(~x^~x)v(~x^x)v(~x^x)v(~x^x)"",""~xv(~x^x)v(~x^x)vx"",""~xvFvFvx"",""~xvx"",""T""]","4,5",Other,,,,,Don't mix up your negatives
+F19_HW2_Q3_P2,172,0,,"[""(~(~x))<->x)"",""x<->x"",""T""]",0,Syntax,"[""(~(~x))<->x"",""x<->x"",""T""]",,,,Don't add unnecessary parentheses and don't skip steps
+F19_HW2_Q3_P2,0,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,2,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,4,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,6,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,8,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,10,0,,"[""(~(~x))<->x"",""x<->x"",""~xvx"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,12,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,16,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)v(~xvx)"",""TvT"",""T""]","2,3",Other,,,,,Don't accidentally switch your operations
+F19_HW2_Q3_P2,18,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,20,1,,"[""(~(~x))<->x"",""x<->x"",""(x<-x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,22,0,,"[""(~(~x))<->x"",""x<->x""]","0,1",Other,,,,,Complete the question
+F19_HW2_Q3_P2,24,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,26,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,28,1,,"[""(~(~x))<->x"",""x<->x"",""(x<-x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,30,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,32,0,,"[""(~(~x))x"",""x<->x"",""T""]",0,Other,,,,,Don't forget operations and don't skip steps
+F19_HW2_Q3_P2,36,0,,"[""(~(~x))<->x"",""x<->x"",""x->x^x->x"",""TvT"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,38,0,,"[""(~(~x))x"",""(x<->x)"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,40,0,,"[""(~(~x))x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,44,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,48,1,,"[""(~(~x))x"",""((~(~x))->x)^(x->(~(~x)))"",""(~(~(~x))vx)^(~xv(~(~x)))"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,50,0,,"[""(~(~x))x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,52,1,,"[""(~(~x))<->x"",""(~~xx<->x)^(x->~~x)"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,56,0,,"[""(~(~x))<->x"",""x<->x"",""(x<-x)^(x->x)"",""x<->x"",""~xvx"",""T""]","2,3",Other,,,,,Don't mix up operations
+F19_HW2_Q3_P2,58,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,60,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,62,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,64,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,66,1,,"[""(~(~x))<->x"",""(~~x)<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)v(~xvx)"",""TvT"",""T""]",,,,,,,
+F19_HW2_Q3_P2,68,0,,"[""(~(~x))<->x"",""((x))<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,70,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,72,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,74,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,76,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,78,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,82,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,
+F19_HW2_Q3_P2,84,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps and don't forget to put the question
+F19_HW2_Q3_P2,87,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,93,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,95,0,,"[""(~(~x))<->x"",""x<->x"",""~xvx"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,97,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(x->x)"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,99,0,,"[""~~x<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,101,0,,"[""(~(~x))<->x"",""((~(~x))->x)^(~(~(~x))->(~x))"",""(x->x)^(~x->~x)"",""(~xvx)^(~x(~x)v~x)"",""Tv(xv~x)"",""TvT"",""T""]","2,3",Other,,,,,Don't add extra variables and don't accidentally switch your variables
+F19_HW2_Q3_P2,103,1,,"[""(~(~x))<->x"",""(~~x)<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,105,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,107,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,109,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,111,0,,"[""(~(~x))<->x"",""(~(~x))->x^x->(~(~x))"",""T^T"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,113,0,,"[""(~(~x))<->x"",""~~x=x""]","0,1",Other,,,,,Didn't complete the question
+F19_HW2_Q3_P2,115,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(x->x)"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,117,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,119,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,121,0,,"[""(~(~x))<->x"",""~~x<->x"",""x<->x"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,123,1,,"[""(~(~x))<->x"",""((~(~x))->x)^(x->(~(~x)))"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""(T)^(T)"",""T""]",,,,,,,
+F19_HW2_Q3_P2,125,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,127,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,131,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(x->x)"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,137,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,139,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,141,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,143,0,,"[""(~(~x))<->x"",""(x<->x)"",""(x->x)^(x->x)"",""~xvx"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,145,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,147,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,151,0,,"[""(~(~x))<->x"",""~(~~x)vx"",""~xvx"",""T""]","0,1",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,153,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,154,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)v(x->x)"",""(x->x)"",""~xvx"",""T""]","1,2",Other,,,,,Don't mix up your operations
+F19_HW2_Q3_P2,156,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(x->x)"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,162,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,164,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,166,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(x->x)"",""(xv~x)^(xv~x)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,168,0,,"[""(~(~x))<->x"",""x<->x""]","0,1",Other,,,,,Didn't complete the question
+F19_HW2_Q3_P2,170,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,174,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""~xv(x^x)"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,178,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,180,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,184,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,188,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,190,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,192,0,,"[""(~(~x))<->x"",""~~x<->x"",""x<->x"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,194,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,198,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,200,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,202,0,,"[""(~(~x))<->x"",""(x)<->x"",""(x->x)^(x->x)"",""(~xvx)"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,204,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,206,1,,"[""(~(~x))<->x"",""x<->x"",""x->x^x->x"",""~xvx^~xvx"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,210,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,212,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,214,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,216,1,,"[""(~(~x))<->x"",""(~~x)<->x"",""(x)<->x"",""(x->x)^x<-x"",""(~xvx)^x<-x"",""T^x<-x"",""T""]",,,,,,,
+F19_HW2_Q3_P2,218,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,220,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,224,0,,"[""(~(~x))<->x"",""x<->x"",""~xvx"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,226,1,,"[""(~(~x))<->x"",""(~(~x)->x)^(x->~(~x))"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,228,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,236,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,238,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,240,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,242,0,,"[""(~(~(x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",0,Syntax,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,Make sure you close your parentheses
+F19_HW2_Q3_P2,244,0,,"[""(~(~x))<->x"",""x<->x"",""(x^x)v(~x^~x)"",""xv~x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,246,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,249,1,,"[""(~(~x))<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,251,1,,"[""(~(~x))<->x"",""x<->x"",""x->x^x->x"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,253,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,255,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,257,0,,"[""(~(~x))<->x"",""x<->x""]","0,1",Other,,,,,Complete the question and don't skip steps
+F19_HW2_Q3_P2,259,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,261,0,,"[""(~(~x))<->x)"",""x<->x"",""T""]",0,Syntax,"[""(~(~x))<->x"",""x<->x"",""T""]",,,,Make sure you don't have extra close parentheses and don't skip steps
+F19_HW2_Q3_P2,265,0,,"[""(~(~x))<->x"",""x<->x"",""(x^x)v(~x^~x)"",""TvT"",""T""]","2,3",Negation,,,,,Negation was used incorrectly. Should have used idempotence and don't skip steps
+F19_HW2_Q3_P2,267,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,269,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T""]","3,4",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,273,0,,"[""(~(~x))<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,279,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,281,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,283,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,287,0,,"[""(~(~x))<->x"",""(x)<->x"",""x<->x"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,288,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,290,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,294,1,,"[""(~(~x))<->x"",""((~(~x))->x)^(x->(~(~x)))"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,296,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""~xv(x^x)"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,298,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,300,1,,"[""(~(~x))<->x"",""~~x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,302,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,304,0,,"[""(~(~x))<->x"",""(~(~(x))->x"",""~(~(~(x)))vx"",""xv~x"",""T"",""x->(~(~(x)))"",""~xv(~(~(x)))"",""~xvx"",""T""]","0,1",Syntax,"[""(~(~x))<->x"",""(~(~x))->x"",""~(~(~(x)))vx"",""xv~x"",""T"",""x->(~(~(x)))"",""~xv(~(~(x)))"",""~xvx""T""]",,,,Don't split up the question when inputting your answer
+F19_HW2_Q3_P2,305,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,307,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,309,1,,"[""(~(~x))<->x"",""~~x<->x"",""(x->x)^(x->x)"",""(x->x)"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,311,0,,"[""(~(~x))<->x"",""(~(~x))->x)^(x->~(~x))"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]","0,1",Syntax,"[""(~(~x))<->x"",""(~(~x))->x^(x->~(~x))"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,Don't add extra closed parentheses
+F19_HW2_Q3_P2,313,0,,"[""(~(~x))<->x"",""((~(~x))->x)^(x->(~(~x))"",""(~(~x)->x)"",""x->x"",""~xvx"",""x"",""T""]","0,1",Syntax,"[""(~(~x))<->x"",""((~(~x))->x)^x->(~(~x))"",""(~(~x)->x)"",""x->x"",""~xvx"",""x"",""T""]",,,,Don't leave parentheses open and review idempotence and negation
+F19_HW2_Q3_P2,319,0,,"[""(~(~x))<->x"",""x""]","0,1",Other,,,,,Complete the question
+F19_HW2_Q3_P2,321,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,323,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,325,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,327,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,329,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,330,0,,"[""(~(~x))<->x"",""x<->x"",""(~xvx)^(~xvx)"",""~xvx"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,332,0,,"[""(~(~x))<->x"",""x<->x"",""(~xvx)^(~xvx)"",""~xvx"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,334,0,,"[""(~(~x))<->x"",""(x)<->x"",""x<->x"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,336,0,,"[""(~(~x))<->x"",""x<->x""]","0,1",Other,,,,,Complete the question
+F19_HW2_Q3_P2,338,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,340,1,,"[""(~~x<->x)"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,342,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,344,0,,"[""(~~x)<->x"",""x<->x"",""(~xvx)^(~xvx)"",""T^T"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,346,1,,"[""(~(~x))<->x"",""(~(~x))->x^x->(~(~x))"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,348,0,,"[""(~~x<->x)"",""x<->x"",""x->x^x->x"",""(~xvx)v^(~xvx)"",""T^T"",""T""]","2,3",Syntax,"[""(~~x<->x)"",""x<->x"",""x->x^x->x"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,Don't add extra operations
+F19_HW2_Q3_P2,350,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,354,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,358,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,360,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,362,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)""]","1,2",Other,,,,,Complete the question
+F19_HW2_Q3_P2,364,0,,"[""(~(~x))<->x"",""x<->x"",""x->x^x->x"",""x->x"",""T""]","3,4",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,366,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,368,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,370,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,372,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,374,1,,"[""(~(~x))<->x"",""x<->x"",""x->x^x->x"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,376,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,378,0,,"[""(~(~x))<->x"",""(x<->x)"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,380,0,,"[""(~(~x))<->x"",""x<->x"",""~xvx"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,382,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,386,0,,"[""(~(~x))<->x"",""(~~x))<->x"",""x<->x"",""T""]","0,1",Syntax,"[""(~(~x))<->x"",""(~~x)<->x"",""x<->x"",""T""]",,,,Make sure you don't have extra parentheses and don't skip steps
+F19_HW2_Q3_P2,384,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,388,0,,"[""(~(~x))<->x)"",""x<->x"",""T""]",0,Syntax,"[""(~(~x))<->x"",""x<->x"",""T""]",,,,Make sure you don't have extra parentheses and don't skip steps
+F19_HW2_Q3_P2,390,1,,"[""(~(~x))<->x"",""(~~x)<->x"",""(x)<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,392,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,394,0,,"[""(~(~x))<->x"",""(x)<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,396,1,,"[""(~(~x))<->x"",""~~x<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,398,0,,"[""(~(~x))<->x"",""x<->x""]","0,1",Other,,,,,Complete the question
+F19_HW2_Q3_P2,400,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,404,0,,"[""(~(~x))<->x"",""x<->x"",""~xvx"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,406,1,,"[""(~(~x))<->x"",""(~(~x)->x)^(x->~(~x))"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,408,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,410,0,,"[""~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]",0,Syntax,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]",,,,Make sure you don't have extra parentheses and don't skip steps
+F19_HW2_Q3_P2,412,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,414,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,418,1,,"[""(~(~x))<->x"",""(~(~x)->x)^(x->~(~x))"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,420,0,,"[""(~(~x))<->x"",""~(~x)->x"",""~(~(~x))vx"",""~xvx"",""x"",""x->~(~x)"",""~xv~(~x)"",""~xvx"",""x""]","0,1",Other,,,,,Don't split up the question and remember to complete the question
+F19_HW2_Q3_P2,422,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,424,1,,"[""(~(~x))<->x"",""(x)<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T""]",,,,,,,
+F19_HW2_Q3_P2,426,0,,"[""~(~x))<->x"",""T""]",0,Syntax,"[""(~(~x))<->x"",""T""]",,,,Show your work
+F19_HW2_Q3_P2,428,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,430,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,432,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,434,0,,"[""(~(~x))<->x"",""(~(~(~x))vx)^(~xvx)"",""(~xvx)^T"",""T^T"",""T""]","0,1",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,436,0,,"[""(~(~x))<->x"",""(~(~x)^x)v(~(~(~x))^~x)"",""(x^x)v(~x^~x)"",""xv~x"",""T""]","0,1",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,438,0,,"[""(~(~x))<->x"",""x<->x"",""T""]","1,2",Skipped Steps,,,,,Don't skip steps and put the question as the first line
+F19_HW2_Q3_P2,440,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""T^T"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,442,0,,"[""(~(~x))<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]","0,1",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,444,0,,"[""(~(~x))<->x"",""~~x<->x"",""x<->x"",""(x^x)v(~x^~x)"",""xv~x"",""T""]","2,3",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,446,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,448,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)v(~xvx)"",""T^T"",""T""]","2,3",Other,,,,,Don't mix up your operations
+F19_HW2_Q3_P2,450,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,452,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""TvT"",""T""]","3,4",Other,,,,,Don't mix up your operations
+F19_HW2_Q3_P2,454,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""x->x"",""~xvx"",""T""]",,,,,,,
+F19_HW2_Q3_P2,456,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,Write the question as the first line
+F19_HW2_Q3_P2,458,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x->x)"",""(~xvx)^(~xvx)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P2,462,0,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x<-x)"",""(~xvx)^(xv~x)"",""T""]","3,4",Skipped Steps,,,,,Don't skip steps
+F19_HW2_Q3_P2,464,1,,"[""(~(~x))<->x"",""x<->x"",""(x->x)^(x<-x)"",""(~xvx)^(xv~x)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P3,0,0,,"[""((p->q)^(q->r))->(p->r)"",""((~pvq)^(~qvr))->(~pvr)"",""((~pvq)^~q)v(~pvq)^r)->(~qvr)"",""((~p^~q)v(q^~q))v((~pvr)v(q^r))->(~pvr)"",""((pvq)^(~qvq))^((pv~r)^(~qv~r))v(~pvr)"",""((pvq)^(T))^((pv~r)^(~qv~r))v(~pvr)"",""(pvq)^(pv~r)^(~qv~r)v(~pvr)"",""((pvq)^(pv~r)^(~qv~r))v(~pvr)"",""((pvq)v(~pvr))^((pv~r)v(~pvr))^((~qv~r)v(~pvr))"",""(pvqv~pvr)^(pv~rv~pvr))^(~qv~rv~pvr)"",""(T)^(T)^(T)"",""T""]","8,9",Syntax,"[""((p->q)^(q->r))->(p->r)"",""((~pvq)^(~qvr))->(~pvr)"",""((~pvq)^~q)v(~pvq)^r)->(~qvr)"",""((~p^~q)v(q^~q))v((~pvr)v(q^r))->(~pvr)"",""((pvq)^(~qvq))^((pv~r)^(~qv~r))v(~pvr)"",""((pvq)^(T))^((pv~r)^(~qv~r))v(~pvr)"",""(pvq)^(pv~r)^(~qv~r)v(~pvr)"",""((pvq)^(pv~r)^(~qv~r))v(~pvr)"",""((pvq)v(~pvr))^((pv~r)v(~pvr))^((~qv~r)v(~pvr))"",""(pvqv~pvr)^(pv~rv~pvr)^(~qv~rv~pvr)"",""(T)^(T)^(T)"",""T""]",,,,Don't accidentally switch variables
+F19_HW2_Q3_P3,2,0,"Major error in move from Line 7 (labeled ""Identity"") to Line 8, where propositions Q and NOT Q are grouped together in conjunction, which violates the correct order of operations. Use parentheses to keep track of order of operations.","[""((p->q)^(q->r))->(p->r)"",""~((~pvq)^(~qvr))v(~pvr)"",""((p^~q)v(q^~r))v(~pvr)"",""((p^~q)vq^(p^~q)v~r)v(~pvr)"",""(pvq^~qvq^p^~qv~r)v(~pvr)"",""(pvq^T^p^~qv~r)v(~pvr)"",""(pvq^p^~qv~r)v(~pvr)"",""(pv(q^~q)^pv~r)v(~pvr)"",""(pvT^pv~r)v(~pvr)"",""(pvpv~r)v(~pvr)"",""(pv~r)v(~pvr)"",""(pv~p)v(rv~r)"",""TvT"",""T""]","7,8",Identity,,,,,
+F19_HW2_Q3_P3,4,0,,"[""((p->q)^(q->r))->(p->r)"",""((pvq)^(qvr))->(pvr)""]","0,1",Other,,,,,Complete the question
+F19_HW2_Q3_P3,6,0,Major error: You can't assume the validity of a statement when asked to prove the validity of a statement.,"[""((p->q)^(q->r))->(p->r)"",""T""]","0,1",Other,,,,,Complete the question
+F19_HW2_Q3_P3,8,0,,"[""((p->q)^(q->r))->(p->r)"",""((~pvq)^(~qvr))->(~pvr)"",""~((~pvq)^(~qvr))v(~pvr)"",""(~(~pvq)v~(~qvr))v(~pvr)"",""((p^~q)((p^~q)v(q^~r))v(~pvr)"",""(p^~q)v(~pvr)v(q^~r)"",""(pv(~pvr))^((~pvr)v~q)v(q^~r)"",""(pv~p)vr))^((~pvr)v~q)v(q^~r)"",""((~pv~q)vr)v(q^~r)"",""((~pv~q)vr)vq)^((~pv~q)vr)v~r)"",""((~pvr)v(~qvq))^((~pv~q)v(rv~r))"",""((~pvr)vT)^((~pv~q)vT)"",""T^T"",""T""]","6,7",Syntax,"[""((p->q)^(q->r))->(p->r)"",""((~pvq)^(~qvr))->(~pvr)"",""~((~pvq)^(~qvr))v(~pvr)"",""(~(~pvq)v~(~qvr))v(~pvr)"",""((p^~q)((p^~q)v(q^~r))v(~pvr)"",""(p^~q)v(~pvr)v(q^~r)"",""(pv(~pvr))^((~pvr)v~q)v(q^~r)"",""((pv~p)vr)^((~pvr)v~q)v(q^~r)"",""((~pv~q)vr)v(q^~r)"",""((~pv~q)vr)vq)^((~pv~q)vr)v~r)"",""((~pvr)v(~qvq))^((~pv~q)v(rv~r))"",""((~pvr)vT)^((~pv~q)vT)"",""T^T"",""T""]",,,,Make sure you don't have extra close parentheses
+F19_HW2_Q3_P3,10,1,,"[""((p->q)^(q->r))->(p->r)"",""(~pvq)^(~qvr)->(~pvr)"",""(~((~pvq)^(~qvr)))v(~pvr)"",""(~(~pvq))v(~(~qvr))v(~pvr)"",""(~(~pvq))v(~(~qvr))v(~pvr)"",""(p^~q)v(q^~r)v(~pvr)"",""(p^~q)v((qv(~pvr))^(~rv(~pvr)))"",""(p^~q)v((qv~pvr)^(~rv~pvr))"",""(p^~q)v((qv~pvr)^((~rvr)v~p))"",""(p^~q)v((qv~pvr)^(Tv~p))"",""(p^~q)v((qv~pvr)^(T))"",""(p^~q)v(qv~pvr)"",""(pv(qv~pvr))^(~qv(qv~pvr))"",""((pv~p)vqvr))^((~qvq)v~pvr)"",""(Tvqvr)^(Tv~pvr)"",""T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P3,12,1,,"[""((p->q)^(q->r))->(p->r)"",""((~pvq)^(~qvr))->(~pvr)"",""~((~pvq)^(~qvr))v(~pvr)"",""(~(~pvq)v~(~qvr))v(~pvr)"",""((p^~q)v(q^~r))v(~pvr)"",""(p^~q)v(q^~r)v~pvr"",""((~pvp)^(~pv~q))v((~rvq)^(~rvr))"",""(T^(~pv~q))v((rvq)^T)""]",,,,,,,
+F19_HW2_Q3_P3,14,1,,"[""((p->q)^(q->r))->(p->r)"",""~((p->q)^(q->r))v(p->r)"",""~((~pvq)^(~qvr))v(~pvr)"",""~(~pvq)v~(~qvr)v(~pvr)"",""(p^~q)v(q^~r)v(~pvr)"",""(p^~q)v(~pvr)v(q^~r)"",""(p^~q)v(~pvrvq)^(~pvrv~r)"",""(p^~q)v(~pvrvq)^(~pvT)"",""(p^~q)v(~pvrvq)^T"",""(~pvrvq)v(p^~q)^T"",""(~pvrvqvp)^(~pvrvqv~q)^T"",""((~pvp)vrvq)^(~pvrv(qv~q))^T"",""(Tvrvq)^(~pvrvT)^T"",""T^T^T"",""T""]",,,,,,,
+F19_HW2_Q3_P3,16,0,,"[""((p->q)^(q->r))->(p->r)"",""((~pvq)^(~qvr))->(~pvr)"",""~((~pvq)^(~qvr))->(~pvr)"",""~(~pvq)v~(~qvr)v(~pvr)"",""(p^~q)v(q^~r)v~pvr"",""~pv(p^~q)vrv(q^~r)"",""(~pv(p^~q))v(rv(q^~r))"",""((~pvp)^(~pv~q))v((rvq)^rv~r))"",""(T^(~pv~q))v((rvq)^T))"",""(~pv~q)v(rvq)"",""~pv~qvrvq"",""~pvrv(~qvq)"",""~pvrvT"",""T""]","7,8",Syntax,"[""((p->q)^(q->r))->(p->r)"",""((~pvq)^(~qvr))->(~pvr)"",""~((~pvq)^(~qvr))->(~pvr)"",""~(~pvq)v~(~qvr)v(~pvr)"",""(p^~q)v(q^~r)v~pvr"",""~pv(p^~q)vrv(q^~r)"",""(~pv(p^~q))v(rv(q^~r))"",""((~pvp)^(~pv~q))v((rvq)^rv~r))"",""(T^(~pv~q))v((rvq)^T)"",""(~pv~q)v(rvq)"",""~pv~qvrvq"",""~pvrv(~qvq)"",""~pvrvT"",""T""]",,,,Make sure you don't have extra close parentheses
