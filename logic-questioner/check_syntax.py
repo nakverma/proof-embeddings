@@ -10,6 +10,8 @@ class LogicLexer(Lexer):
 
     tokens = {P,Q,R,TRUE,FALSE,AND,OR,NOT,IMP,D_IMP,R_PAREN,L_PAREN}
 
+    ignore = ' \t'
+
     P = 'p'
     Q = 'q'
     R = 'r'
