@@ -8,12 +8,13 @@ Create a dataset of logic expression trees
 """
 
 
-
+import gc
 import itertools
 import pickle as pkl
 import copy
 import numpy as np
 import sys
+import ast
 import random
 import math
 from collections import Iterable
@@ -24,6 +25,7 @@ from parsing_logic.scan_parse import *
 
 import networkx as nx
 
+from sympy import *
 
 
 """
@@ -953,7 +955,7 @@ class AndNode(N_aryNode):
                     andnode = AndNode(self.parent)
                     andnode.set_operands(new_operands)
 
-                    return ornode
+                    return andnode
             return False
 
     def reduce_identity(self):
@@ -1853,7 +1855,6 @@ class LogicTree():
         node.parent = self
         self.root = node
 
-
     def construct_tree(self, logexpr):
         lexer = LogicLexer()
         parser = LogicParser()
@@ -1922,8 +1923,6 @@ class LogicTree():
 
         self.set_root(construct_helper(ast))
 
-
-
     def set_computed_ops(self, ops):
         self.computed_ops = ops
 
@@ -1936,6 +1935,7 @@ class LogicTree():
         return new_tree
 
     def deep_ops(self,expand):
+        #deleted_objs = gc.collect()
 
         original_tree = self.copy()
         self.computed_ops += 1
@@ -2047,7 +2047,6 @@ class LogicTree():
         deep_ops_helper(self, self)
         return new_trees
 
-
     def parse_tree(self):
         if isinstance(self.root, BinaryNode) or isinstance(self.root, N_aryNode):
             tmp_str = self.root.parse()
@@ -2118,6 +2117,43 @@ class LogicTree():
 
         make_helper(self.root)
         return G
+
+    def make_sympy(self):
+
+        p,q,r = symbols('p,q,r')
+
+        def make_helper(node):
+
+            if isinstance(node, PNode):
+                return p
+            elif isinstance(node, QNode):
+                return q
+            elif isinstance(node, RNode):
+                return r
+            elif isinstance(node, TrueNode):
+                return sympy.true
+            elif isinstance(node, FalseNode):
+                return sympy.false
+            elif isinstance(node, NotNode):
+                return Not(make_helper(node.arg))
+            elif isinstance(node, OrNode):
+                oplst = []
+                for op in node.operands:
+                    oplst.append(make_helper(op))
+                return Or(*oplst)
+            elif isinstance(node, AndNode):
+                oplst = []
+                for op in node.operands:
+                    oplst.append(make_helper(op))
+                return And(*oplst)
+            elif isinstance(node, ImplicationNode):
+                return Implies(node.left, node.right)
+            elif isinstance(node, DblimplicationNode):
+                return And(node.left>>node.right, node.left<<node)
+
+        return make_helper(self.root)
+
+
 
 
 class LogicTreeTrainer():
@@ -2226,6 +2262,9 @@ class LogicTreeTrainer():
             self.ops += 1
             self.trees = new_tree_dict
             print(len(self.trees))
+
+            deleted = gc.collect()
+            print("Doing increment_ops, deleted",deleted,"objects")
 
 
     def duplicates_info(self):
@@ -3154,246 +3193,27 @@ class LogicTreeTrainer():
 
 if __name__ == '__main__':
 
-    trainer = LogicTreeTrainer('T', expand=True)
-    trainer.increment_ops(4)
-    
-    save = '../data/T_trainer.pkl'
-    pkl.dump(trainer, open(save,'wb'))
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-
-
-
-
-
-
-
-IDENTITY
-    TrueNode:
-        10:self.identity
-    FalseNode:
-        11:self.identity
-    Pnode:
-        12:self.identity
-    QNode:
-        13:self.identity
-    RNode:
-        14:self.identity
-    AndNode:
-        19:self.identity
-    OrNode:
-        25:self.identity
-    ImplicationNode:
-        27:self.identity
-    DblimplicationNode:
-        62:self.identity
-    NotNode:
-        30:self.identity
-
-
-BOOLEAN EQUIVALENCE
-    TrueNode:
-        51:self.neg_t
-    FalseNode:
-        40:self.neg_f
-    NotNode:
-        52:self.negate_f
-        53:self.negate_t
-
-
-LOGICAL EQUIVALENCE
-    OrNode:
-        23:self.logic_equiv
-    ImplicationNode:
-        26:self.to_or
-    DblimplicationNode:
-        61:self.to_and
-
-DOMINATION
-    TrueNode:
-        1:self.new_var_p
-        2:self.new_var_q
-        3:self.new_var_r
-        4:self.new_var_notp
-        5:self.new_var_notq
-        6:self.new_var_notr
-        10:self.identity
-    FalseNode:
-        31:self.new_var_p_f
-        32:self.new_var_q_f
-        33:self.new_var_r_f
-        34:self.new_var_notp_f
-        35:self.new_var_notq_f
-        36:self.new_var_notr_f
-    OrNode:
-        48:self.domination
-
-INDEMPOTENCE
-    Pnode:
-        45:self.identity2
-    QNode:
-        46:self.identity2
-    RNode:
-        47:self.identity2
-    OrNode:
-        49:self.indempotence
-
-DOUBLE NEGATION
-    NotNode:
-        58:self.double_negation
-
-COMMUTATIVITY
-    AndNode:
-        15:self.commutative1
-    OrNode:
-        20:self.commutative2
-
-ASSOCIATIVITY
-    AndNode:
-        16:self.associative3
-        17:self.associative4
-        41:self.flatten1
-        42:self.expand1
-    OrNode:
-        21:self.associative1
-        22:self.associative2
-        43:self.flatten2
-        44:self.expand2
-
-DISTRIBUTIVITY
-    AndNode:
-        54:self.distribute
-        56:self.factor
-    OrNode:
-        55:self.distribute
-        57:self.factor
-
-NEGATION
-    TrueNode:
-        7:self.new_tautology_p
-        8:self.new_tautology_q
-        9:self.new_tautology_r
-    FalseNode:
-        37:self.new_fallacy_p
-        38:self.new_fallacy_q
-        39:self.new_fallacy_r
-    OrNode:
-        50:self.negation
-
-DEMORGAN
-    AndNode:
-        18:self.demorgan4
-    OrNode:
-        24:self.demorgan3
-    NotNode:
-        28:self.demorgan1
-        29:self.demorgan2
-
-
-
-
-
-
-
-"""
-
-
-
-
-
-
-
-
-
-
-"""
-
-Expansive ops:
-
-From True
-1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-
-From False
-11, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
-
-From P
-12
-
-From R
-13
-
-From Q
-14
-
-
-From And
-19
-
-From Or
-25
-
-From Imp
-27
-
-From Not
-30
-
-expops = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-expops.extend([11, 12, 13, 14, 19, 25, 27, 30])
-expops.extend([31, 32, 33, 34, 35, 36, 37, 38, 39, 40])
-
-
-
-"""
-
-
-
-
-'''
-
-TODO:
-
-add p becomes p^p
-add q becomes q^q
-add r becomes r^r
-add F becomes F^F
-# add "p→p" becoming "~pvp" instead of just "pv~p"
-# add p→q^q→p becomes p↔q
-# add p→q^q→p becomes q↔p
-
-
-add and indempotence mistake to generated mistakes
-
-
-
-
-'''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    trainer = LogicTreeTrainer('T', expand=None)
+    trainer.increment_ops(1)
+    #
+    # save = '../data/unduped/T_unduped_mistakes.pkl'
+    # pkl.dump(trainer, open(save,'wb'))
+
+    """
+    trainers = []
+
+    starting_exprs = ['~(~p)↔p']
+    for expr in starting_exprs:
+        print("building trees from " + expr)
+        trainer = LogicTreeTrainer(expr,expand=None)
+        trainer.increment_ops(4)
+        trainers.append(trainer)
+
+    for i in range(len(trainers)):
+        trainer = trainers[i]
+        seed = starting_exprs[i]
+        save = '../data/unduped/' + seed + '_unduped_mistakes.pkl'
+        pkl.dump(trainer, open(save, 'wb'))
+    """
 
 # comment
-#
