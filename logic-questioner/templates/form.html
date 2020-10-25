@@ -5,36 +5,62 @@
 <br/>
 <h1 class="latex" style="text-align: center">Logic Questioner</h1>
 <br/>
+<br/>
 
 {% from "includes/formhelpers.html" import render_field %}
 
-<h5 style="text-align: center">{{ form.question }}</h5>
 <form action="" method="POST" style="width: 75%; margin: 0 auto;">
+    <div style="width: 75%; margin: 0 auto;">
+        <label class="switch" style="width: 200px; float: left; margin-left:15%; margin-right: 10%;">
+            <input type="checkbox" id="tog_btn_show_laws">
+            <div class="slidershowlaws round"><!--ADDED HTML -->
+                <span class="on" style="font-size: 85%;">Show Laws</span>
+                <span class="off" style="font-size: 85%;">Hide Laws</span><!--END-->
+            </div>
+        </label>
+    {{ render_field(form.mode, class="radio", style="width:30%; float: left;") }}
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <h5 style="text-align: center">{{ form.question }}</h5>
     {% for string_field in form.steps %}
         {{ string_field.hidden_tag() }}
         {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
 
-        <div style="width:30%; margin-right:2%; float: left;">
-            {{ render_field(string_field.law, class="form-control") }}
+        <div style="width:100%; padding-left:2%; height:80px; border-radius: 15px; background: #D4D4D4; display: flex; align-items: center;">
+            <div style="width:5%; margin-right: 2%; float: left;">
+                <button type="submit" class="btn btn-danger" name="delete_{{ loop.index|string }}" value="&#x2716;">&#x2716;</button>
+            </div>
+            <div style="width:33%; margin-right:2%; float: left; padding-top:1%">
+                {{ render_field(string_field.law, class="form-control") }}
+            </div>
+            <div style="width:55%; float: left; padding-top:1%" class="autocomplete">
+                {% if string_field.error %}
+                    {{ render_field(string_field.step, style="border-color: red", class="form-control", autocomplete="off", errors=string_field.error) }}
+                {% else %}
+                    {{ render_field(string_field.step, class="form-control", autocomplete="off") }}
+                {% endif %}
+            </div>
         </div>
-        <div style="width:65%; float: left;" class="autocomplete">
-            {% if string_field.error %}
-                {{ render_field(string_field.step, style="border-color: red", class="form-control", autocomplete="off", errors=string_field.error) }}
-            {% else %}
-                {{ render_field(string_field.step, class="form-control", autocomplete="off") }}
-            {% endif %}
-        </div>
+        <br/>
 
     {% endfor %}
 
     <br/>
-    <output style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">{{ form.output }}</output>
+    <output style="width: 100%; color: #008000; margin: 0 auto; display: flex; justify-content: center;">{{ form.output }}</output>
     <br/>
     <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
-        <button type="submit" class="btn btn-danger" name="next" value="NEXT" style="width: 25%;">NEW STEP</button>
+        <button type="submit" class="btn btn-primary" name="next" value="NEXT" style="width: 25%;">NEW STEP</button>
         <span style="width: 10px"></span>
-        <button type="submit" class="btn btn-danger" name="end" value="END" style="width: 25%;">SUBMIT</button>
+        <button type="submit" class="btn btn-primary" name="end" value="END" style="width: 25%;">CHECK</button>
     </div>
+
+    <br />
+    <br />
+    <br />
+    <img src="{{url_for('static', filename='laws_table.png')}}" alt="Laws Table Image" class="toggleoff" id="laws_table" style="width:100%;"/>
 
 </form>
 
@@ -54,8 +80,8 @@
             currentFocus = -1;
 
             arr = [];
-            var first_type_tokens = ["p", "q", "r"];
-            var second_type_tokens = ["v", "^"];
+            var first_type_tokens = ["p", "q", "r", "T", "F"];
+            var second_type_tokens = ["v", "^", "->", "<->"];
             var last_token = this.value.substr(this.value.length - 1);
             if (first_type_tokens.includes(last_token)) {
                 for (i = 0; i < second_type_tokens.length; i++) {
@@ -67,6 +93,7 @@
                     arr.push(this.value + first_type_tokens[i]);
                 }
                 arr.push(this.value + "(");
+                arr.push(this.value + "~")
             } else if (last_token == "(") {
                 for (i = 0; i < first_type_tokens.length; i++) {
                     arr.push(this.value + first_type_tokens[i]);
@@ -165,6 +192,14 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script type="text/javascript">
+    var toggle_button = document.getElementById("tog_btn_show_laws");
+    var laws_table_image = document.getElementById("laws_table");
+
+    toggle_button.onclick = function() {
+        laws_table_image.classList.toggle("toggleon");
+    };
+
+
     var start_tokens = [")", "(", "~", "¬", "p", "q", "r"];
     num_steps = document.querySelectorAll('.autocomplete').length;
     for (i = 0; i < num_steps; i++) {
@@ -173,5 +208,4 @@ document.addEventListener("click", function (e) {
 </script>
 
 {% endblock body %}
-
 

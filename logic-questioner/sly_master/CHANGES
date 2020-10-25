@@ -1,0 +1,234 @@
+Version 0.4
+-----------
+05/09/2020 Experimental support for EBNF choices.  For example:
+
+	      @('term { PLUS|MINUS term }')
+              def expr(self, p):
+                  lterm = p.pterm0
+                  for op, rterm in p[1]:
+		      lterm = BinOp(op, lterm, rterm)
+
+           One issue here is just how one refers to the choice
+           of values.  There is no unified name to pick. So,
+           you basically have to do it using a numeric index like p[1].
+           In this case, p[1] is a list of all of the repeated items
+           (represented as tuples).
+
+05/09/2020 Changed the internal names used for EBNF rules to make them
+           a bit easier to debug in the parser.out file.
+
+03/06/2020 Added experimental support for EBNF repetition and optional
+           syntax.  For example, here is a rule for a comma-separated
+           expression list:
+
+               @('expr { COMMA expr }')
+               def exprlist(self, p):
+                   return [ p.expr0 ] + p.expr1
+
+           In this code, the { ... } means zero-or-more repetitions.
+           It turns all symbols inside into lists.  So, instead of
+           representing a single value, p.expr1 is now a list of 
+           values.  
+
+           An optional value can be enclosed in brackets like this:
+
+              @('VAR NAME [ EQUAL expr ] SEMI')
+              def variable_declaration(self, p):
+                  print(f"Definining {p.NAME}. Initial value={p.expr}")
+
+           In this case, all symbols inside [ ... ] either have a value
+           if present or are assigned to None if missing.
+
+           In both cases, you continue to use the same name indexing
+           scheme used by the rest of SLY.  For example, in the first
+           example above, you use "expr0" and "expr1" to refer to the
+           different "expr" symbols since that name appears in more
+           than one place.
+
+04/09/2019 Fixed very mysterious error message that resulted if you 
+           defined a grammar rule called "start".   start can now 
+           be a string or a function.
+
+04/09/2019 Minor refinement to the reporting of reduce/reduce conflicts.
+           If a top grammar rule wasn't specified, SLY could fail with 
+           a mysterious "unknown conflict" exception.  This should be
+           fixed.
+
+11/18/2018 Various usability fixes observed from last compilers course.
+
+            - Errors encountered during grammar construction are now
+              reported as part of the raised GrammarError exception
+              instead of via logging.  This places them in the same
+              visual position as normal Python errors (at the end
+              of the traceback)
+
+            - Repeated warning messages about unused tokens have
+              been consolidated in a single warning message to make
+              the output less verbose.
+
+            - Grammar attributes (e.g., p.TOKEN) used during parsing
+              are now read-only.
+
+            - The error about "infinite recursion" is only checked
+              if there are no undefined grammar symbols.  Sometimes
+              you'd get this message and be confused when the only
+              mistake was a bad token name or similar. 
+          
+
+9/8/2018   Fixed Issue #14.  YaccProduction index property causes
+           AttributeError if index is 0
+
+9/5/2018   Added support for getattr() and related functions on
+           productions.
+
+Version 0.3
+-----------
+4/1/2018   Support for Lexer inheritance added.  For example:
+
+            from sly import Lexer
+
+            class BaseLexer(Lexer):
+                tokens = { NAME, NUMBER }
+                ignore = ' \t'
+		
+                NAME = r'[a-zA-Z]+'
+		NUMBER = r'\d+'
+
+               
+            class ChildLexer(BaseLexer):
+                tokens = { PLUS, MINUS }
+                PLUS = r'\+'
+                MINUS = r'-'
+
+           In this example, the ChildLexer class gets all of the tokens
+           from the parent class (BaseLexer) in addition to the new
+           definitions it added of its own.  
+
+           One quirk of Lexer inheritance is that definition order has
+           an impact on the low-level regular expression parsing.  By
+           default new definitions are always processed AFTER any previous
+           definitions.  You can change this using the before() function
+           like this:
+
+            class GrandChildLexer(ChildLexer):
+                tokens = { PLUSPLUS, MINUSMINUS }
+                PLUSPLUS = before(PLUS, r'\+\+')
+                MINUSMINUS = before(MINUS, r'--')
+
+           In this example, the PLUSPLUS token is checked before the
+           PLUS token in the base class.  Thus, an input text of '++'
+           will be parsed as a single token PLUSPLUS, not two PLUS tokens.
+
+4/1/2018   Better support for lexing states.   Each lexing state can be defined as
+           as a separate class.  Use the begin(cls) method to switch to a
+           different state.  For example:
+
+            from sly import Lexer
+
+            class LexerA(Lexer):
+                tokens = { NAME, NUMBER, LBRACE }
+
+                ignore = ' \t'
+
+                NAME = r'[a-zA-Z]+'
+                NUMBER = r'\d+'
+                LBRACE = r'\{'
+
+                def LBRACE(self, t):
+                    self.begin(LexerB)
+                    return t
+
+            class LexerB(Lexer):
+                tokens = { PLUS, MINUS, RBRACE }
+
+                ignore = ' \t'
+
+                PLUS = r'\+'
+                MINUS = r'-'
+                RBRACE = r'\}'
+
+                def RBRACE(self, t):
+                    self.begin(LexerA)
+                    return t
+
+           In this example, LexerA switches to a new state LexerB when
+           a left brace ({) is encountered.  The begin() method causes
+           the state transition.   LexerB switches back to state LexerA
+           when a right brace (}) is encountered.
+
+           An option to the begin() method, you can also use push_state(cls)
+           and pop_state(cls) methods.  This manages the lexing states as a
+           stack.  The pop_state() method will return back to the previous
+           lexing state.
+   
+1/27/2018  Tokens no longer have to be specified as strings.   For example, you
+           can now write:
+
+           from sly import Lexer
+
+           class TheLexer(Lexer):
+               tokens = { ID, NUMBER, PLUS, MINUS }
+
+               ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
+               NUMBER = r'\d+'
+               PLUS = r'\+'
+               MINUS = r'-'
+
+           This convention also carries over to the parser for things such
+           as precedence specifiers:
+
+           from sly import Parser
+           class TheParser(Parser):
+                 tokens = TheLexer.tokens
+
+                 precedence = (
+                     ('left', PLUS, MINUS),
+                     ('left', TIMES, DIVIDE),
+                     ('right', UMINUS),
+                  )
+            ...
+
+           Nevermind the fact that ID, NUMBER, PLUS, and MINUS appear to be
+           undefined identifiers.  It all works. 
+
+1/27/2018  Tokens now allow special-case remapping.   For example:
+
+           from sly import Lexer
+
+           class TheLexer(Lexer):
+               tokens = { ID, IF, ELSE, WHILE, NUMBER, PLUS, MINUS }
+
+               ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
+               ID['if'] = IF
+               ID['else'] = ELSE
+               ID['while'] = WHILE
+
+               NUMBER = r'\d+'
+               PLUS = r'\+'
+               MINUS = r'-'
+       
+           In this code, the ID rule matches any identifier.  However,
+           special cases have been made for IF, ELSE, and WHILE tokens.
+           Previously, this had to be handled in a special action method 
+           such as this:
+
+               def ID(self, t):
+                   if t.value in { 'if', 'else', 'while' }:
+                       t.type = t.value.upper()
+                   return t
+
+           Nevermind the fact that the syntax appears to suggest that strings
+           work as a kind of mutable mapping.
+      
+1/16/2018  Usability improvement on Lexer class.  Regular expression rules
+           specified as strings that don't match any name in tokens are
+           now reported as errors.
+
+Version 0.2
+-----------
+
+12/24/2017 The error(self, t) method of lexer objects now receives a
+           token as input.  The value attribute of this token contains
+           all remaining input text.  If the passed token is returned
+           by error(), then it shows up in the token stream where
+           can be processed by the parser.

@@ -38,7 +38,157 @@
       background-color: DodgerBlue !important;
       color: #ffffff;
     }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 180px;
+      height: 45px;
+    }
+
+    .switch input {display:none;}
+
+    .slidershowlaws {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ca2222;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slidershowlaws:before {
+      position: absolute;
+      content: "";
+      height: 40px;
+      width: 40px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slidershowlaws {
+      background-color: #2ab934;
+    }
+
+    input:focus + .slidershowlaws {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slidershowlaws:before {
+      -webkit-transform: translateX(156px);
+      -ms-transform: translateX(156px);
+      transform: translateX(156px);
+    }
+
+    .slidermode {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #20B2AA;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slidermode:before {
+      position: absolute;
+      content: "";
+      height: 40px;
+      width: 40px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slidermode {
+      background-color: #FFA500;
+    }
+
+    input:focus + .slidermode {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    .radio {
+      fieldset.inlineLabels ul {list-style:none};
+      list-style: none;
+      border: 0px;
+      width: 100%;
+      height: 2em;
+    }
+
+    input:checked + .slidermode:before {
+      -webkit-transform: translateX(136px);
+      -ms-transform: translateX(136px);
+      transform: translateX(136px);
+    }
+
+    /*------ ADDED CSS ---------*/
+    .on
+    {
+      display: none;
+    }
+
+    .on, .off
+    {
+      color: white;
+      position: absolute;
+      transform: translate(-50%,-50%);
+      top: 50%;
+      left: 50%;
+      font-size: 10px;
+      font-family: Verdana, sans-serif;
+    }
+
+    .toggleoff {
+      display: none;
+    }
+
+    .toggleon {
+      display: flex;
+    }
+
+    input:checked+ .slidershowlaws .on
+    {display: block;}
+
+    input:checked + .slidershowlaws .off
+    {display: none;}
+
+    input:checked+ .slidermode .on
+    {display: block;}
+
+    input:checked + .slidermode .off
+    {display: none;}
+
+    /*--------- END --------*/
+
+    /* Rounded sliders */
+    .slidershowlaws.round {
+      border-radius: 34px;
+    }
+
+    .slidershowlaws.round:before {
+      border-radius: 50%;}
+
+    .slidermode.round {
+      border-radius: 34px;
+    }
+
+    .slidermode.round:before {
+      border-radius: 50%;
+    }
+
 </style>
+
 <body>
     <div class="container">
         {% include "includes/messages.html" %}

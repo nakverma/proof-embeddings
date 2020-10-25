@@ -222,19 +222,19 @@ def checkSyntax(log_expr):
     parser = LogicParser()
     try:
         result = parser.parse(lexer.tokenize(log_expr))
+        if result:
+            return True
+        return False
     except:
         return False
-    
-    if result:
-        return True
-    return False
 
 
+"""
 if __name__ == '__main__':
     lexer = LogicLexer()
     parser = LogicParser()
     # text = "pvq->p^r"
-    # text = "r^q"
-    text = "ppp"
+    text = "r^q"
     result = parser.parse(lexer.tokenize(text))
     print(result)
+"""
