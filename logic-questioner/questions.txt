@@ -1,0 +1,27 @@
+tautologies:
+
+(p∨q)∨(p∨¬q)
+((p→r)∧(q→r)∧(p∨q))->r
+(¬(¬x))↔x
+((p→q)∧(q→r))→(p→r)
+F->T
+
+
+fallacies:
+
+~(p->q)^(p^q^s->r)^p
+(~q∨q)∧~r∧p∧r
+~r∧((~p∨p)∧r)^(p->r)
+s∧((~s∧~q)∨(~s∧~T))∧p
+
+
+
+other:
+
+(p->q)^(q->r) = p->(q^r)
+~(~((q∧r)∨(q∧~r))∧p) = p->q
+q∨(p∧~q) = ~p->q
+~(~(((~p∧s)∨((~p∧T)∧~s))∧p)∧~p) = p
+~(q∧~p)∧(q∨~p) = p↔q
+~(~r∧~(~(p∧(q∨q)))) = (p^q)->r
+
