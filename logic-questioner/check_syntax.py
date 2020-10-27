@@ -5,16 +5,19 @@ import re
 import sys
 
 
+
+
 class LogicLexer(Lexer):
     # Set of token names.   This is always required
 
-    tokens = {P,Q,R,TRUE,FALSE,AND,OR,NOT,IMP,D_IMP,R_PAREN,L_PAREN}
+    tokens = {P,Q,R,S,TRUE,FALSE,AND,OR,NOT,IMP,D_IMP,R_PAREN,L_PAREN}
 
     ignore = ' \t'
 
     P = 'p'
     Q = 'q'
     R = 'r'
+    S = 's'
     TRUE = 'T'
     FALSE = 'F'
     AND = '\\^|∧'
@@ -24,6 +27,11 @@ class LogicLexer(Lexer):
     D_IMP = '<->|↔'
     R_PAREN = '\\('
     L_PAREN = '\\)'
+
+    def error(self, t):
+        print("Illegal character '%s'" % t.value[0])
+        sys.exit()
+
 
 
 class Expr:
@@ -205,6 +213,10 @@ class LogicParser(Parser):
         return p.R
         # return Var(p[0])
 
+    @_('S')
+    def term(self, p):
+        return p.S
+
     @_('TRUE')
     def term(self, p):
         return p.TRUE
@@ -216,25 +228,239 @@ class LogicParser(Parser):
         # return Lit(p[0])
 
 
+    def error(self, p):
+        if p:
+            print("Syntax error at token", p.type)
+            sys.exit()
+        else:
+            emsg = "Syntax error: reached end of expression"+\
+                        "with missing operand / parentheses"
+            print(emsg)
+            sys.exit()
+
 
 def checkSyntax(log_expr):
     lexer = LogicLexer()
     parser = LogicParser()
     try:
         result = parser.parse(lexer.tokenize(log_expr))
+        if result:
+            return True
+        return False
     except:
         return False
-    
-    if result:
-        return True
-    return False
+
+
+
+
+
 
 
 if __name__ == '__main__':
     lexer = LogicLexer()
     parser = LogicParser()
-    # text = "pvq->p^r"
-    # text = "r^q"
-    text = "ppp"
+
+    text = "pvq->p^r"
     result = parser.parse(lexer.tokenize(text))
     print(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class LogicParser(Parser):
+#     # Get the token list from the lexer (required)
+#     tokens = LogicLexer.tokens
+#
+#     @_('orarg')
+#     def expr(self, p):
+#         return p.orarg
+#
+#     @_('orarg OR andarg')
+#     def orarg(self, p):
+#         return p.orarg + 'v' + p.andarg
+#
+#     @_('andarg')
+#     def orarg(self, p):
+#         return p.andarg
+#
+#     @_('andarg AND imparg')
+#     def andarg(self, p):
+#         return p.andarg + '^' + p.imparg
+#
+#     @_('imparg')
+#     def andarg(self, p):
+#         return p.imparg
+#
+#     @_('imparg IMP dblimparg')
+#     def imparg(self, p):
+#         return p.imparg + '->' + p.dblimparg
+#
+#     @_('dblimparg')
+#     def imparg(self, p):
+#         return p.dblimparg
+#
+#     @_('dblimparg D_IMP notarg')
+#     def dblimparg(self, p):
+#         return p.dblimparg + '<->' + p.notarg
+#
+#     @_('notarg')
+#     def dblimparg(self, p):
+#         return p.notarg
+#
+#     @_('NOT term')
+#     def notarg(self, p):
+#         return '~' + p.term
+#
+#     @_('term')
+#     def notarg(self, p):
+#         return p.term
+#
+#     @_('R_PAREN expr L_PAREN')
+#     def term(self, p):
+#         return '(' + p.expr + ')'
+#
+#     @_('P')
+#     def term(self, p):
+#         return 'p'
+#
+#     @_('Q')
+#     def term(self, p):
+#         return 'q'
+#
+#     @_('R')
+#     def term(self, p):
+#         return 'r'
+#
+#     @_('TRUE')
+#     def term(self, p):
+#         return 'T'
+#
+#     @_('FALSE')
+#     def term(self, p):
+#         return 'F'
+
+
+
+
+
+
+
+
+
+
+
+
+#
+# class LogicParser(Parser):
+#     # Get the token list from the lexer (required)
+#     tokens = LogicLexer.tokens
+#
+#     # precedence = (
+#     #                 ('right', NOT),
+#     #                 ('nonassoc', D_IMP),
+#     #                 ('right', IMP),
+#     #                 ('right', AND),
+#     #                 ('right', OR),
+#     # )
+#
+#     # precedence = (
+#     #                 ('right', OR),
+#     #                 ('right', AND),
+#     #                 ('right', IMP),
+#     #                 ('nonassoc', D_IMP),
+#     #                 ('right', NOT)
+#     # )
+#
+#     @_('orarg')
+#     def expr(self, p):
+#         return p[0]
+#
+#     @_('orarg OR andarg')
+#     def orarg(self, p):
+#         return OrOp(p[1], p[0], p[2])
+#
+#     @_('andarg')
+#     def orarg(self, p):
+#         return p[0]
+#
+#     @_('andarg AND imparg')
+#     def andarg(self, p):
+#         return AndOp(p[1], p[0], p[2])
+#
+#     @_('imparg')
+#     def andarg(self, p):
+#         return p[0]
+#
+#     @_('imparg IMP dblimparg')
+#     def imparg(self, p):
+#         return ImpOp(p[1], p[0], p[2])
+#
+#     @_('dblimparg')
+#     def imparg(self, p):
+#         return p[0]
+#
+#     @_('dblimparg D_IMP notarg')
+#     def dblimparg(self, p):
+#         return DblimpOp(p[1], p[0], p[2])
+#
+#     @_('notarg')
+#     def dblimparg(self, p):
+#         return p[0]
+#
+#     @_('NOT term')
+#     def notarg(self, p):
+#         return NotOp(p[0], p[1])
+#
+#     @_('term')
+#     def notarg(self, p):
+#         return p[0]
+#
+#     @_('R_PAREN expr L_PAREN')
+#     def term(self, p):
+#         return p[1]
+#
+#     @_('P')
+#     def term(self, p):
+#         return Var(p[0])
+#
+#     @_('Q')
+#     def term(self, p):
+#         return Var(p[0])
+#
+#     @_('R')
+#     def term(self, p):
+#         return Var(p[0])
+#
+#     @_('TRUE')
+#     def term(self, p):
+#         return Lit(p[0])
+#
+#     @_('FALSE')
+#     def term(self, p):
+#         return Lit(p[0])
+#
+
+
+
+# comment
