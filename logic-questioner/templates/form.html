@@ -9,17 +9,27 @@
 
 {% from "includes/formhelpers.html" import render_field %}
 
-<form action="" method="POST" style="width: 75%; margin: 0 auto;">
-    <div style="width: 75%; margin: 0 auto;">
-        <label class="switch" style="width: 200px; float: left; margin-left:15%; margin-right: 10%;">
+<form id="form" action="" method="POST" style="width: 75%; margin: 0 auto;">
+    <div style="width: 100%; margin: 0 auto;">
+
+        <label class="switch" style="width: 135px; float: left; margin-left:10%; margin-right: 10%;">
             <input type="checkbox" id="tog_btn_show_laws">
-            <div class="slidershowlaws round"><!--ADDED HTML -->
-                <span class="on" style="font-size: 85%;">Show Laws</span>
-                <span class="off" style="font-size: 85%;">Hide Laws</span><!--END-->
+            <div class="slidershowlaws round">
+                <span class="on" style="font-size: 85%; text-align: center;">Show Laws</span>
+                <span class="off" style="font-size: 85%; text-align: center;">Hide Laws</span>
             </div>
         </label>
-    {{ render_field(form.mode, class="radio", style="width:30%; float: left;") }}
+
+        <div>
+            {{ render_field(form.mode, class="radio", style="width:20%; float: left;") }}
+        </div>
+
+        <div class="input-range" style="width: 20%; margin-left: 15%; float: left;">
+            <div id="range-slider" data-value=""></div>
+            <div id="labels-list" class="labels" data-value=""></div>
+        </div>
     </div>
+
     <br />
     <br />
     <br />
@@ -52,17 +62,86 @@
     <output style="width: 100%; color: #008000; margin: 0 auto; display: flex; justify-content: center;">{{ form.output }}</output>
     <br/>
     <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
-        <button type="submit" class="btn btn-primary" name="next" value="NEXT" style="width: 25%;">NEW STEP</button>
+        <button type="submit" class="btn btn-danger" name="skip" value="SKIP" style="width: 20%;">SKIP QUESTION</button>
         <span style="width: 10px"></span>
-        <button type="submit" class="btn btn-primary" name="end" value="END" style="width: 25%;">CHECK</button>
+        <button type="submit" class="btn btn-danger" name="clear" value="CLEAR" style="width: 20%;">CLEAR ALL</button>
+        <span style="width: 10px"></span>
+        <button type="submit" class="btn btn-primary" name="next" value="NEXT" style="width: 20%;">NEW STEP</button>
+        <span style="width: 10px"></span>
+        <button type="submit" class="btn btn-primary" name="end" value="END" style="width: 20%;">SUBMIT</button>
     </div>
+
+    <input style="display: none;" type="text" id="difficulty" name="difficulty" value={{ form.difficulty }} />
+    <input style="display: none;" type="text" id="showlaws" name="showlaws" value={{ form.showlaws}} />
 
     <br />
     <br />
     <br />
+
     <img src="{{url_for('static', filename='laws_table.png')}}" alt="Laws Table Image" class="toggleoff" id="laws_table" style="width:100%;"/>
 
 </form>
+
+<script type="text/javascript">
+    var max = 3, // Set max value
+    icon = "fa-fire", // Set the icon (https://fontawesome.com/icons)
+    target = document.querySelectorAll('[data-value]'),
+    listIcon = document.getElementById("labels-list");
+
+    if (document.getElementById('difficulty').value == 'mild') {
+        initvalue = 1;
+    } else if (document.getElementById('difficulty').value == 'medium') {
+        initvalue = 2;
+    } else {
+        initvalue = 3;
+    }
+
+    // Function to update du value
+    function updateValue(target, value){
+        target.forEach(function(currentIndex) {
+            currentIndex.dataset.value =  value;
+        });
+    }
+
+    // Init the number of item with the initial value settings
+
+    for (i = 0; i < max; i++) { 
+        var picto = "<i class='fas "+ icon +"'></i>";
+        $(".labels").append(picto);
+    }
+
+    updateValue(target, initvalue);
+
+    // Update the slider on click
+
+    $('.fas').on( "click", function(){
+        var index = $(this).index() + 1;
+
+        if (index == 1) {
+            document.getElementById('difficulty').value = 'mild';
+        } else if (index == 2) {
+            document.getElementById('difficulty').value = 'medium';
+        } else {
+            document.getElementById('difficulty').value = 'spicy';
+        }
+
+        $( "#range-slider" ).slider( "value", index );
+        updateValue(target, index);
+    });
+
+
+    // Init the slider
+    $( "#range-slider" ).slider({
+        range: "min",
+        value: initvalue,
+        min: 1, 
+        max: max, 
+
+        slide: function( event, ui ) {                     
+          updateValue(target, ui.value);
+        }
+    });
+</script>
 
 <script>
     function autocomplete(inp, arr) {
@@ -184,6 +263,7 @@
                 }
             }
         }
+
 /* Execute a function when someone clicks in the document: */
 document.addEventListener("click", function (e) {
     closeAllLists(e.target);
@@ -195,7 +275,18 @@ document.addEventListener("click", function (e) {
     var toggle_button = document.getElementById("tog_btn_show_laws");
     var laws_table_image = document.getElementById("laws_table");
 
+    if (document.getElementById('showlaws').value == 1) { 
+        document.getElementById("tog_btn_show_laws").click();
+        document.getElementById("laws_table").classList.toggle("toggleon");
+    }
+
     toggle_button.onclick = function() {
+        if (document.getElementById('showlaws').value == 1) { 
+            document.getElementById('showlaws').value = 0;
+        }
+        else {
+            document.getElementById('showlaws').value = 1;
+        }   
         laws_table_image.classList.toggle("toggleon");
     };
 
@@ -206,6 +297,7 @@ document.addEventListener("click", function (e) {
         autocomplete(document.getElementById("steps-" + i.toString() + "-step"), start_tokens);
     }
 </script>
+
 
 {% endblock body %}
 
