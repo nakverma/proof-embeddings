@@ -63,5 +63,6 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
             del f
             return False
 
-# example: should return True
-# print(check_correct_operation('T', '~F', 1))
+if __name__ == "__main__":
+    print(check_correct_operation('T', '~F', ['BOOLEAN_EQUIVALENCE'], 1))
+

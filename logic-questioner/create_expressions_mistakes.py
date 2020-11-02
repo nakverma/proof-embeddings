@@ -978,7 +978,10 @@ class AndNode(N_aryNode):
         for nonidx in nonoridxs:
             for oridx in oridxs:
                 if new_ops[nonidx] in new_ops[oridx].operands:
-                    new_ops.pop(nonidx)
+                    new_ops.pop(oridx)
+
+        if len(new_ops) == 1:
+            return new_ops[0]
 
         retand = AndNode(self.parent)
         retand.set_operands(new_ops)
@@ -1113,6 +1116,8 @@ class AndNode(N_aryNode):
             return False
 
     def reduce_identity(self):
+        # ok i think this is doing the same thing as remove_true,
+        # but for now it will stay
         for i in range(len(self.operands)):
             if isinstance(self.operands[i], TrueNode):
                 if len(self.operands) == 2:
@@ -1180,8 +1185,8 @@ class AndNode(N_aryNode):
             new_ops.pop(idx)
         if len(new_ops) == 1:
             return new_ops[0]
-        retor = OrNode(self.parent)
-        retor.set_operands(new_ops)
+        retand = AndNode(self.parent)
+        retand.set_operands(new_ops)
         return retor
 
     def to_iff(self):
@@ -1261,7 +1266,7 @@ class OrNode(N_aryNode):
     def __init__(self, parent, operands=None):
         N_aryNode.__init__(self, parent, operands)
         self.token = "∨"
-        self.nodeOps = set([20,21,22,23,24,25,43,44,48,49,50,55,57,72])
+        self.nodeOps = set([20,21,22,23,24,25,43,44,48,49,50,55,57,72,77])
         # complex ops: the return value is a list of replacement nodes
         self.complexOps = set([20,44])
         self.node_ops_dict = {20:self.commutative2,
@@ -1276,6 +1281,7 @@ class OrNode(N_aryNode):
                                 55:self.distribute,
                                 57:self.factor,
                                 50:self.negation,
+                                77:self.absorption,
                                 72:self.remove_false,
                                 44:self.expand2}
 
@@ -1708,6 +1714,33 @@ class OrNode(N_aryNode):
         else:
             return False
 
+    def absorption(self):
+
+        andidxs = []
+        nonandidxs = []
+        for i in range(len(self.operands)-1, -1, -1):
+            if isinstance(self.operands[i], AndNode):
+                andidxs.append(i)
+            else:
+                nonandidxs.append(i)
+        if not andidxs:
+            return False
+
+        new_ops = [o.copy() for o in self.operands]
+
+        for nonidx in nonandidxs:
+            for andidx in andidxs:
+                if new_ops[nonidx] in new_ops[andidx].operands:
+                    new_ops.pop(andidx)
+
+        if len(new_ops) == 1:
+            return new_ops[0]
+
+        retor = OrNode(self.parent)
+        retor.set_operands(new_ops)
+        return retor
+
+
     def identity(self):
         andnode = AndNode(self.parent)
         truenode = TrueNode(andnode)
@@ -1969,12 +2002,13 @@ class LogicTree():
 
         self.blowup_control=blowup_control
 
-        cur_max_op_id = 76
+        cur_max_op_id = 77
         self.all_ops = set([i for i in range(1,cur_max_op_id+1)])
 
-        self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72]
+        self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]
         self.BOOLEAN_EQUIVALENCE = [51,40,52,53]
-        self.IMP_TO_DISJ = [23,26,61,63]
+        self.IMP_TO_DISJ = [23,26]
+        self.IFF_TO_IMPLICATION = [61,63]
         self.DOMINATION = [1,2,3,4,5,6,10,31,32,33,34,35,36,48,65,66,68,71,74]
         self.DOMINATION.extend([75])
         self.INDEMPOTENCE = [45,46,47,49,60,70]
@@ -1984,12 +2018,13 @@ class LogicTree():
         self.DISTRIBUTIVITY = [54,56,55,57]
         self.NEGATION = [7,8,9,37,38,39,50,67,76]
         self.DEMORGAN = [18,24,28,29]
-        self.ABSORPTION = [64]
+        self.ABSORPTION = [64,77]
         self.ALL = [i for i in range(1, cur_max_op_id+1)]
 
         self.op_optns_diict = {'IDENTITY':self.IDENTITY,
         'BOOLEAN_EQUIVALENCE':self.BOOLEAN_EQUIVALENCE,
         'IMPLICATION_TO_DISJUNCTION':self.IMP_TO_DISJ,
+        'IFF_TO_IMPLICATION':self.IFF_TO_IMPLICATION,
         'DOMINATION':self.DOMINATION,
         'IDEMPOTENCE':self.INDEMPOTENCE,
         'DOUBLE_NEGATION':self.DOUBLE_NEGATION,
@@ -2011,7 +2046,7 @@ class LogicTree():
         self.expansive_ops = self.expansive_ops.union(set([37,38,39,40,45,46]))
         self.expansive_ops = self.expansive_ops.union(set([62,65,66,67,70,74]))
         self.expansive_ops = self.expansive_ops.union(set([75,76]))
-        self.reductive_ops = set([26,48,49,50,52,53,58,59,62,60,64,71])
+        self.reductive_ops = set([26,48,49,50,52,53,58,59,62,60,64,71,73,77])
 
 
         self.op_pairs_dict = {}
@@ -3376,7 +3411,6 @@ class LogicTreeTrainer():
             ret_mistks += str_mistks
             return ret_mistks
         return (str_mistks, node_mistks)
-
 
 
 
