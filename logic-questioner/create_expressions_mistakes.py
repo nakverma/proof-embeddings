@@ -1178,7 +1178,7 @@ class AndNode(N_aryNode):
         for i in range(len(self.operands)-1, -1, -1):
             if isinstance(self.operands[i], TrueNode):
                 true_idxs.append(i)
-        if not true_idxs:
+        if not true_idxs or len(true_idxs) == len(self.operands):
             return False
         new_ops = [o.copy() for o in self.operands]
         for idx in true_idxs:
