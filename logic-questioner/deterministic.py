@@ -45,7 +45,7 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
         trees = trainer.get_trees()
 
         if len(trees) < 1500:
-            tree_strs = []
+            tree_strs = [t.parse_tree() for t in trees]
             for t in trees:
                 for loc_parses in t.deep_parse_tree():
                     tree_strs.append(loc_parses)
