@@ -31,7 +31,7 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
     with redirect_stdout(f):
 
         try:
-            trainer = LogicTreeTrainer(e1, op_seq=ops, op_pairs=False, expand=None)
+            trainer = LogicTreeTrainer(e1, expand=None, op_seq=ops, op_pairs=False)
         except:
             raise ValueError('Could not parse', e1)
 
