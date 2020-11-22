@@ -1187,7 +1187,7 @@ class AndNode(N_aryNode):
             return new_ops[0]
         retand = AndNode(self.parent)
         retand.set_operands(new_ops)
-        return retor
+        return retand
 
     def to_iff(self):
         for i in range(len(self.operands)-1):
