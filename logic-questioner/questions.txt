@@ -25,3 +25,37 @@ q∨(p∧~q) = ~p->q
 ~(q∧~p)∧(q∨~p) = p↔q
 ~(~r∧~(~(p∧(q∨q)))) = (p^q)->r
 
+
+
+
+
+new (1/11):
+
+tautologies:
+
+(p^q)v(~pv(p^~q))
+((p∨q)∧(r∨~q))->(p∨r)
+(p^q)->(pvq)
+q->(p->q)
+p^~(p^~q)<->p^q
+
+
+fallacies:
+
+
+other:
+
+(p->q)->((p->q)->q) = (pvq)
+(pvq)^(pv~q) = p
+~(p^~q)vq = ~pvq
+~(p^q)^(pv~q) = ~q
+(pvq)^(~p->~q) = p
+
+
+
+
+
+
+
+
+#

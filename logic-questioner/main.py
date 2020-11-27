@@ -166,8 +166,8 @@ def login():
             error = 'Invalid Credentials!'
         else:
             question_text, question_answer = select_a_question('mild')
-            return redirect(url_for('solve', 
-                                    username=request.form['username'], 
+            return redirect(url_for('solve',
+                                    username=request.form['username'],
                                     password=request.form['password'],
                                     question_text=question_text,
                                     question_answer=question_answer,
@@ -204,12 +204,10 @@ def solve():
         if "skip" in request.form:
             question_text, question_answer = select_a_question(request.form['difficulty'], current_question_text=request.args['question_text'])
             return redirect(url_for('solve', 
-                                    # username=request.args['username'],
-                                    # password=request.args['password'],
                                     question_text=question_text,
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
-                                    showlaws=request.form['showlaws'])) 
+                                    showlaws=request.form['showlaws']))
 
         elif "clear" in request.form:
             previous_data = form.data
@@ -236,10 +234,10 @@ def solve():
             elif form.data['mode'] == 'practice' and not step_syntax_check(step):
                 has_error = True
                 step.error = 'Please use correct logic syntax in this step!'
-            elif form.data['mode'] == 'practice' and i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']]*3, num_ops=3):
+            elif form.data['mode'] == 'practice' and i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
-            elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']]*3, num_ops=3):
+            elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
             else:
@@ -261,21 +259,21 @@ def solve():
                     if not step_syntax_check(step):
                         has_error = True
                         step.error = 'Please use correct logic syntax in this step!'
-                    elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']]*3, num_ops=3):
+                    elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
                         has_error = True
                         step.error = 'Did NOT apply %s correctly!' % step.data['law']
                     elif i != 0:
                         if not step_syntax_check(form.steps[i-1]):
-                            has_error = True 
+                            has_error = True
                             step.error = 'Please use correct logic syntax in the previous step!'
-                        elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']]*3, num_ops=3):
+                        elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                             has_error = True
                             step.error = 'Did NOT apply %s correctly!' % step.data['law']
                     else:
                         step.error = None
 
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
-                form.output = 'CORRECT! Press "Skip Question" to move on to the next question!' 
+                form.output = 'CORRECT! Press "Skip Question" to move on to the next question!'
 
     return render_template("form.html", form=form)
 
