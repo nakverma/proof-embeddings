@@ -3,7 +3,7 @@
 {% block body %}
 
 <br/>
-<h1 class="latex" style="text-align: center">Logic Questioner</h1>
+<h1 class="latex" style="text-align: center">Propositional Logic Practice</h1>
 <br/>
 <br/>
 
@@ -12,7 +12,11 @@
 <form id="form" action="" method="POST" style="width: 75%; margin: 0 auto;">
     <div style="width: 100%; margin: 0 auto;">
 
-        <label class="switch" style="width: 135px; float: left; margin-left:10%; margin-right: 10%;">
+        <p class="btn btn-primary" data-toggle="tooltip" title="Toggle this button to show the law table for assistance during your practice."
+           style="float:left; border-radius: 100%; font-size: 0.5%; margin-left: 5%;">
+            <i class="fa fa-info"></i>
+        </p>
+        <label class="switch" style="width: 15%; float: left; margin-right: 10%;">
             <input type="checkbox" id="tog_btn_show_laws">
             <div class="slidershowlaws round">
                 <span class="on" style="font-size: 85%; text-align: center;">Show Laws</span>
@@ -20,13 +24,23 @@
             </div>
         </label>
 
-        <div>
-            {{ render_field(form.mode, class="radio", style="width:20%; float: left;") }}
+
+        <div style="width:20%; float: left; margin-left: 10%;">
+            <p class="btn btn-primary" data-toggle="tooltip" title="Toggle between 'Practice' mode for checks on every new step and 'Test' mode for a final check when the 'Check' button is pressed."
+               style="float: left; border-radius: 100%; font-size: 0.5%;">
+                <i class="fa fa-info"></i>
+            </p>
+            {{ render_field(form.mode, class="radio") }}
         </div>
 
-        <div class="input-range" style="width: 20%; margin-left: 15%; float: left;">
-            <div id="range-slider" data-value=""></div>
-            <div id="labels-list" class="labels" data-value=""></div>
+        <div style="width: 20%; margin-left: 10%; float: left;">
+            <p class="btn btn-primary" data-toggle="tooltip" title="Choose the difficulty of the questions. Left-most is the mildest, and right-most is the most spicy!"
+               style="float:left; border-radius: 100%; font-size: 0.5%;">
+                <i class="fa fa-info"></i>
+            </p>
+            <div class="input-range" style="width: 100%; margin-left: 65%;">
+                <div id="labels-list" class="labels" data-value=""></div>
+            </div>
         </div>
     </div>
 
@@ -34,7 +48,8 @@
     <br />
     <br />
     <br />
-    <h5 style="text-align: center">{{ form.question }}</h5>
+
+    <h5 style="text-align: center;">{{ form.question }}</h5>
     {% for string_field in form.steps %}
         {{ string_field.hidden_tag() }}
         {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
@@ -68,7 +83,7 @@
         <span style="width: 10px"></span>
         <button type="submit" class="btn btn-primary" name="next" value="NEXT" style="width: 20%;">NEW STEP</button>
         <span style="width: 10px"></span>
-        <button type="submit" class="btn btn-primary" name="end" value="END" style="width: 20%;">SUBMIT</button>
+        <button type="submit" class="btn btn-success" name="end" value="END" style="width: 20%;">CHECK</button>
     </div>
 
     <input style="display: none;" type="text" id="difficulty" name="difficulty" value={{ form.difficulty }} />
@@ -83,6 +98,10 @@
 </form>
 
 <script type="text/javascript">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+
     var max = 3, // Set max value
     icon = "fa-fire", // Set the icon (https://fontawesome.com/icons)
     target = document.querySelectorAll('[data-value]'),

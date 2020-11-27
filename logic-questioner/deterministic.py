@@ -1,7 +1,5 @@
 """
-
 checking student response deterministically
-
 """
 from create_expressions_mistakes import *
 
@@ -12,6 +10,7 @@ import io
 
 
 def check_correct_operation(e1, e2, ops, num_ops=1):
+    ops = ops*num_ops
     def convert_to_logic_symbols(expr):
         logic_symbols = ['∧', '∨', '→', '↔', '~']
         new_expr = expr.replace('^', '∧')
@@ -31,7 +30,7 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
     with redirect_stdout(f):
 
         try:
-            trainer = LogicTreeTrainer(e1, op_seq=ops, op_pairs=False, expand=None)
+            trainer = LogicTreeTrainer(e1, expand=None, op_seq=ops, op_pairs=False)
         except:
             raise ValueError('Could not parse', e1)
 
@@ -45,7 +44,7 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
         trees = trainer.get_trees()
 
         if len(trees) < 1500:
-            tree_strs = []
+            tree_strs = [t.parse_tree() for t in trees]
             for t in trees:
                 for loc_parses in t.deep_parse_tree():
                     tree_strs.append(loc_parses)
@@ -63,5 +62,5 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
             del f
             return False
 
-# example: should return True
-# print(check_correct_operation('T', '~F', 1))
+if __name__ == "__main__":
+    print(check_correct_operation('T', '~F', ['LITERAL NEGATION'], 1))

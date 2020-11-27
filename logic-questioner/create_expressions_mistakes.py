@@ -30,14 +30,12 @@ from sympy import *
 
 """
 NOTE:
-
     When adding new operation to any LogicNode, need to:
         1. Make sure the operation id (some integer) is 1 + max(all other operation ids)
         2. Add operation id to the __init__ method of the class
         3. Add operation to the  __init__ method of the LogicTree Class
         4. Update cur_max_op_id in LogicTree __init__ method
         5. Add the operation id to the assortment of operations in LogicTree __init__ (e.g. IDENTITY)
-
 """
 
 
@@ -196,7 +194,6 @@ class TrueNode(LeafNode):
     def __init__(self, parent):
         LeafNode.__init__(self, parent)
         self.token = "T"
-        self.nodeOps = set([1,2,3,4,5,6,7,8,9,10,51,65,66,67,68])
 
         self.node_ops_dict = {1:self.new_var_p,\
                                 2:self.new_var_q,\
@@ -214,6 +211,7 @@ class TrueNode(LeafNode):
                                 10:self.identity,\
                                 68:self.identity2\
                                 }
+        self.nodeOps = set(self.node_ops_dict.keys())
 
 
     def copy(self):
@@ -356,7 +354,6 @@ class FalseNode(LeafNode):
     def __init__(self, parent):
         LeafNode.__init__(self, parent)
         self.token = "F"
-        self.nodeOps = set([31,32,33,34,35,36,37,38,39,40,11,74,75,76])
         self.node_ops_dict = {31:self.new_var_p_f,\
                                 32:self.new_var_q_f,\
                                 33:self.new_var_r_f,\
@@ -372,6 +369,7 @@ class FalseNode(LeafNode):
                                 40:self.neg_f,\
                                 11:self.identity\
                                 }
+        self.nodeOps = set(self.node_ops_dict.keys())
 
     def copy(self):
         f = FalseNode(self.parent)
@@ -506,10 +504,10 @@ class PNode(LeafNode):
     def __init__(self, parent):
         LeafNode.__init__(self, parent)
         self.token = "p"
-        self.nodeOps = set([12,45])
         self.node_ops_dict = {12:self.identity,\
                                 45:self.identity2\
                                 }
+        self.nodeOps = set(self.node_ops_dict.keys())
 
 
     def copy(self):
@@ -555,10 +553,10 @@ class QNode(LeafNode):
     def __init__(self, parent):
         LeafNode.__init__(self, parent)
         self.token = "q"
-        self.nodeOps = set([13,46])
         self.node_ops_dict = {13:self.identity,\
                                 46:self.identity2\
                                 }
+        self.nodeOps = set(self.node_ops_dict.keys())
 
     def copy(self):
         q = QNode(self.parent)
@@ -601,10 +599,10 @@ class RNode(LeafNode):
     def __init__(self, parent):
         LeafNode.__init__(self, parent)
         self.token = "r"
-        self.nodeOps = set([14,47])
         self.node_ops_dict = {14:self.identity,\
                                 47:self.identity2\
                                 }
+        self.nodeOps = set(self.node_ops_dict.keys())
 
     def copy(self):
         r = RNode(self.parent)
@@ -648,10 +646,10 @@ class SNode(LeafNode):
     def __init__(self, parent):
         LeafNode.__init__(self, parent)
         self.token = "s"
-        self.nodeOps = set([69,70])
         self.node_ops_dict = {69:self.identity,\
                                 70:self.identity2\
                                 }
+        self.nodeOps = set(self.node_ops_dict.keys())
 
 
     def copy(self):
@@ -699,9 +697,7 @@ class AndNode(N_aryNode):
     def __init__(self, parent, operands=None):
         N_aryNode.__init__(self, parent, operands)
         self.token = "∧"
-        self.nodeOps = set([15,16,17,18,19,41,42,54,56,60,59,64,71,73])
-        # complex ops: the return value is a list of replacement nodes
-        self.complexOps = set([15,42,63])
+
         self.node_ops_dict = {15:self.commutative1,
                                 16:self.associative3,
                                 17:self.associative4,
@@ -717,6 +713,10 @@ class AndNode(N_aryNode):
                                 71:self.domination,
                                 73:self.remove_true,
                                 19:self.identity}
+
+        # complex ops: the return value is a list of replacement nodes
+        self.complexOps = set([15,42,63])
+        self.nodeOps = set(self.node_ops_dict.keys())
 
 
     def copy(self):
@@ -978,7 +978,10 @@ class AndNode(N_aryNode):
         for nonidx in nonoridxs:
             for oridx in oridxs:
                 if new_ops[nonidx] in new_ops[oridx].operands:
-                    new_ops.pop(nonidx)
+                    new_ops.pop(oridx)
+
+        if len(new_ops) == 1:
+            return new_ops[0]
 
         retand = AndNode(self.parent)
         retand.set_operands(new_ops)
@@ -1113,6 +1116,8 @@ class AndNode(N_aryNode):
             return False
 
     def reduce_identity(self):
+        # ok i think this is doing the same thing as remove_true,
+        # but for now it will stay
         for i in range(len(self.operands)):
             if isinstance(self.operands[i], TrueNode):
                 if len(self.operands) == 2:
@@ -1173,16 +1178,16 @@ class AndNode(N_aryNode):
         for i in range(len(self.operands)-1, -1, -1):
             if isinstance(self.operands[i], TrueNode):
                 true_idxs.append(i)
-        if not true_idxs:
+        if not true_idxs or len(true_idxs) == len(self.operands):
             return False
         new_ops = [o.copy() for o in self.operands]
         for idx in true_idxs:
             new_ops.pop(idx)
         if len(new_ops) == 1:
             return new_ops[0]
-        retor = OrNode(self.parent)
-        retor.set_operands(new_ops)
-        return retor
+        retand = AndNode(self.parent)
+        retand.set_operands(new_ops)
+        return retand
 
     def to_iff(self):
         for i in range(len(self.operands)-1):
@@ -1261,9 +1266,6 @@ class OrNode(N_aryNode):
     def __init__(self, parent, operands=None):
         N_aryNode.__init__(self, parent, operands)
         self.token = "∨"
-        self.nodeOps = set([20,21,22,23,24,25,43,44,48,49,50,55,57,72])
-        # complex ops: the return value is a list of replacement nodes
-        self.complexOps = set([20,44])
         self.node_ops_dict = {20:self.commutative2,
                                 21:self.associative1,
                                 22:self.associative2,
@@ -1276,8 +1278,13 @@ class OrNode(N_aryNode):
                                 55:self.distribute,
                                 57:self.factor,
                                 50:self.negation,
+                                77:self.absorption,
                                 72:self.remove_false,
                                 44:self.expand2}
+
+        # complex ops: the return value is a list of replacement nodes
+        self.complexOps = set([20,44])
+        self.nodeOps = set(self.node_ops_dict.keys())
 
 
 
@@ -1508,26 +1515,12 @@ class OrNode(N_aryNode):
         return retnot
 
 
-
-    # def demorg_factor(self):
-    #     retnot = NotNode(self.parent)
-    #     andnode = AndNode(retnot)
-    #     new_ops = [o.copy() for o in self.operands]
-    #     for i in range(len(new_ops)):
-    #         notnode = NotNode(andnode)
-    #         notnode.set_arg(new_ops[i])
-    #         new_ops[i] = notnode
-    #     andnode.set_operands(new_ops)
-    #     return retnot
-
-
     def domination(self):
         for i in range(len(self.operands)):
             if isinstance(self.operands[i], TrueNode):
                 return TrueNode(self.parent)
         else:
             return False
-
 
     def remove_false(self):
         false_idxs = []
@@ -1568,7 +1561,6 @@ class OrNode(N_aryNode):
         # if len(self.operands) == 2: #GOTTA CHANGE THIS TO ITERATE OVER ALL OPERANDS INSTEAD OF JUST WHEN THERE ARE 2
 
         for i in range(len(self.operands)-1):
-            # if isinstance(self.operands[i], LeafNode) and\
             if isinstance(self.operands[i+1], AndNode) and\
                 len(self.operands[i+1].operands) == 2:
                 andnode = AndNode(self.parent)
@@ -1594,7 +1586,6 @@ class OrNode(N_aryNode):
                     return ret_or
 
 
-            # elif isinstance(self.operands[i+1], LeafNode) and\
             elif isinstance(self.operands[i], AndNode) and\
                 len(self.operands[i].operands) == 2:
                 andnode = AndNode(self.parent)
@@ -1708,6 +1699,33 @@ class OrNode(N_aryNode):
         else:
             return False
 
+    def absorption(self):
+
+        andidxs = []
+        nonandidxs = []
+        for i in range(len(self.operands)-1, -1, -1):
+            if isinstance(self.operands[i], AndNode):
+                andidxs.append(i)
+            else:
+                nonandidxs.append(i)
+        if not andidxs:
+            return False
+
+        new_ops = [o.copy() for o in self.operands]
+
+        for nonidx in nonandidxs:
+            for andidx in andidxs:
+                if new_ops[nonidx] in new_ops[andidx].operands:
+                    new_ops.pop(andidx)
+
+        if len(new_ops) == 1:
+            return new_ops[0]
+
+        retor = OrNode(self.parent)
+        retor.set_operands(new_ops)
+        return retor
+
+
     def identity(self):
         andnode = AndNode(self.parent)
         truenode = TrueNode(andnode)
@@ -1749,13 +1767,13 @@ class ImplicationNode(BinaryNode):
     def __init__(self, parent, left=None, right=None):
         BinaryNode.__init__(self, parent, left, right)
         self.token = "→"
-        self.nodeOps = set([26,27])
-        # complex ops: the return value is a list of replacement nodes
-        self.complexOps = set([26])
         self.node_ops_dict = {26:self.to_or,\
                                 27:self.identity\
                                 }
 
+        # complex ops: the return value is a list of replacement nodes
+        self.complexOps = set([26])
+        self.nodeOps = set(self.node_ops_dict.keys())
 
     def copy(self):
         imp = ImplicationNode(self.parent, self.left.copy(), self.right.copy())
@@ -1814,12 +1832,13 @@ class DblimplicationNode(BinaryNode):
     def __init__(self, parent, left=None, right=None):
         BinaryNode.__init__(self, parent, left, right)
         self.token = "↔"
-        self.nodeOps = set([61,62])
-        # complex ops: the return value is a list of replacement nodes
-        self.complexOps = set([61])
         self.node_ops_dict = {61:self.to_and,\
                                 62:self.identity\
                                 }
+
+        # complex ops: the return value is a list of replacement nodes
+        self.complexOps = set([61])
+        self.nodeOps = set(self.node_ops_dict.keys())
 
 
     def copy(self):
@@ -1878,7 +1897,6 @@ class NotNode(UnaryNode):
     def __init__(self, parent, arg=None):
         UnaryNode.__init__(self, parent, arg)
         self.token = "~"
-        self.nodeOps = set([28,29,30,52,53,58])
         self.node_ops_dict = {28:self.demorgan1,\
                                 29:self.demorgan2,\
                                 52:self.negate_f,\
@@ -1886,6 +1904,8 @@ class NotNode(UnaryNode):
                                 58:self.double_negation,\
                                 30:self.identity\
                                 }
+
+        self.nodeOps = set(self.node_ops_dict.keys())
 
     def copy(self):
         nt = NotNode(self.parent, self.arg.copy())
@@ -1969,12 +1989,13 @@ class LogicTree():
 
         self.blowup_control=blowup_control
 
-        cur_max_op_id = 76
+        cur_max_op_id = 77
         self.all_ops = set([i for i in range(1,cur_max_op_id+1)])
 
-        self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72]
+        self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]
         self.BOOLEAN_EQUIVALENCE = [51,40,52,53]
-        self.IMP_TO_DISJ = [23,26,61,63]
+        self.IMP_TO_DISJ = [23,26]
+        self.IFF_TO_IMPLICATION = [61,63]
         self.DOMINATION = [1,2,3,4,5,6,10,31,32,33,34,35,36,48,65,66,68,71,74]
         self.DOMINATION.extend([75])
         self.INDEMPOTENCE = [45,46,47,49,60,70]
@@ -1984,22 +2005,25 @@ class LogicTree():
         self.DISTRIBUTIVITY = [54,56,55,57]
         self.NEGATION = [7,8,9,37,38,39,50,67,76]
         self.DEMORGAN = [18,24,28,29]
-        self.ABSORPTION = [64]
+        self.ABSORPTION = [64,77]
         self.ALL = [i for i in range(1, cur_max_op_id+1)]
 
-        self.op_optns_diict = {'IDENTITY':self.IDENTITY,
-        'BOOLEAN_EQUIVALENCE':self.BOOLEAN_EQUIVALENCE,
-        'IMPLICATION_TO_DISJUNCTION':self.IMP_TO_DISJ,
-        'DOMINATION':self.DOMINATION,
-        'IDEMPOTENCE':self.INDEMPOTENCE,
-        'DOUBLE_NEGATION':self.DOUBLE_NEGATION,
-        'COMMUTATIVITY':self.COMMUTATIVITY,
-        'ASSOCIATIVITY':self.ASSOCIATIVITY,
-        'DISTRIBUTIVITY':self.DISTRIBUTIVITY,
-        'NEGATION':self.NEGATION,
-        'DEMORGAN':self.DEMORGAN,
-        'ABSORPTION':self.ABSORPTION,
-        'ALL':self.ALL}
+        self.op_optns_diict = {
+            'Identity': self.IDENTITY,
+            'Domination': self.DOMINATION,
+            'Idempotence': self.INDEMPOTENCE,
+            'Commutativity': self.COMMUTATIVITY,
+            'Associativity': self.ASSOCIATIVITY,
+            'Double Negation': self.DOUBLE_NEGATION,
+            'Negation': self.NEGATION,
+            'DeMorgan': self.DEMORGAN,
+            'Absorption': self.ABSORPTION,
+            'Literal Negation': self.BOOLEAN_EQUIVALENCE,
+            'Distributivity': self.DISTRIBUTIVITY,
+            'Implication to Disjunction': self.IMP_TO_DISJ,
+            'Iff to Implication': self.IFF_TO_IMPLICATION,
+            'ALL': self.ALL
+        }
 
 
         self.op_seq = op_seq
@@ -2011,7 +2035,7 @@ class LogicTree():
         self.expansive_ops = self.expansive_ops.union(set([37,38,39,40,45,46]))
         self.expansive_ops = self.expansive_ops.union(set([62,65,66,67,70,74]))
         self.expansive_ops = self.expansive_ops.union(set([75,76]))
-        self.reductive_ops = set([26,48,49,50,52,53,58,59,62,60,64,71])
+        self.reductive_ops = set([26,48,49,50,52,53,58,59,62,60,64,71,73,77])
 
 
         self.op_pairs_dict = {}
@@ -3377,8 +3401,8 @@ class LogicTreeTrainer():
             return ret_mistks
         return (str_mistks, node_mistks)
 
-
-
+t = LogicTreeTrainer('pvqvrv~pv~q', expand=None, op_seq=['Commutativity'])
+t.increment_ops()
 
 if __name__ == '__main__':
 
@@ -3390,14 +3414,12 @@ if __name__ == '__main__':
 
     """
     trainers = []
-
     starting_exprs = ['~(~p)↔p']
     for expr in starting_exprs:
         print("building trees from " + expr)
         trainer = LogicTreeTrainer(expr,expand=None)
         trainer.increment_ops(4)
         trainers.append(trainer)
-
     for i in range(len(trainers)):
         trainer = trainers[i]
         seed = starting_exprs[i]

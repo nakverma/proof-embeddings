@@ -87,17 +87,19 @@
     }
 
     input:checked + .slidershowlaws:before {
-      -webkit-transform: translateX(90px);
-      -ms-transform: translateX(90px);
-      transform: translateX(90px);
+      -webkit-transform: translateX(80px);
+      -ms-transform: translateX(80px);
+      transform: translateX(80px);
     }
 
-    .radio {
-      fieldset.inlineLabels ul {list-style:none};
+    fieldset.inlineLabels ul {list-style:none}
+
+    .radio
+    {
       list-style: none;
-      border: 0px;
+      border: 0;
       width: 100%;
-      height: 2em;
+      height: 5%;
     }
     /*------ ADDED CSS ---------*/
     .on
@@ -168,6 +170,7 @@
       flex-wrap: wrap;
       justify-content: center;
     }
+
     .input-range #range-slider {
       width: calc(100% - 16.66666667%);
       order: 10;
@@ -178,21 +181,7 @@
       border-radius: 2vw;
       height: 0.8vw;
     }
-    @media screen and (max-width: 768px) {
-      .input-range #range-slider {
-        margin-top: 4vw;
-      }
-    }
-    .input-range #range-slider .ui-slider-range {
-      background-color: #bad6ef;
-      border-radius: 2vw;
-      -webkit-transition: all ease 250ms;
-      -moz-transition: all ease 250ms;
-      -o-transition: all ease 250ms;
-      transition: all ease 250ms;
-      cursor: pointer;
-      height: 0.8vw;
-    }
+
     .input-range #range-slider .ui-slider-handle {
       background-color: #bad6ef;
       border: none;
@@ -210,15 +199,15 @@
       transition: all ease 250ms;
       cursor: pointer;
     }
-    .input-range #range-slider[data-value="1"] .ui-slider-range,
+
     .input-range #range-slider[data-value="1"] .ui-slider-handle {
       background-color: #bad6ef;
     }
-    .input-range #range-slider[data-value="2"] .ui-slider-range,
+
     .input-range #range-slider[data-value="2"] .ui-slider-handle {
       background-color: #ffb72f;
     }
-    .input-range #range-slider[data-value="3"] .ui-slider-range,
+
     .input-range #range-slider[data-value="3"] .ui-slider-handle {
       background-color: #fd6b6b;
     }
@@ -240,7 +229,7 @@
       transition: all ease 250ms;
     }
     .input-range .labels .fas:before {
-      font-size: 4vw;
+      font-size: 65px;
     }
     .input-range .labels .fas:hover {
       -webkit-transform: scale(1.1);
@@ -262,8 +251,6 @@
       text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
 
-
-
 </style>
 
 <body>
@@ -279,4 +266,3 @@
 
 </body>
 </html>
-
