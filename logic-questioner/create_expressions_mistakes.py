@@ -3401,9 +3401,6 @@ class LogicTreeTrainer():
             return ret_mistks
         return (str_mistks, node_mistks)
 
-t = LogicTreeTrainer('pvqvrv~pv~q', expand=None, op_seq=['Commutativity'])
-t.increment_ops()
-
 if __name__ == '__main__':
 
     trainer = LogicTreeTrainer('T', expand=None)
