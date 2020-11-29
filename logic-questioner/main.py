@@ -13,6 +13,7 @@ app.secret_key = "secret"
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
+completed_question = False
 
 # TODO: Make sure the symbols above are correct e.g. ¬ instead of ~
 questions = [
@@ -190,26 +191,37 @@ def solve():
     except:
         return redirect(url_for('login'))
     """
+    global completed_question
 
     form = WireForm(request.form, steps=steps_init)
     form.question.text = request.args['question_text']
     form.difficulty = request.args['question_difficulty']
     form.showlaws = request.args['showlaws']
     has_error = False
+
+
     # TODO: Implement question difficulty and show/hide laws persistently!
     # TODO: There are some problems with the clear and delete button in terms of the visual
     #       persistent changes, investigate these!
 
     if request.method == 'POST':
         if "skip" in request.form:
+            if not completed_question:
+                ans_data_csv = open('answer_data.csv', 'a')
+                ans_data_csv.write(form.question.text+",0,"+str(len(form.steps)-1)+"\n")
+                ans_data_csv.close()
+            completed_question = False
+
             question_text, question_answer = select_a_question(request.form['difficulty'], current_question_text=request.args['question_text'])
-            return redirect(url_for('solve', 
+            return redirect(url_for('solve',
                                     question_text=question_text,
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
                                     showlaws=request.form['showlaws']))
 
-        elif "clear" in request.form:
+        completed_question = False
+
+        if "clear" in request.form:
             previous_data = form.data
             previous_data['steps'] = [{"step": "", "csrf_token": ""}]
             form.__init__(data=previous_data)
@@ -224,6 +236,8 @@ def solve():
                 form.__init__(data=previous_data)
                 return render_template("form.html", form=form)
 
+        step_data = None
+        # (question, step#, law, correct/incorrect)
         for i, step in enumerate(form.steps):
             if not step_input_check(step):
                 has_error = True
@@ -237,11 +251,21 @@ def solve():
             elif form.data['mode'] == 'practice' and i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
+
+                if len(form.steps) == 1: # this is the only step
+                    step_data = (form.question.text, i, step.data['law'], 0)
+
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
+
+                if i == len(form.steps)-1: # this is the most recent step
+                    step_data = (form.question.text, i, step.data['law'], 0)
             else:
                 step.error = None
+
+                if form.data['mode'] == 'practice' and i == len(form.steps)-1: # this is the most recent step
+                    step_data = (form.question.text, i, step.data['law'], 1)
 
         if has_error:
             pass
@@ -262,6 +286,9 @@ def solve():
                     elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
                         has_error = True
                         step.error = 'Did NOT apply %s correctly!' % step.data['law']
+
+                        if len(form.steps) == 1: # this is the only step
+                            step_data = (form.question.text, i, step.data['law'], 0)
                     elif i != 0:
                         if not step_syntax_check(form.steps[i-1]):
                             has_error = True
@@ -269,11 +296,38 @@ def solve():
                         elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                             has_error = True
                             step.error = 'Did NOT apply %s correctly!' % step.data['law']
+
+                            if i == len(form.steps)-1: # this is the most recent step
+                                step_data = (form.question.text, i, step.data['law'], 0)
+                        else:
+                            if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
+                                step_data = (form.question.text, i, step.data['law'], 1)
                     else:
                         step.error = None
 
+                        if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
+                            step_data = (form.question.text, i, step.data['law'], 1)
+
+
+
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Skip Question" to move on to the next question!'
+                completed_question = True
+                ans_data_csv = open('answer_data.csv', 'a')
+
+                ans_data_csv.write(form.question.text+",1,"+str(len(form.steps)-1)+"\n")
+                ans_data_csv.close()
+
+        if step_data:
+            step_commad = ""
+            for entry in step_data:
+                step_commad += str(entry) + ","
+            step_commad += "\n"
+
+            step_data_csv = open('step_data.csv', 'a') #'a' option creates the file if not present, appends if present
+            step_data_csv.write(step_commad)
+            step_data_csv.close()
+
 
     return render_template("form.html", form=form)
 
