@@ -376,6 +376,8 @@ def solve():
                 except ClientError as e:
                     print(e)
 
+                completed_question = False
+
             elif not has_error:
                 previous_data = form.data
                 previous_data['steps'].append({"step": "", "csrf_token": ""})
