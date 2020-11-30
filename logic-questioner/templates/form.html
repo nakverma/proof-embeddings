@@ -13,7 +13,7 @@
     <div style="width: 100%; margin: 0 auto;">
 
         <p class="btn btn-primary" data-toggle="tooltip" title="Toggle this button to show the law table for assistance during your practice."
-           style="float:left; border-radius: 100%; font-size: 0.5%; margin-left: 5%;">
+           style="float:left; border-radius: 100%; font-size: 0.5%; margin-left: 20%;">
             <i class="fa fa-info"></i>
         </p>
         <label class="switch" style="width: 15%; float: left; margin-right: 10%;">
@@ -24,7 +24,7 @@
             </div>
         </label>
 
-
+        <!--
         <div style="width:20%; float: left; margin-left: 10%;">
             <p class="btn btn-primary" data-toggle="tooltip" title="Toggle between 'Practice' mode for checks on every new step and 'Test' mode for a final check when the 'Check' button is pressed."
                style="float: left; border-radius: 100%; font-size: 0.5%;">
@@ -32,32 +32,35 @@
             </p>
             {{ render_field(form.mode, class="radio") }}
         </div>
+        -->
 
         <div style="width: 20%; margin-left: 10%; float: left;">
-            <p class="btn btn-primary" data-toggle="tooltip" title="Choose the difficulty of the questions. Left-most is the mildest, and right-most is the most spicy!"
+            <p class="btn btn-primary" data-toggle="tooltip" title='Choose the difficulty of the questions using "Next Question" button. Left-most is the mildest, and right-most is the most spicy!'
                style="float:left; border-radius: 100%; font-size: 0.5%;">
                 <i class="fa fa-info"></i>
             </p>
-            <div class="input-range" style="width: 100%; margin-left: 65%;">
+            <div class="input-range" style="width: 100%; margin-left: 65%; pointer-events:none;">
                 <div id="labels-list" class="labels" data-value=""></div>
             </div>
         </div>
+
     </div>
 
     <br />
     <br />
     <br />
     <br />
+    <br />
 
-    <h5 style="text-align: center;">{{ form.question }}</h5>
+    <h5 style="text-align: center;">{{ ' '.join(form.question.text.split()[:2]) }}</h5>
+    <h5 style="text-align: center;">{{ form.question.text.split()[2] }}</h5>
+    <h5 style="text-align: center;">{{ ' '.join(form.question.text.split()[3:-1]) }}</h5>
+    <h5 style="text-align: center;">{{ form.question.text.split()[-1] }}</h5>
     {% for string_field in form.steps %}
         {{ string_field.hidden_tag() }}
         {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
 
         <div style="width:100%; padding-left:2%; height:80px; border-radius: 15px; background: #D4D4D4; display: flex; align-items: center;">
-            <div style="width:5%; margin-right: 2%; float: left;">
-                <button type="submit" class="btn btn-danger" name="delete_{{ loop.index|string }}" value="&#x2716;">&#x2716;</button>
-            </div>
             <div style="width:33%; margin-right:2%; float: left; padding-top:1%">
                 {{ render_field(string_field.law, class="form-control") }}
             </div>
@@ -68,6 +71,12 @@
                     {{ render_field(string_field.step, class="form-control", autocomplete="off") }}
                 {% endif %}
             </div>
+            <div style="width:5%; margin-left: 2%; float: left;">
+                <button type="submit" class="btn btn-danger" name="delete_{{ loop.index|string }}" value="&#x2716;">&#x2716;</button>
+            </div>
+            <div style="width:5%; margin-left: 2%; margin-right: 2%; float: left;">
+                <button type="submit" class="btn btn-success" name="next" value="&#x2713;">&#x2713;</button>
+            </div>
         </div>
         <br/>
 
@@ -77,17 +86,17 @@
     <output style="width: 100%; color: #008000; margin: 0 auto; display: flex; justify-content: center;">{{ form.output }}</output>
     <br/>
     <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
-        <button type="submit" class="btn btn-danger" name="skip" value="SKIP" style="width: 20%;">SKIP QUESTION</button>
+        <button onclick="openForm()" type="button" class="btn btn-danger" name="skip" value="SKIP" style="width: 20%;">NEXT QUESTION</button>
         <span style="width: 10px"></span>
         <button type="submit" class="btn btn-danger" name="clear" value="CLEAR" style="width: 20%;">CLEAR ALL</button>
         <span style="width: 10px"></span>
-        <button type="submit" class="btn btn-primary" name="next" value="NEXT" style="width: 20%;">NEW STEP</button>
-        <span style="width: 10px"></span>
-        <button type="submit" class="btn btn-success" name="end" value="END" style="width: 20%;">CHECK</button>
+        <button type="submit" class="btn btn-success" name="next" value="NEXT" style="width: 20%;">CHECK / NEW STEP</button>
+        <!-- <span style="width: 10px"></span> -->
+        <!-- <button type="submit" class="btn btn-success" name="end" value="END" style="width: 20%;">CHECK</button> -->
     </div>
 
     <input style="display: none;" type="text" id="difficulty" name="difficulty" value={{ form.difficulty }} />
-    <input style="display: none;" type="text" id="showlaws" name="showlaws" value={{ form.showlaws}} />
+    <input style="display: none;" type="text" id="showlaws" name="showlaws" value={{ form.showlaws }} />
 
     <br />
     <br />
@@ -97,7 +106,27 @@
 
 </form>
 
+<div id="myForm" class="form-popup" style="background-color: lightgray; width: 30%; height: 27.5%; position: absolute; top: 20%; left: 35%; border-radius: 25px; border: 2px solid black;">
+    <br />
+    <p style="text-align: center">Choose the difficulty level for the next question!</p>
+    <div class="input-range" style="width: 40%; margin-left: 50%; margin-top: 15%; ">
+        <div id="labels-list" class="labels" data-value=""></div>
+    </div>
+    <button type="button" class="btn btn-danger" style="margin: 0 auto; display: block; " onclick="closeForm()">CLOSE</button>
+</div>
 <script type="text/javascript">
+    function openForm() {
+        document.getElementById("form").style.opacity = 0.25;
+        document.getElementById("form").style.pointerEvents = "none";
+        document.getElementById("myForm").style.display = "block";
+    }
+
+    function closeForm() {
+        document.getElementById("form").style.opacity = 1.0;
+        document.getElementById("form").style.pointerEvents = "auto";
+        document.getElementById("myForm").style.display = "none";
+    }
+
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
     })
@@ -123,7 +152,6 @@
     }
 
     // Init the number of item with the initial value settings
-
     for (i = 0; i < max; i++) { 
         var picto = "<i class='fas "+ icon +"'></i>";
         $(".labels").append(picto);
@@ -132,7 +160,6 @@
     updateValue(target, initvalue);
 
     // Update the slider on click
-
     $('.fas').on( "click", function(){
         var index = $(this).index() + 1;
 
@@ -146,6 +173,8 @@
 
         $( "#range-slider" ).slider( "value", index );
         updateValue(target, index);
+
+        document.getElementById("form").submit();
     });
 
 
@@ -165,10 +194,18 @@
 <script>
     function autocomplete(inp, arr) {
         /* Two arguments, i) the text field element and ii) array of autocompleted values: */
-
         var currentFocus;
         /* Execute a function when someone writes in the text field: */
         inp.addEventListener("input", function (e) {
+            /* LaTeXify things! */
+            var str = this.value;
+            var ret = str.replace("v", "∨");
+            ret = ret.replace("^", "∧");
+            ret = ret.replace("<->", "↔");
+            ret = ret.replace("->", "→");
+            ret = ret.replace("~", "¬");
+            this.value = ret;
+
             var a, b, i, val = this.value;
             /*close any already open lists of autocompleted values*/
             closeAllLists();
@@ -179,7 +216,7 @@
 
             arr = [];
             var first_type_tokens = ["p", "q", "r", "T", "F"];
-            var second_type_tokens = ["v", "^", "->", "<->"];
+            var second_type_tokens = ["∨", "∧", "→", "↔"];
             var last_token = this.value.substr(this.value.length - 1);
             if (first_type_tokens.includes(last_token)) {
                 for (i = 0; i < second_type_tokens.length; i++) {
@@ -191,7 +228,7 @@
                     arr.push(this.value + first_type_tokens[i]);
                 }
                 arr.push(this.value + "(");
-                arr.push(this.value + "~")
+                arr.push(this.value + "¬")
             } else if (last_token == "(") {
                 for (i = 0; i < first_type_tokens.length; i++) {
                     arr.push(this.value + first_type_tokens[i]);

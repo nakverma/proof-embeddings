@@ -464,3 +464,21 @@ if __name__ == '__main__':
 
 
 # comment
+
+
+def raw2latex(s):
+    s = s.replace("v", "∨")
+    s = s.replace("^", "∧")
+    s = s.replace("<->", "↔")
+    s = s.replace("->", "→")
+    s = s.replace("~", "¬")
+    return s
+
+
+def latex2raw(s):
+    s = s.replace("¬", "~")
+    s = s.replace("→", "->")
+    s = s.replace("↔", "<->")
+    s = s.replace("∧", "^")
+    s = s.replace("v", "∨")
+    return s

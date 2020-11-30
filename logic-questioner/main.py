@@ -4,20 +4,29 @@ from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
 import random
 
-from check_syntax import checkSyntax
+from check_syntax import checkSyntax, raw2latex, latex2raw
 from deterministic import check_correct_operation
 from create_expressions_mistakes import LogicTree
 
+import boto3
+import botocore
+from botocore.exceptions import ClientError
+
 app = Flask(__name__)
 app.secret_key = "secret"
+
+BUCKET_NAME = 'response-data' # replace with your bucket name
+ANSWER_KEY = 'answer_data.csv' # replace with your object key
+STEP_KEY = 'step_data.csv'
+
+s3 = boto3.resource('s3')
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
 completed_question = False
 
-# TODO: Make sure the symbols above are correct e.g. ¬ instead of ~
 questions = [
-    {'question': "Prove that (pvq)v(pv~q) is a tautology.",
+    {'question': "Prove that %s is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
     {'question': "Prove that ((p->r)^(q->r)^(pvq))->r is a tautology.",
@@ -68,7 +77,7 @@ questions = [
     {'question': "Prove that qv(p^~q) is logically equivalent to ~p->q.",
      'answer': '~p->q',
      'difficulty': 'spicy'},
-    {'question': "Prove that ~(~(((~p^s)∨((~p^T)^~s))^p)^~p) is logically equivalent to p.",
+    {'question': "Prove that ~(~(((~p^s)v((~p^T)^~s))^p)^~p) is logically equivalent to p.",
      'answer': 'p',
      'difficulty': 'spicy'},
     {'question': "Prove that ~(q^~p)^(qv~p) is logically equivalent to p<->q.",
@@ -89,10 +98,29 @@ questions = [
     {'question': "Prove that ~(p^q)^(pv~q) is logically equivalent to ~q.",
      'answer': '~q',
      'difficulty': 'spicy'},
-    {'question': "Prove that (pvq)^(~p->~q)  is logically equivalent to p.",
+    {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
      'answer': 'p',
      'difficulty': 'spicy'}
 ]
+
+questions_ = []
+for question in questions:
+    question['answer'] = raw2latex(question['answer'])
+    q = "Prove that "
+    q += raw2latex(question['question'].split('Prove that ')[-1].split(' is')[0])
+    q += " is "
+    q += " ".join(question['question'].split('Prove that ')[-1].split(' is')[-1].split()[:-1])
+    q += " "
+    last = question['question'].split('Prove that ')[-1].split(' is')[-1].split()[-1]
+    if last != 'fallacy' and last != 'tautology':
+        q += raw2latex(last)
+    else:
+        q += last
+    question['question'] = q
+    questions_.append(question)
+questions = questions_
+
+print("QUESTIONS: ", questions)
 
 laws = list(LogicTree().op_optns_diict.keys())
 laws.remove('ALL')
@@ -112,7 +140,7 @@ def step_law_check(step):
 
 
 def step_syntax_check(step):
-    if not checkSyntax(step.data['step']):
+    if not checkSyntax(latex2raw(step.data['step'])):
         return False
     return True
 
@@ -138,8 +166,8 @@ class WireForm(Form):
     mode = RadioField('choice',
                       validators=[DataRequired('Please select assessment mode!')],
                       choices=[('practice', 'Practice'), ('test', 'Test')],
-                      default='test')
-    # NOTE: Default mode is made "test" and the radio button option is removed visually
+                      default='practice')
+    # NOTE: Default mode is made "practice" and the radio button option is removed visually
     #       (i.e. from HTML). This was suggested by Prof. Ansaf.
     difficulty = 'mild'
     showlaws = 0
@@ -199,17 +227,41 @@ def solve():
     form.showlaws = request.args['showlaws']
     has_error = False
 
-
     # TODO: Implement question difficulty and show/hide laws persistently!
     # TODO: There are some problems with the clear and delete button in terms of the visual
     #       persistent changes, investigate these!
 
     if request.method == 'POST':
-        if "skip" in request.form:
+        for i in range(len(form.steps)):
+            if 'delete_%d' % (i + 1) in request.form:
+                previous_data = form.data
+                del previous_data['steps'][i]
+                if len(form.steps) == 1:
+                    previous_data['steps'].append({"step": "", "csrf_token": ""})
+                form.__init__(data=previous_data)
+                form.showlaws = request.form['showlaws']
+                return render_template("form.html", form=form)
+
+        if "skip" in request.form or ("clear" not in request.form and "next" not in request.form and "end" not in request.form):
             if not completed_question:
-                ans_data_csv = open('answer_data.csv', 'a')
-                ans_data_csv.write(form.question.text+",0,"+str(len(form.steps)-1)+"\n")
+                try:
+                    s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
+                except botocore.exceptions.ClientError as e:
+                    if e.response['Error']['Code'] == "404":
+                        print("The object does not exist.")
+                    else:
+                        raise
+
+                ans_data_csv = open('local_answer_data.csv', 'a')
+                ans_data_csv.write(form.question.text + ",0," + str(len(form.steps) - 1) + "\n")
                 ans_data_csv.close()
+
+                s3_client = boto3.client('s3')
+                try:
+                    response = s3_client.upload_file('local_answer_data.csv', BUCKET_NAME, ANSWER_KEY)
+                except ClientError as e:
+                    print(e)
+
             completed_question = False
 
             question_text, question_answer = select_a_question(request.form['difficulty'], current_question_text=request.args['question_text'])
@@ -225,16 +277,8 @@ def solve():
             previous_data = form.data
             previous_data['steps'] = [{"step": "", "csrf_token": ""}]
             form.__init__(data=previous_data)
+            form.showlaws = request.form['showlaws']
             return render_template("form.html", form=form)
-
-        for i in range(len(form.steps)):
-            if 'delete_%d' % (i+1) in request.form:
-                previous_data = form.data
-                del previous_data['steps'][i]
-                if len(form.steps) == 1:
-                    previous_data['steps'].append({"step": "", "csrf_token": ""})
-                form.__init__(data=previous_data)
-                return render_template("form.html", form=form)
 
         step_data = None
         # (question, step#, law, correct/incorrect)
@@ -269,13 +313,15 @@ def solve():
 
         if has_error:
             pass
+        # elif "next" in request.form:
+            # previous_data = form.data
+            # previous_data['steps'].append({"step": "", "csrf_token": ""})
+            # form.__init__(data=previous_data)
+        # elif "end" in request.form:
         elif "next" in request.form:
             previous_data = form.data
-            previous_data['steps'].append({"step": "", "csrf_token": ""})
             form.__init__(data=previous_data)
-        elif "end" in request.form:
-            previous_data = form.data
-            form.__init__(data=previous_data)
+            form.showlaws = request.form['showlaws']
 
             if form.data['mode'] == 'test':
                 has_error = False
@@ -308,15 +354,33 @@ def solve():
                         if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
                             step_data = (form.question.text, i, step.data['law'], 1)
 
-
-
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
-                form.output = 'CORRECT! Press "Skip Question" to move on to the next question!'
+                form.output = 'CORRECT! Press "Next Question" to move on to the next question!'
                 completed_question = True
-                ans_data_csv = open('answer_data.csv', 'a')
 
-                ans_data_csv.write(form.question.text+",1,"+str(len(form.steps)-1)+"\n")
+                try:
+                    s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
+                except botocore.exceptions.ClientError as e:
+                    if e.response['Error']['Code'] == "404":
+                        print("The object does not exist.")
+                    else:
+                        raise
+
+                ans_data_csv = open('local_answer_data.csv', 'a')
+                ans_data_csv.write(form.question.text + ",1," + str(len(form.steps) - 1) + "\n")
                 ans_data_csv.close()
+
+                s3_client = boto3.client('s3')
+                try:
+                    response = s3_client.upload_file('local_answer_data.csv', BUCKET_NAME, ANSWER_KEY)
+                except ClientError as e:
+                    print(e)
+
+            elif not has_error:
+                previous_data = form.data
+                previous_data['steps'].append({"step": "", "csrf_token": ""})
+                form.__init__(data=previous_data)
+                form.showlaws = request.form['showlaws']
 
         if step_data:
             step_commad = ""
@@ -324,10 +388,23 @@ def solve():
                 step_commad += str(entry) + ","
             step_commad += "\n"
 
-            step_data_csv = open('step_data.csv', 'a') #'a' option creates the file if not present, appends if present
+            try:
+                s3.Bucket(BUCKET_NAME).download_file(STEP_KEY, 'local_step_data.csv')
+            except botocore.exceptions.ClientError as e:
+                if e.response['Error']['Code'] == "404":
+                    print("The object does not exist.")
+                else:
+                    raise
+
+            step_data_csv = open('local_step_data.csv','a')  # 'a' option creates the file if not present, appends if present
             step_data_csv.write(step_commad)
             step_data_csv.close()
 
+            s3_client = boto3.client('s3')
+            try:
+                response = s3_client.upload_file('local_step_data.csv', BUCKET_NAME, STEP_KEY)
+            except ClientError as e:
+                print(e)
 
     return render_template("form.html", form=form)
 
