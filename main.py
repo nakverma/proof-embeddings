@@ -224,7 +224,7 @@ def solve():
                     else:
                         raise
 
-                ans_data_csv = open('local_answer_data.csv', 'w')
+                ans_data_csv = open('local_answer_data.csv', 'a')
                 ans_data_csv.write(form.question.text+",0,"+str(len(form.steps)-1)+"\n")
                 ans_data_csv.close()
 
@@ -339,20 +339,56 @@ def solve():
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Skip Question" to move on to the next question!'
                 completed_question = True
-                ans_data_csv = open('answer_data.csv', 'a')
 
+                try:
+                    s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
+                except botocore.exceptions.ClientError as e:
+                    if e.response['Error']['Code'] == "404":
+                        print("The object does not exist.")
+                    else:
+                        raise
+
+                ans_data_csv = open('local_answer_data.csv', 'a')
                 ans_data_csv.write(form.question.text+",1,"+str(len(form.steps)-1)+"\n")
                 ans_data_csv.close()
 
+                s3_client = boto3.client('s3')
+                try:
+                    response = s3_client.upload_file('local_answer_data.csv',\
+                                                        BUCKET_NAME,\
+                                                        ANSWER_KEY)
+                except ClientError as e:
+                    print(e)
+
+
         if step_data:
+
             step_commad = ""
             for entry in step_data:
                 step_commad += str(entry) + ","
             step_commad += "\n"
 
-            step_data_csv = open('step_data.csv', 'a') #'a' option creates the file if not present, appends if present
+            try:
+                s3.Bucket(BUCKET_NAME).download_file(STEP_KEY, 'local_step_data.csv')
+            except botocore.exceptions.ClientError as e:
+                if e.response['Error']['Code'] == "404":
+                    print("The object does not exist.")
+                else:
+                    raise
+
+            step_data_csv = open('local_step_data.csv', 'a') #'a' option creates the file if not present, appends if present
             step_data_csv.write(step_commad)
             step_data_csv.close()
+
+            s3_client = boto3.client('s3')
+            try:
+                response = s3_client.upload_file('local_step_data.csv',\
+                                                    BUCKET_NAME,\
+                                                    STEP_KEY)
+            except ClientError as e:
+                print(e)
+
+
 
 
     return render_template("form.html", form=form)
