@@ -705,7 +705,9 @@ class AndNode(N_aryNode):
                                 41:self.flatten1,
                                 42:self.expand1,
                                 54:self.distribute,
+                                80:self.distr_same_con,
                                 56:self.factor,
+                                81:self.factor_same_con,
                                 60:self.indempotence,
                                 59:self.reduce_identity,
                                 63:self.to_iff,
@@ -1046,6 +1048,62 @@ class AndNode(N_aryNode):
         else:
             return False
 
+    def distr_same_con(self):
+        for i in range(len(self.operands)-1):
+            if isinstance(self.operands[i+1], AndNode) and\
+                len(self.operands[i+1].operands) == 2:
+                andnode = AndNode(self.parent)
+                leftand = AndNode(andnode)
+                rightand = AndNode(andnode)
+                left_args = [self.operands[i].copy(), self.operands[i+1].operands[0].copy()]
+                right_args = [self.operands[i].copy(), self.operands[i+1].operands[1].copy()]
+                leftand.set_operands(left_args)
+                rightand.set_operands(right_args)
+                andnode.set_operands([leftand, rightand])
+
+                if len(self.operands) == 2:
+                    return andnode
+                else:
+                    ret_and = AndNode(self.parent)
+                    andnode.set_parent(ret_and)
+                    new_operands = [op.copy() for op in self.operands]
+                    new_operands.pop(i)
+                    new_operands.pop(i)
+                    new_operands.insert(i, andnode)
+                    ret_and.set_operands(new_operands)
+
+                    return ret_and
+
+
+            elif isinstance(self.operands[i], AndNode) and\
+                len(self.operands[i].operands) == 2:
+                andnode = AndNode(self.parent)
+                leftand = AndNode(andnode)
+                rightand = AndNode(andnode)
+                right_args = [self.operands[i+1].copy(), self.operands[i].operands[0].copy()]
+                left_args = [self.operands[i+1].copy(), self.operands[i].operands[1].copy()]
+                rightand.set_operands(right_args)
+                leftand.set_operands(left_args)
+                andnode.set_operands([leftand, rightand])
+
+                if len(self.operands) == 2:
+                    return andnode
+                else:
+                    ret_and = AndNode(self.parent)
+                    andnode.set_parent(ret_and)
+                    new_operands = [op.copy() for op in self.operands]
+                    new_operands.pop(i)
+                    new_operands.pop(i)
+                    new_operands.insert(i, andnode)
+                    ret_and.set_operands(new_operands)
+
+                    return ret_and
+
+        else:
+            return False
+
+
+
     def factor(self):
         # 𝑝 ∨ (𝑞 ∧𝑟) ≡ (𝑝 ∨𝑞) ∧ (𝑝 ∨𝑟)
 
@@ -1092,6 +1150,60 @@ class AndNode(N_aryNode):
                         andnode.set_operands(unq_ops)
                         ornode.set_operands([dup_op, andnode])
                         return ornode
+
+                else:
+                    return False
+            else:
+                return False
+
+
+    def factor_same_con(self):
+        # 𝑝 v (𝑞 ∨ 𝑟) ≡ (𝑝 v 𝑞) ∨ (𝑝 v 𝑟)
+
+        for i in range(len(self.operands)-1):
+            if isinstance(self.operands[i], AndNode) and\
+                isinstance(self.operands[i+1], AndNode) and\
+                len(self.operands[i].operands) == len(self.operands[i+1].operands) == 2:
+
+                # Check if the or nodes have a common operand
+                all_oprnds = self.operands[i].operands + self.operands[i+1].operands
+                # all_oprnds = [op.parse() for op in all_oprnds]
+                oprnd_counts = {}
+                for op in all_oprnds:
+                    if op in oprnd_counts:
+                        oprnd_counts[op] += 1
+                    else:
+                        oprnd_counts[op] = 1
+                dup_op = None
+                unq_ops = []
+                for op in all_oprnds:
+                    if oprnd_counts[op] == 2:
+                        dup_op = op.copy()
+                    else:
+                        unq_ops.append(op.copy())
+
+                if dup_op and len(unq_ops) == 2:
+                    assert(len(unq_ops) == 2)
+                    if len(self.operands) > 2:
+                        ret_and = AndNode(self.parent)
+                        top_and = AndNode(ret_and)
+                        andnode = AndNode(top_and)
+                        andnode.set_operands(unq_ops)
+                        top_and.set_operands([dup_op, andnode])
+
+                        new_operands = [op.copy() for op in self.operands]
+                        new_operands.pop(i)
+                        new_operands.pop(i)
+                        new_operands.insert(i, top_and)
+                        ret_and.set_operands(new_operands)
+                        return ret_and
+
+                    else:
+                        top_and = AndNode(self.parent)
+                        andnode = AndNode(top_and)
+                        andnode.set_operands(unq_ops)
+                        top_and.set_operands([dup_op, andnode])
+                        return top_and
 
                 else:
                     return False
@@ -1276,7 +1388,9 @@ class OrNode(N_aryNode):
                                 48:self.domination,
                                 49:self.indempotence,
                                 55:self.distribute,
+                                78:self.distr_same_con,
                                 57:self.factor,
+                                79:self.factor_same_con,
                                 50:self.negation,
                                 77:self.absorption,
                                 72:self.remove_false,
@@ -1514,7 +1628,6 @@ class OrNode(N_aryNode):
         retnot.set_arg(andnode)
         return retnot
 
-
     def domination(self):
         for i in range(len(self.operands)):
             if isinstance(self.operands[i], TrueNode):
@@ -1558,7 +1671,6 @@ class OrNode(N_aryNode):
 
     def distribute(self):
         # 𝑝 ∨ (𝑞 ∧𝑟) ≡ (𝑝 ∨𝑞) ∧ (𝑝 ∨𝑟)
-        # if len(self.operands) == 2: #GOTTA CHANGE THIS TO ITERATE OVER ALL OPERANDS INSTEAD OF JUST WHEN THERE ARE 2
 
         for i in range(len(self.operands)-1):
             if isinstance(self.operands[i+1], AndNode) and\
@@ -1606,6 +1718,60 @@ class OrNode(N_aryNode):
                     new_operands.pop(i)
                     new_operands.pop(i)
                     new_operands.insert(i, andnode)
+                    ret_or.set_operands(new_operands)
+
+                    return ret_or
+
+        else:
+            return False
+
+    def distr_same_con(self):
+        for i in range(len(self.operands)-1):
+            if isinstance(self.operands[i+1], OrNode) and\
+                len(self.operands[i+1].operands) == 2:
+                ornode = OrNode(self.parent)
+                leftor = OrNode(ornode)
+                rightor = OrNode(ornode)
+                left_args = [self.operands[i].copy(), self.operands[i+1].operands[0].copy()]
+                right_args = [self.operands[i].copy(), self.operands[i+1].operands[1].copy()]
+                leftor.set_operands(left_args)
+                rightor.set_operands(right_args)
+                ornode.set_operands([leftor, rightor])
+
+                if len(self.operands) == 2:
+                    return ornode
+                else:
+                    ret_or = OrNode(self.parent)
+                    ornode.set_parent(ret_or)
+                    new_operands = [op.copy() for op in self.operands]
+                    new_operands.pop(i)
+                    new_operands.pop(i)
+                    new_operands.insert(i, ornode)
+                    ret_or.set_operands(new_operands)
+
+                    return ret_or
+
+
+            elif isinstance(self.operands[i], OrNode) and\
+                len(self.operands[i].operands) == 2:
+                ornode = OrNode(self.parent)
+                leftor = OrNode(ornode)
+                rightor = OrNode(ornode)
+                right_args = [self.operands[i+1].copy(), self.operands[i].operands[0].copy()]
+                left_args = [self.operands[i+1].copy(), self.operands[i].operands[1].copy()]
+                rightor.set_operands(right_args)
+                leftor.set_operands(left_args)
+                ornode.set_operands([leftor, rightor])
+
+                if len(self.operands) == 2:
+                    return ornode
+                else:
+                    ret_or = OrNode(self.parent)
+                    ornode.set_parent(ret_or)
+                    new_operands = [op.copy() for op in self.operands]
+                    new_operands.pop(i)
+                    new_operands.pop(i)
+                    new_operands.insert(i, ornode)
                     ret_or.set_operands(new_operands)
 
                     return ret_or
@@ -1667,6 +1833,62 @@ class OrNode(N_aryNode):
                     return False
             else:
                 return False
+
+    def factor_same_con(self):
+        # 𝑝 v (𝑞 ∨ 𝑟) ≡ (𝑝 v 𝑞) ∨ (𝑝 v 𝑟)
+
+        for i in range(len(self.operands)-1):
+            if isinstance(self.operands[i], OrNode) and\
+                isinstance(self.operands[i+1], OrNode) and\
+                len(self.operands[i].operands) == len(self.operands[i+1].operands) == 2:
+                # all((isinstance(op, LeafNode) or isinstance(op, UnaryNode)) for op in self.operands[i].operands) and\
+                # all((isinstance(op, LeafNode) or isinstance(op, UnaryNode)) for op in self.operands[i+1].operands):
+
+                # Check if the or nodes have a common operand
+                all_oprnds = self.operands[i].operands + self.operands[i+1].operands
+                # all_oprnds = [op.parse() for op in all_oprnds]
+                oprnd_counts = {}
+                for op in all_oprnds:
+                    if op in oprnd_counts:
+                        oprnd_counts[op] += 1
+                    else:
+                        oprnd_counts[op] = 1
+                dup_op = None
+                unq_ops = []
+                for op in all_oprnds:
+                    if oprnd_counts[op] == 2:
+                        dup_op = op.copy()
+                    else:
+                        unq_ops.append(op.copy())
+
+                if dup_op and len(unq_ops) == 2:
+                    assert(len(unq_ops) == 2)
+                    if len(self.operands) > 2:
+                        ret_or = OrNode(self.parent)
+                        top_or = OrNode(ret_or)
+                        ornode = OrNode(top_or)
+                        ornode.set_operands(unq_ops)
+                        top_or.set_operands([dup_op, ornode])
+
+                        new_operands = [op.copy() for op in self.operands]
+                        new_operands.pop(i)
+                        new_operands.pop(i)
+                        new_operands.insert(i, top_or)
+                        ret_or.set_operands(new_operands)
+                        return ret_or
+
+                    else:
+                        top_or = OrNode(self.parent)
+                        ornode = OrNode(top_or)
+                        ornode.set_operands(unq_ops)
+                        top_or.set_operands([dup_op, ornode])
+                        return top_or
+
+                else:
+                    return False
+            else:
+                return False
+
 
     def negation(self):
         for i in range(len(self.operands)-1):
@@ -1989,7 +2211,7 @@ class LogicTree():
 
         self.blowup_control=blowup_control
 
-        cur_max_op_id = 77
+        cur_max_op_id = 81
         self.all_ops = set([i for i in range(1,cur_max_op_id+1)])
 
         self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]
@@ -2002,7 +2224,7 @@ class LogicTree():
         self.DOUBLE_NEGATION = [58]
         self.COMMUTATIVITY = [15,20]
         self.ASSOCIATIVITY = [16,17,41,42,21,22,43,44]
-        self.DISTRIBUTIVITY = [54,56,55,57]
+        self.DISTRIBUTIVITY = [54,56,55,57,78,79,80,81]
         self.NEGATION = [7,8,9,37,38,39,50,67,76]
         self.DEMORGAN = [18,24,28,29]
         self.ABSORPTION = [64,77]
