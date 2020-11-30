@@ -1,5 +1,3 @@
-boto3==1.16.25
-botocore==1.19.25
 click==7.1.2
 decorator==4.4.2
 Flask==1.1.2
@@ -7,16 +5,12 @@ Flask-WTF==0.14.3
 gunicorn==20.0.4
 itsdangerous==1.1.0
 Jinja2==2.11.2
-jmespath==0.10.0
 MarkupSafe==1.1.1
 mpmath==1.1.0
 networkx==2.5
 numpy==1.19.4
-python-dateutil==2.8.1
-s3transfer==0.3.3
-six==1.15.0
 sly==0.4
-sympy==1.7
-urllib3==1.26.2
+sympy==1.6.2
 Werkzeug==1.0.1
 WTForms==2.3.3
+boto3==1.16.25 botocore==1.19.25

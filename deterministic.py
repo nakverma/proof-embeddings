@@ -18,6 +18,7 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
         new_expr = new_expr.replace('<->', '↔')
         new_expr = new_expr.replace('->', '→')
         new_expr = new_expr.replace('x', 'p')
+        new_expr = new_expr.replace('¬', '~')
         return new_expr
 
     # Remove all spaces in expressions
