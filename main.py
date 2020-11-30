@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for
 from wtforms import Form, StringField, FormField, FieldList, Label, SelectField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
+import boto3
+import botocore
 import random
 
 from check_syntax import checkSyntax
@@ -10,6 +12,12 @@ from create_expressions_mistakes import LogicTree
 
 app = Flask(__name__)
 app.secret_key = "secret"
+
+BUCKET_NAME = 'response-data' # replace with your bucket name
+ANSWER_KEY = 'answer_data.csv' # replace with your object key
+STEP_KEY = 'step_data.csv'
+
+s3 = boto3.resource('s3')
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
@@ -207,9 +215,27 @@ def solve():
     if request.method == 'POST':
         if "skip" in request.form:
             if not completed_question:
-                ans_data_csv = open('answer_data.csv', 'a')
+
+                try:
+                    s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
+                except botocore.exceptions.ClientError as e:
+                    if e.response['Error']['Code'] == "404":
+                        print("The object does not exist.")
+                    else:
+                        raise
+
+                ans_data_csv = open('local_answer_data.csv', 'w')
                 ans_data_csv.write(form.question.text+",0,"+str(len(form.steps)-1)+"\n")
                 ans_data_csv.close()
+
+                s3_client = boto3.client('s3')
+                try:
+                    response = s3_client.upload_file('local_answer_data.csv',\
+                                                        BUCKET_NAME,\
+                                                        ANSWER_KEY)
+                except ClientError as e:
+                    print(e)
+
             completed_question = False
 
             question_text, question_answer = select_a_question(request.form['difficulty'], current_question_text=request.args['question_text'])
