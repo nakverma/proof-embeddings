@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+    <script> less = {async: true}; </script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/2.6.1/less.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+</head>
+
+<style>
+    .autocomplete {
+      /* The container must be positioned relative: */
+      position: relative;
+      display: inline-block;
+    }
+
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid #d4d4d4;
+      border-bottom: none;
+      border-top: none;
+      z-index: 99;
+      /* Position the autocomplete items to be the same width as the container: */
+      top: 100%;
+      left: 0;
+      right: 0;
+    }
+    .autocomplete-items div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #fff;
+      border-bottom: 1px solid #d4d4d4;
+    }
+    .autocomplete-items div:hover {
+      /* When hovering an item: */
+      background-color: #e9e9e9;
+    }
+    .autocomplete-active {
+      /* When navigating through the items using the arrow keys: */
+      background-color: DodgerBlue !important;
+      color: #ffffff;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 105px;
+      height: 45px;
+    }
+
+    .switch input {display:none;}
+
+    .slidershowlaws {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ca2222;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slidershowlaws:before {
+      position: absolute;
+      content: "";
+      height: 40px;
+      width: 40px;
+      left: 2.5px;
+      bottom: 2px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked + .slidershowlaws {
+      background-color: #2ab934;
+    }
+
+    input:focus + .slidershowlaws {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slidershowlaws:before {
+      -webkit-transform: translateX(80px);
+      -ms-transform: translateX(80px);
+      transform: translateX(80px);
+    }
+
+    fieldset.inlineLabels ul {list-style:none}
+
+    .radio
+    {
+      list-style: none;
+      border: 0;
+      width: 100%;
+      height: 5%;
+    }
+    /*------ ADDED CSS ---------*/
+    .on
+    {
+      display: none;
+    }
+
+    .on, .off
+    {
+      color: white;
+      position: absolute;
+      transform: translate(-50%,-50%);
+      top: 50%;
+      left: 50%;
+      font-size: 10px;
+      font-family: Verdana, sans-serif;
+    }
+
+    .toggleoff {
+      display: none;
+    }
+
+    .toggleon {
+      display: flex;
+    }
+
+    input:checked+ .slidershowlaws .on
+    {display: block;}
+
+    input:checked + .slidershowlaws .off
+    {display: none;}
+
+    input:checked+ .slidermode .on
+    {display: block;}
+
+    input:checked + .slidermode .off
+    {display: none;}
+
+    /*--------- END --------*/
+
+    /* Rounded sliders */
+    .slidershowlaws.round {
+      border-radius: 34px;
+    }
+
+    .slidershowlaws.round:before {
+      border-radius: 50%;}
+
+    .slidermode.round {
+      border-radius: 34px;
+    }
+
+    .slidermode.round:before {
+      border-radius: 50%;
+    }
+  
+    .input-range {
+      /* position: absolute; */
+      /* top: 50%; */
+      /* left: 50%; */
+      /* width: 30%; */
+      -webkit-transform: translate(-50%, -50%);
+      -moz-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      -o-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .input-range #range-slider {
+      width: calc(100% - 16.66666667%);
+      order: 10;
+      margin: 0;
+      border: none;
+      background-color: #f1f1f1;
+      margin-top: 2vw;
+      border-radius: 2vw;
+      height: 0.8vw;
+    }
+
+    .input-range #range-slider .ui-slider-handle {
+      background-color: #bad6ef;
+      border: none;
+      width: 1.5vw;
+      height: 1.5vw;
+      border-radius: 20px;
+      transform: translateY(-50%);
+      top: 50%;
+      margin-left: -0.75vw;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      outline: none;
+      -webkit-transition: all ease 250ms;
+      -moz-transition: all ease 250ms;
+      -o-transition: all ease 250ms;
+      transition: all ease 250ms;
+      cursor: pointer;
+    }
+
+    .input-range #range-slider[data-value="1"] .ui-slider-handle {
+      background-color: #bad6ef;
+    }
+
+    .input-range #range-slider[data-value="2"] .ui-slider-handle {
+      background-color: #ffb72f;
+    }
+
+    .input-range #range-slider[data-value="3"] .ui-slider-handle {
+      background-color: #fd6b6b;
+    }
+    .input-range .labels {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .input-range .labels .fas {
+      width: calc(100% / 3);
+      text-align: center;
+      cursor: pointer;
+      color: #f1f1f1;
+      -webkit-transition: all ease 250ms;
+      -moz-transition: all ease 250ms;
+      -o-transition: all ease 250ms;
+      transition: all ease 250ms;
+    }
+    .input-range .labels .fas:before {
+      font-size: 65px;
+    }
+    .input-range .labels .fas:hover {
+      -webkit-transform: scale(1.1);
+      -moz-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+      -o-transform: scale(1.1);
+      transform: scale(1.1);
+    }
+    .input-range .labels[data-value="1"] .fas:nth-child(-n + 1) {
+      color: #bad6ef;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .input-range .labels[data-value="2"] .fas:nth-child(-n + 2) {
+      color: #ffb72f;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .input-range .labels[data-value="3"] .fas:nth-child(-n + 3) {
+      color: #fd6b6b;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+</style>
+
+<body>
+    <div class="container">
+        {% include "includes/messages.html" %}
+        {% block body %}
+        {% endblock body %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+</body>
+</html>

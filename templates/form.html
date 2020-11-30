@@ -1,0 +1,322 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<br/>
+<h1 class="latex" style="text-align: center">Propositional Logic Practice</h1>
+<br/>
+<br/>
+
+{% from "includes/formhelpers.html" import render_field %}
+
+<form id="form" action="" method="POST" style="width: 75%; margin: 0 auto;">
+    <div style="width: 100%; margin: 0 auto;">
+
+        <p class="btn btn-primary" data-toggle="tooltip" title="Toggle this button to show the law table for assistance during your practice."
+           style="float:left; border-radius: 100%; font-size: 0.5%; margin-left: 5%;">
+            <i class="fa fa-info"></i>
+        </p>
+        <label class="switch" style="width: 15%; float: left; margin-right: 10%;">
+            <input type="checkbox" id="tog_btn_show_laws">
+            <div class="slidershowlaws round">
+                <span class="on" style="font-size: 85%; text-align: center;">Show Laws</span>
+                <span class="off" style="font-size: 85%; text-align: center;">Hide Laws</span>
+            </div>
+        </label>
+
+
+        <div style="width:20%; float: left; margin-left: 10%;">
+            <p class="btn btn-primary" data-toggle="tooltip" title="Toggle between 'Practice' mode for checks on every new step and 'Test' mode for a final check when the 'Check' button is pressed."
+               style="float: left; border-radius: 100%; font-size: 0.5%;">
+                <i class="fa fa-info"></i>
+            </p>
+            {{ render_field(form.mode, class="radio") }}
+        </div>
+
+        <div style="width: 20%; margin-left: 10%; float: left;">
+            <p class="btn btn-primary" data-toggle="tooltip" title="Choose the difficulty of the questions. Left-most is the mildest, and right-most is the most spicy!"
+               style="float:left; border-radius: 100%; font-size: 0.5%;">
+                <i class="fa fa-info"></i>
+            </p>
+            <div class="input-range" style="width: 100%; margin-left: 65%;">
+                <div id="labels-list" class="labels" data-value=""></div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <h5 style="text-align: center;">{{ form.question }}</h5>
+    {% for string_field in form.steps %}
+        {{ string_field.hidden_tag() }}
+        {# Flask-WTF needs `hidden_tag()` so CSRF works for each form #}
+
+        <div style="width:100%; padding-left:2%; height:80px; border-radius: 15px; background: #D4D4D4; display: flex; align-items: center;">
+            <div style="width:5%; margin-right: 2%; float: left;">
+                <button type="submit" class="btn btn-danger" name="delete_{{ loop.index|string }}" value="&#x2716;">&#x2716;</button>
+            </div>
+            <div style="width:33%; margin-right:2%; float: left; padding-top:1%">
+                {{ render_field(string_field.law, class="form-control") }}
+            </div>
+            <div style="width:55%; float: left; padding-top:1%" class="autocomplete">
+                {% if string_field.error %}
+                    {{ render_field(string_field.step, style="border-color: red", class="form-control", autocomplete="off", errors=string_field.error) }}
+                {% else %}
+                    {{ render_field(string_field.step, class="form-control", autocomplete="off") }}
+                {% endif %}
+            </div>
+        </div>
+        <br/>
+
+    {% endfor %}
+
+    <br/>
+    <output style="width: 100%; color: #008000; margin: 0 auto; display: flex; justify-content: center;">{{ form.output }}</output>
+    <br/>
+    <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
+        <button type="submit" class="btn btn-danger" name="skip" value="SKIP" style="width: 20%;">SKIP QUESTION</button>
+        <span style="width: 10px"></span>
+        <button type="submit" class="btn btn-danger" name="clear" value="CLEAR" style="width: 20%;">CLEAR ALL</button>
+        <span style="width: 10px"></span>
+        <button type="submit" class="btn btn-primary" name="next" value="NEXT" style="width: 20%;">NEW STEP</button>
+        <span style="width: 10px"></span>
+        <button type="submit" class="btn btn-success" name="end" value="END" style="width: 20%;">CHECK</button>
+    </div>
+
+    <input style="display: none;" type="text" id="difficulty" name="difficulty" value={{ form.difficulty }} />
+    <input style="display: none;" type="text" id="showlaws" name="showlaws" value={{ form.showlaws}} />
+
+    <br />
+    <br />
+    <br />
+
+    <img src="{{url_for('static', filename='laws_table.png')}}" alt="Laws Table Image" class="toggleoff" id="laws_table" style="width:100%;"/>
+
+</form>
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    var max = 3, // Set max value
+    icon = "fa-fire", // Set the icon (https://fontawesome.com/icons)
+    target = document.querySelectorAll('[data-value]'),
+    listIcon = document.getElementById("labels-list");
+
+    if (document.getElementById('difficulty').value == 'mild') {
+        initvalue = 1;
+    } else if (document.getElementById('difficulty').value == 'medium') {
+        initvalue = 2;
+    } else {
+        initvalue = 3;
+    }
+
+    // Function to update du value
+    function updateValue(target, value){
+        target.forEach(function(currentIndex) {
+            currentIndex.dataset.value =  value;
+        });
+    }
+
+    // Init the number of item with the initial value settings
+
+    for (i = 0; i < max; i++) { 
+        var picto = "<i class='fas "+ icon +"'></i>";
+        $(".labels").append(picto);
+    }
+
+    updateValue(target, initvalue);
+
+    // Update the slider on click
+
+    $('.fas').on( "click", function(){
+        var index = $(this).index() + 1;
+
+        if (index == 1) {
+            document.getElementById('difficulty').value = 'mild';
+        } else if (index == 2) {
+            document.getElementById('difficulty').value = 'medium';
+        } else {
+            document.getElementById('difficulty').value = 'spicy';
+        }
+
+        $( "#range-slider" ).slider( "value", index );
+        updateValue(target, index);
+    });
+
+
+    // Init the slider
+    $( "#range-slider" ).slider({
+        range: "min",
+        value: initvalue,
+        min: 1, 
+        max: max, 
+
+        slide: function( event, ui ) {                     
+          updateValue(target, ui.value);
+        }
+    });
+</script>
+
+<script>
+    function autocomplete(inp, arr) {
+        /* Two arguments, i) the text field element and ii) array of autocompleted values: */
+
+        var currentFocus;
+        /* Execute a function when someone writes in the text field: */
+        inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) {
+                return false;
+            }
+            currentFocus = -1;
+
+            arr = [];
+            var first_type_tokens = ["p", "q", "r", "T", "F"];
+            var second_type_tokens = ["v", "^", "->", "<->"];
+            var last_token = this.value.substr(this.value.length - 1);
+            if (first_type_tokens.includes(last_token)) {
+                for (i = 0; i < second_type_tokens.length; i++) {
+                    arr.push(this.value + second_type_tokens[i]);
+                }
+                arr.push(this.value + ")");
+            } else if (second_type_tokens.includes(last_token)) {
+                for (i = 0; i < first_type_tokens.length; i++) {
+                    arr.push(this.value + first_type_tokens[i]);
+                }
+                arr.push(this.value + "(");
+                arr.push(this.value + "~")
+            } else if (last_token == "(") {
+                for (i = 0; i < first_type_tokens.length; i++) {
+                    arr.push(this.value + first_type_tokens[i]);
+                }
+            } else if (last_token == ")") {
+                for (i = 0; i < second_type_tokens.length; i++) {
+                    arr.push(this.value + second_type_tokens[i]);
+                }
+            }
+
+            /* Create a DIV element that will contain the items (values): */
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+
+            /* Append the DIV element as a child of the autocomplete container: */
+            this.parentNode.appendChild(a);
+            for (i = 0; i < arr.length; i++) {
+                /* Check if the item starts with the same letters as the text field value: */
+                if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    /* Create a DIV element for each matching element: */
+                    b = document.createElement("DIV");
+                    /* Make the matching letters bold: */
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    /* Insert a input field that will hold the current array item's value: */
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /* Execute a function when someone clicks on the item value (DIV element): */
+                    b.addEventListener("click", function (e) {
+                        /* Insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /* Close the list of autocompleted values, (or any other open lists of autocompleted values: */
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        });
+
+        /* Execute a function presses a key on the keyboard: */
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /* If the arrow DOWN key is pressed, increase the currentFocus variable:*/
+                currentFocus++;
+                /* Make the current item more visible: */
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /* If the arrow UP key is pressed, decrease the currentFocus variable: */
+                currentFocus--;
+                /* Make the current item more visible: */
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /* If the ENTER key is pressed, prevent the form from being submitted, */
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /* Simulate a click on the "active" item: */
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+
+        function addActive(x) {
+            /* Function to classify an item as "active": */
+            if (!x) return false;
+            /* Start by removing the "active" class on all items: */
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /* Add class "autocomplete-active": */
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+
+        function removeActive(x) {
+            /* A function to remove the "active" class from all autocomplete items: */
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+
+        function closeAllLists(elmnt) {
+            /* Close all autocomplete lists in the document, except the one passed as an argument: */
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+
+/* Execute a function when someone clicks in the document: */
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script type="text/javascript">
+    var toggle_button = document.getElementById("tog_btn_show_laws");
+    var laws_table_image = document.getElementById("laws_table");
+
+    if (document.getElementById('showlaws').value == 1) { 
+        document.getElementById("tog_btn_show_laws").click();
+        document.getElementById("laws_table").classList.toggle("toggleon");
+    }
+
+    toggle_button.onclick = function() {
+        if (document.getElementById('showlaws').value == 1) { 
+            document.getElementById('showlaws').value = 0;
+        }
+        else {
+            document.getElementById('showlaws').value = 1;
+        }   
+        laws_table_image.classList.toggle("toggleon");
+    };
+
+
+    var start_tokens = [")", "(", "~", "¬", "p", "q", "r"];
+    num_steps = document.querySelectorAll('.autocomplete').length;
+    for (i = 0; i < num_steps; i++) {
+        autocomplete(document.getElementById("steps-" + i.toString() + "-step"), start_tokens);
+    }
+</script>
+
+
+{% endblock body %}
+
