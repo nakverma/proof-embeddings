@@ -29,7 +29,7 @@ steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1
 completed_question = False
 
 questions = [
-    {'question': "Prove that %s is a tautology.",
+    {'question': "Prove that (pvq)v(pv~q) is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
     {'question': "Prove that ((p->r)^(q->r)^(pvq))->r is a tautology.",
@@ -230,6 +230,10 @@ def solve():
     form.showlaws = request.args['showlaws']
     has_error = False
 
+    req_ip = str(request.access_route[-1])
+    t = str(datetime.now())
+    print("host", request.host)
+
     # TODO: Implement question difficulty and show/hide laws persistently!
     # TODO: There are some problems with the clear and delete button in terms of the visual
     #       persistent changes, investigate these!
@@ -256,7 +260,11 @@ def solve():
                         raise
 
                 ans_data_csv = open('local_answer_data.csv', 'a')
-                ans_data_csv.write(form.question.text + ",0," + str(len(form.steps) - 1) + "\n")
+
+                ans_data = req_ip+","+t+","
+                ans_data += form.question.text + ",0," + str(len(form.steps) - 1) + "\n"
+
+                ans_data_csv.write(ans_data)
                 ans_data_csv.close()
 
                 s3_client = boto3.client('s3')
@@ -286,9 +294,6 @@ def solve():
         step_data = []
         # (question, step#, law, correct/incorrect)
         # (IP, timestamp, question, step#, law, correct/incorrect)
-
-        req_ip = str(request.access_route[-1])
-        t = str(datetime.now())
 
 
         for i, step in enumerate(form.steps):
@@ -379,7 +384,11 @@ def solve():
                         raise
 
                 ans_data_csv = open('local_answer_data.csv', 'a')
-                ans_data_csv.write(form.question.text + ",1," + str(len(form.steps) - 1) + "\n")
+
+                ans_data = req_ip+","+t+","
+                ans_data += form.question.text + ",0," + str(len(form.steps) - 1) + "\n"
+
+                ans_data_csv.write(ans_data)
                 ans_data_csv.close()
 
                 s3_client = boto3.client('s3')
