@@ -232,7 +232,6 @@ def solve():
 
     req_ip = str(request.access_route[-1])
     t = str(datetime.now())
-    print("host", request.host)
 
     # TODO: Implement question difficulty and show/hide laws persistently!
     # TODO: There are some problems with the clear and delete button in terms of the visual
@@ -281,8 +280,6 @@ def solve():
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
                                     showlaws=request.form['showlaws']))
-
-        completed_question = False
 
         if "clear" in request.form:
             previous_data = form.data
@@ -386,7 +383,7 @@ def solve():
                 ans_data_csv = open('local_answer_data.csv', 'a')
 
                 ans_data = req_ip+","+t+","
-                ans_data += form.question.text + ",0," + str(len(form.steps) - 1) + "\n"
+                ans_data += form.question.text + ",1," + str(len(form.steps) - 1) + "\n"
 
                 ans_data_csv.write(ans_data)
                 ans_data_csv.close()
@@ -397,7 +394,6 @@ def solve():
                 except ClientError as e:
                     print(e)
 
-                completed_question = False
 
             elif not has_error:
                 previous_data = form.data
