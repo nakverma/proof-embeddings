@@ -2,11 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for
 from wtforms import Form, StringField, FormField, FieldList, Label, SelectField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
-import random
+
 
 from check_syntax import checkSyntax, raw2latex, latex2raw
 from deterministic import check_correct_operation
 from create_expressions_mistakes import LogicTree
+
+from datetime import datetime
+import random
 
 import boto3
 import botocore
@@ -282,6 +285,14 @@ def solve():
 
         step_data = None
         # (question, step#, law, correct/incorrect)
+        # (IP, timestamp, question, step#, law, correct/incorrect)
+
+        req_ip = str(request.remote_addr)
+        print(req_ip)
+        t = datetime.now()
+        print(t)
+
+
         for i, step in enumerate(form.steps):
             if not step_input_check(step):
                 has_error = True
@@ -323,36 +334,36 @@ def solve():
             form.__init__(data=previous_data)
             form.showlaws = request.form['showlaws']
 
-            if form.data['mode'] == 'test':
-                has_error = False
-                for i, step in enumerate(form.steps):
-                    if not step_syntax_check(step):
-                        has_error = True
-                        step.error = 'Please use correct logic syntax in this step!'
-                    elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
-                        has_error = True
-                        step.error = 'Did NOT apply %s correctly!' % step.data['law']
-
-                        if len(form.steps) == 1: # this is the only step
-                            step_data = (form.question.text, i, step.data['law'], 0)
-                    elif i != 0:
-                        if not step_syntax_check(form.steps[i-1]):
-                            has_error = True
-                            step.error = 'Please use correct logic syntax in the previous step!'
-                        elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
-                            has_error = True
-                            step.error = 'Did NOT apply %s correctly!' % step.data['law']
-
-                            if i == len(form.steps)-1: # this is the most recent step
-                                step_data = (form.question.text, i, step.data['law'], 0)
-                        else:
-                            if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-                                step_data = (form.question.text, i, step.data['law'], 1)
-                    else:
-                        step.error = None
-
-                        if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-                            step_data = (form.question.text, i, step.data['law'], 1)
+            # if form.data['mode'] == 'test':
+            #     has_error = False
+            #     for i, step in enumerate(form.steps):
+            #         if not step_syntax_check(step):
+            #             has_error = True
+            #             step.error = 'Please use correct logic syntax in this step!'
+            #         elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
+            #             has_error = True
+            #             step.error = 'Did NOT apply %s correctly!' % step.data['law']
+            #
+            #             if len(form.steps) == 1: # this is the only step
+            #                 step_data = (form.question.text, i, step.data['law'], 0)
+            #         elif i != 0:
+            #             if not step_syntax_check(form.steps[i-1]):
+            #                 has_error = True
+            #                 step.error = 'Please use correct logic syntax in the previous step!'
+            #             elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
+            #                 has_error = True
+            #                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
+            #
+            #                 if i == len(form.steps)-1: # this is the most recent step
+            #                     step_data = (form.question.text, i, step.data['law'], 0)
+            #             else:
+            #                 if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
+            #                     step_data = (form.question.text, i, step.data['law'], 1)
+            #         else:
+            #             step.error = None
+            #
+            #             if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
+            #                 step_data = (form.question.text, i, step.data['law'], 1)
 
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Next Question" to move on to the next question!'
