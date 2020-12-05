@@ -283,11 +283,11 @@ def solve():
             form.showlaws = request.form['showlaws']
             return render_template("form.html", form=form)
 
-        step_data = None
+        step_data = []
         # (question, step#, law, correct/incorrect)
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
-        req_ip = str(request.remote_addr)
+        req_ip = str(request.environ['REMOTE_ADDR'])
         print(req_ip)
         t = datetime.now()
         print(t)
