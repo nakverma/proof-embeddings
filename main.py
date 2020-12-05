@@ -291,6 +291,8 @@ def solve():
         print(req_ip)
         t = datetime.now()
         print(t)
+        print(type(request.access_route))
+        print(request.access_route)
 
 
         for i, step in enumerate(form.steps):
