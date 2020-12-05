@@ -307,7 +307,7 @@ def solve():
 
                 # if len(form.steps) == 1: # this is the only step
                 #     step_data = (form.question.text, i, step.data['law'], 0)
-                step_data.append([req_ip, t, form.question.text, i, step.data['law'], step.data['step'], 0])
+                step_data.append([req_ip, t, latex2raw(form.question.text), i, step.data['law'], latex2raw(step.data['step']), 0])
 
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
@@ -315,13 +315,13 @@ def solve():
 
                 # if i == len(form.steps)-1: # this is the most recent step
                 #     step_data = (form.question.text, i, step.data['law'], 0)
-                step_data.append([req_ip, t, form.question.text, i, step.data['law'], step.data['step'], 0])
+                step_data.append([req_ip, t, latex2raw(form.question.text), i, step.data['law'], latex2raw(step.data['step']), 0])
             else:
                 step.error = None
 
                 # if form.data['mode'] == 'practice' and i == len(form.steps)-1: # this is the most recent step
                 #     step_data = (form.question.text, i, step.data['law'], 1)
-                step_data.append([req_ip, t, form.question.text, i, step.data['law'], step.data['step'], 1])
+                step_data.append([req_ip, t, latex2raw(form.question.text), i, step.data['law'], latex2raw(step.data['step']), 1])
 
         if has_error:
             pass
