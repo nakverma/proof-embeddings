@@ -287,12 +287,8 @@ def solve():
         # (question, step#, law, correct/incorrect)
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
-        req_ip = str(request.environ['REMOTE_ADDR'])
-        print(req_ip)
-        t = datetime.now()
-        print(t)
-        print(type(request.access_route))
-        print(request.access_route)
+        req_ip = str(request.access_route[-1])
+        t = str(datetime.now())
 
 
         for i, step in enumerate(form.steps):
@@ -309,20 +305,23 @@ def solve():
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                if len(form.steps) == 1: # this is the only step
-                    step_data = (form.question.text, i, step.data['law'], 0)
+                # if len(form.steps) == 1: # this is the only step
+                #     step_data = (form.question.text, i, step.data['law'], 0)
+                step_data.append([req_ip, t, form.question.text, i, step.data['law'], step.data['step'], 0])
 
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                if i == len(form.steps)-1: # this is the most recent step
-                    step_data = (form.question.text, i, step.data['law'], 0)
+                # if i == len(form.steps)-1: # this is the most recent step
+                #     step_data = (form.question.text, i, step.data['law'], 0)
+                step_data.append([req_ip, t, form.question.text, i, step.data['law'], step.data['step'], 0])
             else:
                 step.error = None
 
-                if form.data['mode'] == 'practice' and i == len(form.steps)-1: # this is the most recent step
-                    step_data = (form.question.text, i, step.data['law'], 1)
+                # if form.data['mode'] == 'practice' and i == len(form.steps)-1: # this is the most recent step
+                #     step_data = (form.question.text, i, step.data['law'], 1)
+                step_data.append([req_ip, t, form.question.text, i, step.data['law'], step.data['step'], 1])
 
         if has_error:
             pass
@@ -400,8 +399,9 @@ def solve():
         if step_data:
             step_commad = ""
             for entry in step_data:
-                step_commad += str(entry) + ","
-            step_commad += "\n"
+                for item in entry:
+                    step_commad += str(item) + ","
+                step_commad += "\n"
 
             try:
                 s3.Bucket(BUCKET_NAME).download_file(STEP_KEY, 'local_step_data.csv')

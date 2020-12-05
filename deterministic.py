@@ -10,6 +10,8 @@ import io
 
 
 def check_correct_operation(e1, e2, ops, num_ops=1):
+    if e1 == e2:
+        return False
     ops = ops*num_ops
     def convert_to_logic_symbols(expr):
         logic_symbols = ['∧', '∨', '→', '↔', '~']
