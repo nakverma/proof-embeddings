@@ -260,13 +260,19 @@ def solve():
 
                 ans_data_csv = open('local_answer_data.csv', 'a')
 
-                if len(form.steps) == 1 and form.steps[0] == {"step": "", "csrf_token": ""}:
-                    print("skipped without trying")
-                print(form.steps[0].data['step'])
-                print(type(form.steps[0].data['step']))
+                # if len(form.steps) == 1 and form.steps[0] == {"step": "", "csrf_token": ""}:
+                #     print("skipped without trying")
+                # print(form.steps[0].data['step'])
+                # print(type(form.steps[0].data['step']))
 
                 ans_data = req_ip+","+t+","
-                ans_data += form.question.text + ",0," + str(len(form.steps) - 1) + "\n"
+                ans_data += form.question.text + ",0,"
+
+                if len(form.steps) == 1 and not form.steps[0].data['step']:
+                    ans_data += "-1\n"
+                else:
+                    ans_data += str(len(form.steps) - 1) + "\n"
+
 
                 ans_data_csv.write(ans_data)
                 ans_data_csv.close()
