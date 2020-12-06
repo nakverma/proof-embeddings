@@ -147,6 +147,12 @@ def step_syntax_check(step):
         return False
     return True
 
+def clean_step(step):
+    cleaned_step = step.replace('‚à®', 'v')
+    cleaned_step = cleaned_step.replace('‚àß', '^')
+    cleaned_step = cleaned_step.replace('‚Üí', '->')
+    cleaned_step = cleaned_step.replace('‚Üî', '<->')
+    return cleaned_step
 
 def select_a_question(difficulty='mild', current_question_text=None):
     questions_ = [question for question in questions if question['difficulty'] == difficulty and question['question'] != current_question_text]
@@ -313,17 +319,17 @@ def solve():
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
+                step_data.append([req_ip, t, usr_agent, clean_step(form.question.text), i, step.data['law'], clean_step(step.data['step']), 0])
 
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
+                step_data.append([req_ip, t, usr_agent, clean_step(form.question.text), i, step.data['law'], clean_step(step.data['step']), 0])
             else:
                 step.error = None
 
-                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
+                step_data.append([req_ip, t, usr_agent, clean_step(form.question.text), i, step.data['law'], clean_step(step.data['step']), 1])
 
         if has_error:
             pass
@@ -383,7 +389,7 @@ def solve():
                 ans_data_csv = open('local_answer_data.csv', 'a')
 
                 ans_data = req_ip+","+t+","+usr_agent+","
-                ans_data += form.question.text + ",1," + str(len(form.steps) - 1) + "\n"
+                ans_data += clean_step(form.question.text) + ",1," + str(len(form.steps) - 1) + "\n"
 
 
                 ans_data_csv.write(ans_data)
