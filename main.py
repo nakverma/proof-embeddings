@@ -262,8 +262,8 @@ def solve():
 
                 if len(form.steps) == 1 and form.steps[0] == {"step": "", "csrf_token": ""}:
                     print("skipped without trying")
-                print(form.steps[0])
-                print(type(form.steps[0]))
+                print(form.steps[0].data['step'])
+                print(type(form.steps[0].data['step']))
 
                 ans_data = req_ip+","+t+","
                 ans_data += form.question.text + ",0," + str(len(form.steps) - 1) + "\n"
