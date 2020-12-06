@@ -231,7 +231,7 @@ def solve():
     has_error = False
 
     req_ip = str(request.access_route[-1])
-    usr_agent = str(request.user_agent.string)
+    usr_agent = str(request.user_agent.string).replace(",","")
     t = str(datetime.now())
 
     # TODO: Implement question difficulty and show/hide laws persistently!
@@ -262,7 +262,7 @@ def solve():
                 ans_data_csv = open('local_answer_data.csv', 'a')
 
                 ans_data = req_ip+","+t+","+usr_agent+","
-                ans_data += form.question.text + ",0,"
+                ans_data += latex2raw(form.question.text) + ",0,"
 
                 if len(form.steps) == 1 and not form.steps[0].data['step']:
                     ans_data += "-1\n"
