@@ -378,6 +378,9 @@ def solve():
                 ans_data = req_ip+","+t+","
                 ans_data += form.question.text + ",1," + str(len(form.steps) - 1) + "\n"
 
+                if len(form.steps) == 1 and form.steps[0] == {"step": "", "csrf_token": ""}:
+                    print("skipped without trying")
+
                 ans_data_csv.write(ans_data)
                 ans_data_csv.close()
 
