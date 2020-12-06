@@ -34,22 +34,22 @@ questions = [
      'difficulty': 'mild'},
     {'question': "Prove that ((p->r)^(q->r)^(pvq))->r is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that (~(~p))<->p is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
     {'question': "Prove that ((p->q)^(q->r))->(p->r) is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that F->T is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
     {'question': "Prove that (p^q)v(~pv(p^~q)) is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'medium'},
     {'question': "Prove that ((pvq)^(rv~q))->(pvr) is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that (p^q)->(pvq) is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
@@ -58,10 +58,10 @@ questions = [
      'difficulty': 'mild'},
     {'question': "Prove that p^~(p^~q)<->p^q is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that ~(p->q)^(p^q^s->r)^p is a fallacy.",
      'answer': 'F',
-     'difficulty': 'medium'},
+     'difficulty': 'spicy'},
     {'question': "Prove that (~qvq)^~r^p^r is a fallacy.",
      'answer': 'F',
      'difficulty': 'medium'},
@@ -73,37 +73,37 @@ questions = [
      'difficulty': 'medium'},
     {'question': "Prove that (p->q)^(q->r) is logically equivalent to p->(q^r).",
      'answer': 'p->(q^r)',
-     'difficulty': 'spicy'},
+     'difficulty': 'medium'},
     {'question': "Prove that ~(~((q^r)v(q^~r))^p) is logically equivalent to p->q.",
      'answer': 'p->q',
      'difficulty': 'spicy'},
     {'question': "Prove that qv(p^~q) is logically equivalent to ~p->q.",
      'answer': '~p->q',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that ~(~(((~p^s)v((~p^T)^~s))^p)^~p) is logically equivalent to p.",
      'answer': 'p',
      'difficulty': 'spicy'},
     {'question': "Prove that ~(q^~p)^(qv~p) is logically equivalent to p<->q.",
      'answer': 'p↔q',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that ~(~r^~(~(p^(qvq)))) is logically equivalent to (p^q)->r.",
      'answer': '(p^q)->r',
      'difficulty': 'spicy'},
     {'question': "Prove that (p->q)->((p->q)->q) is logically equivalent to (pvq).",
      'answer': '(pvq)',
-     'difficulty': 'spicy'},
+     'difficulty': 'medium'},
     {'question': "Prove that (pvq)^(pv~q) is logically equivalent to p.",
      'answer': 'p',
-     'difficulty': 'spicy'},
+     'difficulty': 'medium'},
     {'question': "Prove that ~(p^~q)vq is logically equivalent to ~pvq.",
      'answer': '~pvq',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that ~(p^q)^(pv~q) is logically equivalent to ~q.",
      'answer': '~q',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
      'answer': 'p',
-     'difficulty': 'spicy'}
+     'difficulty': 'medium'}
 ]
 
 questions_ = []
@@ -289,7 +289,6 @@ def solve():
             return render_template("form.html", form=form)
 
         step_data = []
-        # (question, step#, law, correct/incorrect)
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
 
@@ -307,22 +306,16 @@ def solve():
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                # if len(form.steps) == 1: # this is the only step
-                #     step_data = (form.question.text, i, step.data['law'], 0)
                 step_data.append([req_ip, t, latex2raw(form.question.text), i, step.data['law'], latex2raw(step.data['step']), 0])
 
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                # if i == len(form.steps)-1: # this is the most recent step
-                #     step_data = (form.question.text, i, step.data['law'], 0)
                 step_data.append([req_ip, t, latex2raw(form.question.text), i, step.data['law'], latex2raw(step.data['step']), 0])
             else:
                 step.error = None
 
-                # if form.data['mode'] == 'practice' and i == len(form.steps)-1: # this is the most recent step
-                #     step_data = (form.question.text, i, step.data['law'], 1)
                 step_data.append([req_ip, t, latex2raw(form.question.text), i, step.data['law'], latex2raw(step.data['step']), 1])
 
         if has_error:
