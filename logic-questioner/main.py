@@ -2,11 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for
 from wtforms import Form, StringField, FormField, FieldList, Label, SelectField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
-import random
+
 
 from check_syntax import checkSyntax, raw2latex, latex2raw
 from deterministic import check_correct_operation
 from create_expressions_mistakes import LogicTree
+
+from datetime import datetime
+import random
 
 import boto3
 import botocore
@@ -26,27 +29,27 @@ steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1
 completed_question = False
 
 questions = [
-    {'question': "Prove that %s is a tautology.",
+    {'question': "Prove that (pvq)v(pv~q) is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
     {'question': "Prove that ((p->r)^(q->r)^(pvq))->r is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that (~(~p))<->p is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
     {'question': "Prove that ((p->q)^(q->r))->(p->r) is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that F->T is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
     {'question': "Prove that (p^q)v(~pv(p^~q)) is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'medium'},
     {'question': "Prove that ((pvq)^(rv~q))->(pvr) is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that (p^q)->(pvq) is a tautology.",
      'answer': 'T',
      'difficulty': 'mild'},
@@ -55,10 +58,10 @@ questions = [
      'difficulty': 'mild'},
     {'question': "Prove that p^~(p^~q)<->p^q is a tautology.",
      'answer': 'T',
-     'difficulty': 'mild'},
+     'difficulty': 'spicy'},
     {'question': "Prove that ~(p->q)^(p^q^s->r)^p is a fallacy.",
      'answer': 'F',
-     'difficulty': 'medium'},
+     'difficulty': 'spicy'},
     {'question': "Prove that (~qvq)^~r^p^r is a fallacy.",
      'answer': 'F',
      'difficulty': 'medium'},
@@ -70,37 +73,37 @@ questions = [
      'difficulty': 'medium'},
     {'question': "Prove that (p->q)^(q->r) is logically equivalent to p->(q^r).",
      'answer': 'p->(q^r)',
-     'difficulty': 'spicy'},
+     'difficulty': 'medium'},
     {'question': "Prove that ~(~((q^r)v(q^~r))^p) is logically equivalent to p->q.",
      'answer': 'p->q',
      'difficulty': 'spicy'},
     {'question': "Prove that qv(p^~q) is logically equivalent to ~p->q.",
      'answer': '~p->q',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that ~(~(((~p^s)v((~p^T)^~s))^p)^~p) is logically equivalent to p.",
      'answer': 'p',
      'difficulty': 'spicy'},
     {'question': "Prove that ~(q^~p)^(qv~p) is logically equivalent to p<->q.",
      'answer': 'p↔q',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that ~(~r^~(~(p^(qvq)))) is logically equivalent to (p^q)->r.",
      'answer': '(p^q)->r',
      'difficulty': 'spicy'},
     {'question': "Prove that (p->q)->((p->q)->q) is logically equivalent to (pvq).",
      'answer': '(pvq)',
-     'difficulty': 'spicy'},
+     'difficulty': 'medium'},
     {'question': "Prove that (pvq)^(pv~q) is logically equivalent to p.",
      'answer': 'p',
-     'difficulty': 'spicy'},
+     'difficulty': 'medium'},
     {'question': "Prove that ~(p^~q)vq is logically equivalent to ~pvq.",
      'answer': '~pvq',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that ~(p^q)^(pv~q) is logically equivalent to ~q.",
      'answer': '~q',
-     'difficulty': 'spicy'},
+     'difficulty': 'mild'},
     {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
      'answer': 'p',
-     'difficulty': 'spicy'}
+     'difficulty': 'medium'}
 ]
 
 questions_ = []
@@ -227,6 +230,10 @@ def solve():
     form.showlaws = request.args['showlaws']
     has_error = False
 
+    req_ip = str(request.access_route[-1])
+    usr_agent = str(request.user_agent.string).replace(",","")
+    t = str(datetime.now())
+
     # TODO: Implement question difficulty and show/hide laws persistently!
     # TODO: There are some problems with the clear and delete button in terms of the visual
     #       persistent changes, investigate these!
@@ -253,7 +260,17 @@ def solve():
                         raise
 
                 ans_data_csv = open('local_answer_data.csv', 'a')
-                ans_data_csv.write(form.question.text + ",0," + str(len(form.steps) - 1) + "\n")
+
+                ans_data = req_ip+","+t+","+usr_agent+","
+                ans_data += form.question.text + ",0,"
+
+                if len(form.steps) == 1 and not form.steps[0].data['step']:
+                    ans_data += "-1\n"
+                else:
+                    ans_data += str(len(form.steps) - 1) + "\n"
+
+
+                ans_data_csv.write(ans_data)
                 ans_data_csv.close()
 
                 s3_client = boto3.client('s3')
@@ -271,8 +288,6 @@ def solve():
                                     question_difficulty=request.form['difficulty'],
                                     showlaws=request.form['showlaws']))
 
-        completed_question = False
-
         if "clear" in request.form:
             previous_data = form.data
             previous_data['steps'] = [{"step": "", "csrf_token": ""}]
@@ -280,8 +295,10 @@ def solve():
             form.showlaws = request.form['showlaws']
             return render_template("form.html", form=form)
 
-        step_data = None
-        # (question, step#, law, correct/incorrect)
+        step_data = []
+        # (IP, timestamp, question, step#, law, correct/incorrect)
+
+
         for i, step in enumerate(form.steps):
             if not step_input_check(step):
                 has_error = True
@@ -296,20 +313,17 @@ def solve():
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                if len(form.steps) == 1: # this is the only step
-                    step_data = (form.question.text, i, step.data['law'], 0)
+                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
 
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
 
-                if i == len(form.steps)-1: # this is the most recent step
-                    step_data = (form.question.text, i, step.data['law'], 0)
+                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
             else:
                 step.error = None
 
-                if form.data['mode'] == 'practice' and i == len(form.steps)-1: # this is the most recent step
-                    step_data = (form.question.text, i, step.data['law'], 1)
+                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
 
         if has_error:
             pass
@@ -323,36 +337,36 @@ def solve():
             form.__init__(data=previous_data)
             form.showlaws = request.form['showlaws']
 
-            if form.data['mode'] == 'test':
-                has_error = False
-                for i, step in enumerate(form.steps):
-                    if not step_syntax_check(step):
-                        has_error = True
-                        step.error = 'Please use correct logic syntax in this step!'
-                    elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
-                        has_error = True
-                        step.error = 'Did NOT apply %s correctly!' % step.data['law']
-
-                        if len(form.steps) == 1: # this is the only step
-                            step_data = (form.question.text, i, step.data['law'], 0)
-                    elif i != 0:
-                        if not step_syntax_check(form.steps[i-1]):
-                            has_error = True
-                            step.error = 'Please use correct logic syntax in the previous step!'
-                        elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
-                            has_error = True
-                            step.error = 'Did NOT apply %s correctly!' % step.data['law']
-
-                            if i == len(form.steps)-1: # this is the most recent step
-                                step_data = (form.question.text, i, step.data['law'], 0)
-                        else:
-                            if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-                                step_data = (form.question.text, i, step.data['law'], 1)
-                    else:
-                        step.error = None
-
-                        if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-                            step_data = (form.question.text, i, step.data['law'], 1)
+            # if form.data['mode'] == 'test':
+            #     has_error = False
+            #     for i, step in enumerate(form.steps):
+            #         if not step_syntax_check(step):
+            #             has_error = True
+            #             step.error = 'Please use correct logic syntax in this step!'
+            #         elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
+            #             has_error = True
+            #             step.error = 'Did NOT apply %s correctly!' % step.data['law']
+            #
+            #             if len(form.steps) == 1: # this is the only step
+            #                 step_data = (form.question.text, i, step.data['law'], 0)
+            #         elif i != 0:
+            #             if not step_syntax_check(form.steps[i-1]):
+            #                 has_error = True
+            #                 step.error = 'Please use correct logic syntax in the previous step!'
+            #             elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
+            #                 has_error = True
+            #                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
+            #
+            #                 if i == len(form.steps)-1: # this is the most recent step
+            #                     step_data = (form.question.text, i, step.data['law'], 0)
+            #             else:
+            #                 if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
+            #                     step_data = (form.question.text, i, step.data['law'], 1)
+            #         else:
+            #             step.error = None
+            #
+            #             if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
+            #                 step_data = (form.question.text, i, step.data['law'], 1)
 
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Next Question" to move on to the next question!'
@@ -367,7 +381,12 @@ def solve():
                         raise
 
                 ans_data_csv = open('local_answer_data.csv', 'a')
-                ans_data_csv.write(form.question.text + ",1," + str(len(form.steps) - 1) + "\n")
+
+                ans_data = req_ip+","+t+","+usr_agent+","
+                ans_data += form.question.text + ",1," + str(len(form.steps) - 1) + "\n"
+
+
+                ans_data_csv.write(ans_data)
                 ans_data_csv.close()
 
                 s3_client = boto3.client('s3')
@@ -375,6 +394,7 @@ def solve():
                     response = s3_client.upload_file('local_answer_data.csv', BUCKET_NAME, ANSWER_KEY)
                 except ClientError as e:
                     print(e)
+
 
             elif not has_error:
                 previous_data = form.data
@@ -385,8 +405,9 @@ def solve():
         if step_data:
             step_commad = ""
             for entry in step_data:
-                step_commad += str(entry) + ","
-            step_commad += "\n"
+                for item in entry:
+                    step_commad += str(item) + ","
+                step_commad += "\n"
 
             try:
                 s3.Bucket(BUCKET_NAME).download_file(STEP_KEY, 'local_step_data.csv')
