@@ -380,6 +380,8 @@ def solve():
 
                 if len(form.steps) == 1 and form.steps[0] == {"step": "", "csrf_token": ""}:
                     print("skipped without trying")
+                print(form.steps[0])
+                print(type(form.steps[0]))
 
                 ans_data_csv.write(ans_data)
                 ans_data_csv.close()
