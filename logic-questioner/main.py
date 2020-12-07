@@ -10,6 +10,7 @@ from create_expressions_mistakes import LogicTree
 
 from datetime import datetime
 import random
+import ast
 
 import boto3
 import botocore
@@ -21,92 +22,29 @@ app.secret_key = "secret"
 BUCKET_NAME = 'response-data' # replace with your bucket name
 ANSWER_KEY = 'answer_data.csv' # replace with your object key
 STEP_KEY = 'step_data.csv'
+QUESTIONS_DOC = 'questions.txt'
 
 s3 = boto3.resource('s3')
 
-S3_LOGGING = False
+S3_LOGGING = True
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
 completed_question = False
 
-questions = [
-    {'question': "Prove that (pvq)v(pv~q) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that ((p->r)^(q->r)^(pvq))->r is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (~(~p))<->p is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that ((p->q)^(q->r))->(p->r) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that F->T is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that (p^q)v(~pv(p^~q)) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'medium'},
-    {'question': "Prove that ((pvq)^(rv~q))->(pvr) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (p^q)->(pvq) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that q->(p->q) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that p^~(p^~q)<->p^q is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that ~(p->q)^(p^q^s->r)^p is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (~qvq)^~r^p^r is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'medium'},
-    {'question': "Prove that ~r^((~pvp)^r)^(p->r) is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'medium'},
-    {'question': "Prove that s^((~s^~q)v(~s^~T))^p is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'medium'},
-    {'question': "Prove that (p->q)^(q->r) is logically equivalent to p->(q^r).",
-     'answer': 'p->(q^r)',
-     'difficulty': 'medium'},
-    {'question': "Prove that ~(~((q^r)v(q^~r))^p) is logically equivalent to p->q.",
-     'answer': 'p->q',
-     'difficulty': 'spicy'},
-    {'question': "Prove that qv(p^~q) is logically equivalent to ~p->q.",
-     'answer': '~p->q',
-     'difficulty': 'mild'},
-    {'question': "Prove that ~(~(((~p^s)v((~p^T)^~s))^p)^~p) is logically equivalent to p.",
-     'answer': 'p',
-     'difficulty': 'spicy'},
-    {'question': "Prove that ~(q^~p)^(qv~p) is logically equivalent to p<->q.",
-     'answer': 'p↔q',
-     'difficulty': 'mild'},
-    {'question': "Prove that ~(~r^~(~(p^(qvq)))) is logically equivalent to (p^q)->r.",
-     'answer': '(p^q)->r',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (p->q)->((p->q)->q) is logically equivalent to (pvq).",
-     'answer': '(pvq)',
-     'difficulty': 'medium'},
-    {'question': "Prove that (pvq)^(pv~q) is logically equivalent to p.",
-     'answer': 'p',
-     'difficulty': 'medium'},
-    {'question': "Prove that ~(p^~q)vq is logically equivalent to ~pvq.",
-     'answer': '~pvq',
-     'difficulty': 'mild'},
-    {'question': "Prove that ~(p^q)^(pv~q) is logically equivalent to ~q.",
-     'answer': '~q',
-     'difficulty': 'mild'},
-    {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
-     'answer': 'p',
-     'difficulty': 'medium'}
-]
+
+try:
+    s3.Bucket(BUCKET_NAME).download_file(QUESTIONS_DOC, 'local_questions.txt')
+except botocore.exceptions.ClientError as e:
+    if e.response['Error']['Code'] == "404":
+        print("The object does not exist.")
+    else:
+        raise
+
+q_file = open('local_questions.txt', 'r')
+questions = ast.literal_eval(q_file.read())
+q_file.close()
+
 
 questions_ = []
 for question in questions:
@@ -298,6 +236,7 @@ def solve():
         for i, step in enumerate(form.steps):
             # NOTE: Adding this here because we only want to perform the check for the last step
             if i != len(form.steps) - 1:
+                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
                 continue
 
             if not step_input_check(step):
