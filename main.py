@@ -234,8 +234,11 @@ def solve():
         step_data = []
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
+        print("test1")
+
         for i, step in enumerate(form.steps):
             # NOTE: Adding this here because we only want to perform the check for the last step
+            print("test2", i)
             if i != len(form.steps) - 1:
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
                 continue
@@ -261,6 +264,7 @@ def solve():
                 step.error = None
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
 
+        print("test3", i)
         if has_error:
             pass
 
