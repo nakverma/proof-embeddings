@@ -11,6 +11,7 @@ from create_expressions_mistakes import LogicTree
 from datetime import datetime
 import random
 import ast
+import gc
 
 import boto3
 import botocore
@@ -301,6 +302,8 @@ def solve():
                 previous_data['steps'].append({"step": "", "csrf_token": ""})
                 form.__init__(data=previous_data)
                 form.showlaws = request.form['showlaws']
+
+        gc.collect()
 
         if step_data and S3_LOGGING:
             step_commad = ""
