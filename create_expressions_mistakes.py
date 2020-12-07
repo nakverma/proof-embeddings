@@ -711,6 +711,7 @@ class AndNode(N_aryNode):
                                 60:self.indempotence,
                                 59:self.reduce_identity,
                                 63:self.to_iff,
+                                82:self.negation,
                                 64:self.absorption,
                                 71:self.domination,
                                 73:self.remove_true,
@@ -2211,7 +2212,7 @@ class LogicTree():
 
         self.blowup_control=blowup_control
 
-        cur_max_op_id = 81
+        cur_max_op_id = 82
         self.all_ops = set([i for i in range(1,cur_max_op_id+1)])
 
         self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]
@@ -2225,7 +2226,7 @@ class LogicTree():
         self.COMMUTATIVITY = [15,20]
         self.ASSOCIATIVITY = [16,17,41,42,21,22,43,44]
         self.DISTRIBUTIVITY = [54,56,55,57,78,79,80,81]
-        self.NEGATION = [7,8,9,37,38,39,50,67,76]
+        self.NEGATION = [7,8,9,37,38,39,50,67,76,82]
         self.DEMORGAN = [18,24,28,29]
         self.ABSORPTION = [64,77]
         self.ALL = [i for i in range(1, cur_max_op_id+1)]
@@ -2697,7 +2698,7 @@ class LogicTreeTrainer():
             self.trees = new_tree_dict
             print(len(self.trees))
 
-            # deleted = gc.collect()
+            gc.collect()
             # print("Doing increment_ops, deleted",deleted,"objects")
 
 
