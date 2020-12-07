@@ -26,7 +26,7 @@ QUESTIONS_DOC = 'questions.txt'
 
 s3 = boto3.resource('s3')
 
-S3_LOGGING = False
+S3_LOGGING = True
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
