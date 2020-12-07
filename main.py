@@ -10,6 +10,7 @@ from create_expressions_mistakes import LogicTree
 
 from datetime import datetime
 import random
+import ast
 
 import boto3
 import botocore
@@ -21,90 +22,109 @@ app.secret_key = "secret"
 BUCKET_NAME = 'response-data' # replace with your bucket name
 ANSWER_KEY = 'answer_data.csv' # replace with your object key
 STEP_KEY = 'step_data.csv'
+QUESTIONS_DOC = 'questions.txt'
 
 s3 = boto3.resource('s3')
+
+S3_LOGGING = False
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
 completed_question = False
 
-questions = [
-    {'question': "Prove that (pvq)v(pv~q) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that ((p->r)^(q->r)^(pvq))->r is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (~(~p))<->p is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that ((p->q)^(q->r))->(p->r) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that F->T is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that (p^q)v(~pv(p^~q)) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'medium'},
-    {'question': "Prove that ((pvq)^(rv~q))->(pvr) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (p^q)->(pvq) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that q->(p->q) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'mild'},
-    {'question': "Prove that p^~(p^~q)<->p^q is a tautology.",
-     'answer': 'T',
-     'difficulty': 'spicy'},
-    {'question': "Prove that ~(p->q)^(p^q^s->r)^p is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (~qvq)^~r^p^r is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'medium'},
-    {'question': "Prove that ~r^((~pvp)^r)^(p->r) is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'medium'},
-    {'question': "Prove that s^((~s^~q)v(~s^~T))^p is a fallacy.",
-     'answer': 'F',
-     'difficulty': 'medium'},
-    {'question': "Prove that (p->q)^(q->r) is logically equivalent to p->(q^r).",
-     'answer': 'p->(q^r)',
-     'difficulty': 'medium'},
-    {'question': "Prove that ~(~((q^r)v(q^~r))^p) is logically equivalent to p->q.",
-     'answer': 'p->q',
-     'difficulty': 'spicy'},
-    {'question': "Prove that qv(p^~q) is logically equivalent to ~p->q.",
-     'answer': '~p->q',
-     'difficulty': 'mild'},
-    {'question': "Prove that ~(~(((~p^s)v((~p^T)^~s))^p)^~p) is logically equivalent to p.",
-     'answer': 'p',
-     'difficulty': 'spicy'},
-    {'question': "Prove that ~(q^~p)^(qv~p) is logically equivalent to p<->q.",
-     'answer': 'p↔q',
-     'difficulty': 'mild'},
-    {'question': "Prove that ~(~r^~(~(p^(qvq)))) is logically equivalent to (p^q)->r.",
-     'answer': '(p^q)->r',
-     'difficulty': 'spicy'},
-    {'question': "Prove that (p->q)->((p->q)->q) is logically equivalent to (pvq).",
-     'answer': '(pvq)',
-     'difficulty': 'medium'},
-    {'question': "Prove that (pvq)^(pv~q) is logically equivalent to p.",
-     'answer': 'p',
-     'difficulty': 'medium'},
-    {'question': "Prove that ~(p^~q)vq is logically equivalent to ~pvq.",
-     'answer': '~pvq',
-     'difficulty': 'mild'},
-    {'question': "Prove that ~(p^q)^(pv~q) is logically equivalent to ~q.",
-     'answer': '~q',
-     'difficulty': 'mild'},
-    {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
-     'answer': 'p',
-     'difficulty': 'medium'}
-]
+
+try:
+    s3.Bucket(BUCKET_NAME).download_file(QUESTIONS_DOC, 'local_questions.txt')
+except botocore.exceptions.ClientError as e:
+    if e.response['Error']['Code'] == "404":
+        print("The object does not exist.")
+    else:
+        raise
+
+q_file = open('local_questions.txt', 'r')
+questions = ast.literal_eval(q_file.read())
+q_file.close()
+
+ans_data_csv = open('local_answer_data.csv', 'a')
+
+
+# questions = [
+#     {'question': "Prove that (pvq)v(pv~q) is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that ((p->r)^(q->r)^(pvq))->r is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that (~(~p))<->p is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that ((p->q)^(q->r))->(p->r) is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that F->T is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that (p^q)v(~pv(p^~q)) is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'medium'},
+#     {'question': "Prove that ((pvq)^(rv~q))->(pvr) is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that (p^q)->(pvq) is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that q->(p->q) is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that p^~(p^~q)<->p^q is a tautology.",
+#      'answer': 'T',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that ~(p->q)^(p^q^s->r)^p is a fallacy.",
+#      'answer': 'F',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that (~qvq)^~r^p^r is a fallacy.",
+#      'answer': 'F',
+#      'difficulty': 'medium'},
+#     {'question': "Prove that ~r^((~pvp)^r)^(p->r) is a fallacy.",
+#      'answer': 'F',
+#      'difficulty': 'medium'},
+#     {'question': "Prove that s^((~s^~q)v(~s^~T))^p is a fallacy.",
+#      'answer': 'F',
+#      'difficulty': 'medium'},
+#     {'question': "Prove that (p->q)^(q->r) is logically equivalent to p->(q^r).",
+#      'answer': 'p->(q^r)',
+#      'difficulty': 'medium'},
+#     {'question': "Prove that ~(~((q^r)v(q^~r))^p) is logically equivalent to p->q.",
+#      'answer': 'p->q',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that qv(p^~q) is logically equivalent to ~p->q.",
+#      'answer': '~p->q',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that ~(~(((~p^s)v((~p^T)^~s))^p)^~p) is logically equivalent to p.",
+#      'answer': 'p',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that ~(q^~p)^(qv~p) is logically equivalent to p<->q.",
+#      'answer': 'p↔q',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that ~(~r^~(~(p^(qvq)))) is logically equivalent to (p^q)->r.",
+#      'answer': '(p^q)->r',
+#      'difficulty': 'spicy'},
+#     {'question': "Prove that (p->q)->((p->q)->q) is logically equivalent to (pvq).",
+#      'answer': '(pvq)',
+#      'difficulty': 'medium'},
+#     {'question': "Prove that (pvq)^(pv~q) is logically equivalent to p.",
+#      'answer': 'p',
+#      'difficulty': 'medium'},
+#     {'question': "Prove that ~(p^~q)vq is logically equivalent to ~pvq.",
+#      'answer': '~pvq',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that ~(p^q)^(pv~q) is logically equivalent to ~q.",
+#      'answer': '~q',
+#      'difficulty': 'mild'},
+#     {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
+#      'answer': 'p',
+#      'difficulty': 'medium'}
+# ]
 
 questions_ = []
 for question in questions:
@@ -157,7 +177,7 @@ def select_a_question(difficulty='mild', current_question_text=None):
 
 class StepForm(FlaskForm):
     step = StringField(label="Step")
-    law = SelectField(label="Law", choices=laws)
+    law = SelectField(label="Law", choices=[""] + laws)
     error = None
     delete_button = SubmitField('X')
 
@@ -234,10 +254,6 @@ def solve():
     usr_agent = str(request.user_agent.string).replace(",","")
     t = str(datetime.now())
 
-    # TODO: Implement question difficulty and show/hide laws persistently!
-    # TODO: There are some problems with the clear and delete button in terms of the visual
-    #       persistent changes, investigate these!
-
     if request.method == 'POST':
         for i in range(len(form.steps)):
             if 'delete_%d' % (i + 1) in request.form:
@@ -250,7 +266,7 @@ def solve():
                 return render_template("form.html", form=form)
 
         if "skip" in request.form or ("clear" not in request.form and "next" not in request.form and "end" not in request.form):
-            if not completed_question:
+            if not completed_question and S3_LOGGING:
                 try:
                     s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
                 except botocore.exceptions.ClientError as e:
@@ -268,7 +284,6 @@ def solve():
                     ans_data += "-1\n"
                 else:
                     ans_data += str(len(form.steps) - 1) + "\n"
-
 
                 ans_data_csv.write(ans_data)
                 ans_data_csv.close()
@@ -298,8 +313,12 @@ def solve():
         step_data = []
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
-
         for i, step in enumerate(form.steps):
+            # NOTE: Adding this here because we only want to perform the check for the last step
+            if i != len(form.steps) - 1:
+                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
+                continue
+
             if not step_input_check(step):
                 has_error = True
                 step.error = 'Please fill this step!'
@@ -312,89 +331,50 @@ def solve():
             elif form.data['mode'] == 'practice' and i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
-
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
-
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
-
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
             else:
                 step.error = None
-
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
 
         if has_error:
             pass
-        # elif "next" in request.form:
-            # previous_data = form.data
-            # previous_data['steps'].append({"step": "", "csrf_token": ""})
-            # form.__init__(data=previous_data)
-        # elif "end" in request.form:
+
         elif "next" in request.form:
             previous_data = form.data
             form.__init__(data=previous_data)
             form.showlaws = request.form['showlaws']
 
-            # if form.data['mode'] == 'test':
-            #     has_error = False
-            #     for i, step in enumerate(form.steps):
-            #         if not step_syntax_check(step):
-            #             has_error = True
-            #             step.error = 'Please use correct logic syntax in this step!'
-            #         elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
-            #             has_error = True
-            #             step.error = 'Did NOT apply %s correctly!' % step.data['law']
-            #
-            #             if len(form.steps) == 1: # this is the only step
-            #                 step_data = (form.question.text, i, step.data['law'], 0)
-            #         elif i != 0:
-            #             if not step_syntax_check(form.steps[i-1]):
-            #                 has_error = True
-            #                 step.error = 'Please use correct logic syntax in the previous step!'
-            #             elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
-            #                 has_error = True
-            #                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
-            #
-            #                 if i == len(form.steps)-1: # this is the most recent step
-            #                     step_data = (form.question.text, i, step.data['law'], 0)
-            #             else:
-            #                 if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-            #                     step_data = (form.question.text, i, step.data['law'], 1)
-            #         else:
-            #             step.error = None
-            #
-            #             if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-            #                 step_data = (form.question.text, i, step.data['law'], 1)
-
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Next Question" to move on to the next question!'
                 completed_question = True
 
-                try:
-                    s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
-                except botocore.exceptions.ClientError as e:
-                    if e.response['Error']['Code'] == "404":
-                        print("The object does not exist.")
-                    else:
-                        raise
+                if S3_LOGGING:
+                    try:
+                        s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
+                    except botocore.exceptions.ClientError as e:
+                        if e.response['Error']['Code'] == "404":
+                            print("The object does not exist.")
+                        else:
+                            raise
 
-                ans_data_csv = open('local_answer_data.csv', 'a')
+                    ans_data_csv = open('local_answer_data.csv', 'a')
 
-                ans_data = req_ip+","+t+","+usr_agent+","
-                ans_data += form.question.text + ",1," + str(len(form.steps) - 1) + "\n"
+                    ans_data = req_ip+","+t+","+usr_agent+","
+                    ans_data += form.question.text + ",1," + str(len(form.steps) - 1) + "\n"
 
 
-                ans_data_csv.write(ans_data)
-                ans_data_csv.close()
+                    ans_data_csv.write(ans_data)
+                    ans_data_csv.close()
 
-                s3_client = boto3.client('s3')
-                try:
-                    response = s3_client.upload_file('local_answer_data.csv', BUCKET_NAME, ANSWER_KEY)
-                except ClientError as e:
-                    print(e)
-
+                    s3_client = boto3.client('s3')
+                    try:
+                        response = s3_client.upload_file('local_answer_data.csv', BUCKET_NAME, ANSWER_KEY)
+                    except ClientError as e:
+                        print(e)
 
             elif not has_error:
                 previous_data = form.data
@@ -402,7 +382,7 @@ def solve():
                 form.__init__(data=previous_data)
                 form.showlaws = request.form['showlaws']
 
-        if step_data:
+        if step_data and S3_LOGGING:
             step_commad = ""
             for entry in step_data:
                 for item in entry:
