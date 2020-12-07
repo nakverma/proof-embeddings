@@ -323,41 +323,11 @@ def solve():
 
         if has_error:
             pass
+
         elif "next" in request.form:
             previous_data = form.data
             form.__init__(data=previous_data)
             form.showlaws = request.form['showlaws']
-
-            # if form.data['mode'] == 'test':
-            #     has_error = False
-            #     for i, step in enumerate(form.steps):
-            #         if not step_syntax_check(step):
-            #             has_error = True
-            #             step.error = 'Please use correct logic syntax in this step!'
-            #         elif i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
-            #             has_error = True
-            #             step.error = 'Did NOT apply %s correctly!' % step.data['law']
-            #
-            #             if len(form.steps) == 1: # this is the only step
-            #                 step_data = (form.question.text, i, step.data['law'], 0)
-            #         elif i != 0:
-            #             if not step_syntax_check(form.steps[i-1]):
-            #                 has_error = True
-            #                 step.error = 'Please use correct logic syntax in the previous step!'
-            #             elif not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
-            #                 has_error = True
-            #                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
-            #
-            #                 if i == len(form.steps)-1: # this is the most recent step
-            #                     step_data = (form.question.text, i, step.data['law'], 0)
-            #             else:
-            #                 if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-            #                     step_data = (form.question.text, i, step.data['law'], 1)
-            #         else:
-            #             step.error = None
-            #
-            #             if form.data['mode'] == 'test' and i == len(form.steps)-1: # this is the most recent step
-            #                 step_data = (form.question.text, i, step.data['law'], 1)
 
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Next Question" to move on to the next question!'
