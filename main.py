@@ -242,9 +242,10 @@ def solve():
             if i != len(form.steps) - 1:
                 print("test2 logging data")
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
-                print("test2 logging data")
+                print("test2 skipping data")
                 continue
 
+            print("test2.1 checking step")
             if not step_input_check(step):
                 has_error = True
                 step.error = 'Please fill this step!'
