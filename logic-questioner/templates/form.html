@@ -131,7 +131,7 @@
 </div>
 <script type="text/javascript">
     function captureEnter(e){
-        var key=e.keyCode || e.which;
+        var key = e.keyCode || e.which;
         if (key==13){
             var nextButton = document.getElementById("next");
             nextButton.click(); // this will trigger the click event
@@ -219,6 +219,10 @@
         var currentFocus;
         /* Execute a function when someone writes in the text field: */
         inp.addEventListener("input", function (e) {
+            /* Log the current cursor positions so we preserve them after value manipulations */
+            var cursorStart = e.target.selectionStart;
+            var cursorEnd = e.target.selectionEnd;
+
             /* LaTeXify things! */
             var str = this.value;
             var ret = str.replace("v", "∨");
@@ -288,6 +292,8 @@
                     a.appendChild(b);
                 }
             }
+            /* Preserve initial cursor positions */
+            e.target.setSelectionRange(cursorStart, cursorEnd);
         });
 
         /* Execute a function presses a key on the keyboard: */
