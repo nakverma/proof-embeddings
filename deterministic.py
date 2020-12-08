@@ -46,13 +46,15 @@ def check_correct_operation(e1, e2, ops, num_ops=1):
         trainer.increment_ops(num_ops)
         trees = trainer.get_trees()
 
-        if len(trees) < 1000 and ops[0] != 'Commutativity':
-            tree_strs = [t.parse_tree() for t in trees]
-            for t in trees:
-                for loc_parses in t.deep_parse_tree():
-                    tree_strs.append(loc_parses)
-        else:
-            tree_strs = [t.parse_tree() for t in trees]
+        # if len(trees) < 1000 and ops[0] != 'Commutativity':
+        #     tree_strs = [t.parse_tree() for t in trees]
+        #     for t in trees:
+        #         for loc_parses in t.deep_parse_tree():
+        #             tree_strs.append(loc_parses)
+        # else:
+            # tree_strs = [t.parse_tree() for t in trees]
+
+        tree_strs = [t.parse_tree() for t in trees]
 
         if e2 in tree_strs:
             del trainer
