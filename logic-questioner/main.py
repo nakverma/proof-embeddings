@@ -11,6 +11,7 @@ from create_expressions_mistakes import LogicTree
 from datetime import datetime
 import random
 import ast
+import gc
 
 import boto3
 import botocore
@@ -63,11 +64,11 @@ for question in questions:
     questions_.append(question)
 questions = questions_
 
-print("QUESTIONS: ", questions)
+# print("QUESTIONS: ", questions)
 
 laws = list(LogicTree().op_optns_diict.keys())
 laws.remove('ALL')
-print('Using LAWS=', laws)
+# print('Using LAWS=', laws)
 
 
 def step_input_check(step):
@@ -233,6 +234,7 @@ def solve():
         step_data = []
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
+
         for i, step in enumerate(form.steps):
             # NOTE: Adding this here because we only want to perform the check for the last step
             if i != len(form.steps) - 1:
@@ -259,6 +261,8 @@ def solve():
             else:
                 step.error = None
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
+
+        gc.collect()
 
         if has_error:
             pass
@@ -301,6 +305,7 @@ def solve():
                 previous_data['steps'].append({"step": "", "csrf_token": ""})
                 form.__init__(data=previous_data)
                 form.showlaws = request.form['showlaws']
+
 
         if step_data and S3_LOGGING:
             step_commad = ""
