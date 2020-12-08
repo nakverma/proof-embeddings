@@ -3624,6 +3624,10 @@ class LogicTreeTrainer():
             return ret_mistks
         return (str_mistks, node_mistks)
 
+
+
+
+
 if __name__ == '__main__':
 
     trainer = LogicTreeTrainer('T', expand=None)
