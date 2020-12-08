@@ -12,7 +12,6 @@ from datetime import datetime
 import random
 import ast
 import gc
-import os, psutil
 
 import boto3
 import botocore
@@ -65,11 +64,11 @@ for question in questions:
     questions_.append(question)
 questions = questions_
 
-print("QUESTIONS: ", questions)
+# print("QUESTIONS: ", questions)
 
 laws = list(LogicTree().op_optns_diict.keys())
 laws.remove('ALL')
-print('Using LAWS=', laws)
+# print('Using LAWS=', laws)
 
 
 def step_input_check(step):
@@ -235,30 +234,12 @@ def solve():
         step_data = []
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
-        print("test1")
-        process = psutil.Process(os.getpid())
-        print(process.memory_info().rss)
 
         for i, step in enumerate(form.steps):
             # NOTE: Adding this here because we only want to perform the check for the last step
-            print("test2", i)
-            process = psutil.Process(os.getpid())
-            print(process.memory_info().rss)
             if i != len(form.steps) - 1:
-                print("test2 logging data")
-                process = psutil.Process(os.getpid())
-                print(process.memory_info().rss)
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
-                print("test2 skipping data")
-                process = psutil.Process(os.getpid())
-                print(process.memory_info().rss)
                 continue
-
-            gc.collect()
-
-            print("test2.1 checking step")
-            process = psutil.Process(os.getpid())
-            print(process.memory_info().rss)
 
             if not step_input_check(step):
                 has_error = True
@@ -281,9 +262,8 @@ def solve():
                 step.error = None
                 step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
 
-        print("test3", i)
-        process = psutil.Process(os.getpid())
-        print(process.memory_info().rss)
+        gc.collect()
+
         if has_error:
             pass
 
