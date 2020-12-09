@@ -176,7 +176,7 @@ def solve():
     except:
         return redirect(url_for('login'))
     """
-    global completed_question
+    completed_question = request.args['completed_question']
 
     form = WireForm(request.form, steps=steps_init)
     form.question.text = request.args['question_text']
@@ -240,8 +240,8 @@ def solve():
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
                                     showlaws=request.form['showlaws'],
-                                    sid=create_session_id()),
-                                    completed_question=completed_question)
+                                    sid=create_session_id(),
+                                    completed_question=completed_question))
 
         if "clear" in request.form:
             previous_data = form.data
