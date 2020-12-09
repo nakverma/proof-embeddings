@@ -25,26 +25,30 @@ ANSWER_KEY = 'answer_data.csv' # replace with your object key
 STEP_KEY = 'step_data.csv'
 QUESTIONS_DOC = 'questions.txt'
 
-s3 = boto3.resource('s3')
-
-S3_LOGGING = True
+S3_LOGGING = False
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
 completed_question = False
 
 
-try:
-    s3.Bucket(BUCKET_NAME).download_file(QUESTIONS_DOC, 'local_questions.txt')
-except botocore.exceptions.ClientError as e:
-    if e.response['Error']['Code'] == "404":
-        print("The object does not exist.")
-    else:
-        raise
+if S3_LOGGING:
+    s3 = boto3.resource('s3')
+    try:
+        s3.Bucket(BUCKET_NAME).download_file(QUESTIONS_DOC, 'local_questions.txt')
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            print("The object does not exist.")
+        else:
+            raise
 
-q_file = open('local_questions.txt', 'r')
-questions = ast.literal_eval(q_file.read())
-q_file.close()
+    q_file = open('local_questions.txt', 'r')
+    questions = ast.literal_eval(q_file.read())
+    q_file.close()
+else:
+    q_file = open('questions.txt', 'r')
+    questions = ast.literal_eval(q_file.read())
+    q_file.close()
 
 
 questions_ = []
@@ -234,7 +238,6 @@ def solve():
         step_data = []
         # (IP, timestamp, question, step#, law, correct/incorrect)
 
-
         for i, step in enumerate(form.steps):
             # NOTE: Adding this here because we only want to perform the check for the last step
             if i != len(form.steps) - 1:
@@ -270,7 +273,6 @@ def solve():
         elif "next" in request.form:
             previous_data = form.data
             form.__init__(data=previous_data)
-            form.showlaws = request.form['showlaws']
 
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Next Question" to move on to the next question!'
@@ -304,8 +306,6 @@ def solve():
                 previous_data = form.data
                 previous_data['steps'].append({"step": "", "csrf_token": ""})
                 form.__init__(data=previous_data)
-                form.showlaws = request.form['showlaws']
-
 
         if step_data and S3_LOGGING:
             step_commad = ""
@@ -331,6 +331,9 @@ def solve():
                 response = s3_client.upload_file('local_step_data.csv', BUCKET_NAME, STEP_KEY)
             except ClientError as e:
                 print(e)
+
+        # NOTE: We do this to make sure that `showlaws` is always updated after the NEXT request
+        form.showlaws = request.form['showlaws']
 
     return render_template("form.html", form=form)
 
