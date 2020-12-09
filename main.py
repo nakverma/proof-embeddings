@@ -139,8 +139,7 @@ def main():
                             question_answer=question_answer,
                             question_difficulty='mild',
                             showlaws=False,
-                            sid=create_session_id(),
-                            completed_question=completed_question))
+                            sid=create_session_id()))
 
 
 """
@@ -176,7 +175,6 @@ def solve():
     except:
         return redirect(url_for('login'))
     """
-    completed_question = request.args['completed_question']
 
     form = WireForm(request.form, steps=steps_init)
     form.question.text = request.args['question_text']
@@ -204,7 +202,7 @@ def solve():
                 return render_template("form.html", form=form)
 
         if "skip" in request.form or ("clear" not in request.form and "next" not in request.form and "end" not in request.form):
-            if not request.args['completed_question'] and S3_LOGGING:
+            if not completed_question and S3_LOGGING:
                 try:
                     s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
                 except botocore.exceptions.ClientError as e:
@@ -240,8 +238,7 @@ def solve():
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
                                     showlaws=request.form['showlaws'],
-                                    sid=create_session_id(),
-                                    completed_question=completed_question))
+                                    sid=create_session_id()))
 
         if "clear" in request.form:
             previous_data = form.data
@@ -289,6 +286,7 @@ def solve():
             previous_data = form.data
             form.__init__(data=previous_data)
 
+            completed_question = False
             if not has_error and form.data['steps'][-1]['step'].strip() == request.args['question_answer']:
                 form.output = 'CORRECT! Press "Next Question" to move on to the next question!'
                 completed_question = True
