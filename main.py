@@ -10,6 +10,7 @@ from create_expressions_mistakes import LogicTree
 
 from datetime import datetime
 import random
+import string
 import ast
 import gc
 
@@ -93,6 +94,12 @@ def step_syntax_check(step):
     return True
 
 
+def create_session_id():
+    length = 10
+    random.seed(datetime.now())
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
+
+
 def select_a_question(difficulty='mild', current_question_text=None):
     questions_ = [question for question in questions if question['difficulty'] == difficulty and question['question'] != current_question_text]
     question = random.choice(questions_)
@@ -131,7 +138,8 @@ def main():
                             question_text=question_text,
                             question_answer=question_answer,
                             question_difficulty='mild',
-                            showlaws=False))
+                            showlaws=False,
+                            sid=create_session_id()))
 
 
 """
@@ -175,9 +183,13 @@ def solve():
     form.showlaws = request.args['showlaws']
     has_error = False
 
+    # session_id = request.args['sid']
+    # TODO: Michel
+
     req_ip = str(request.access_route[-1])
-    usr_agent = str(request.user_agent.string).replace(",","")
+    usr_agent = str(request.user_agent.string).replace(",", "")
     t = str(datetime.now())
+    session_id = str(request.args['sid'])
 
     if request.method == 'POST':
         for i in range(len(form.steps)):
@@ -202,7 +214,7 @@ def solve():
 
                 ans_data_csv = open('local_answer_data.csv', 'a')
 
-                ans_data = req_ip+","+t+","+usr_agent+","
+                ans_data = req_ip+","+t+","+usr_agent+","+session_id+","
                 ans_data += form.question.text + ",0,"
 
                 if len(form.steps) == 1 and not form.steps[0].data['step']:
@@ -226,7 +238,8 @@ def solve():
                                     question_text=question_text,
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
-                                    showlaws=request.form['showlaws']))
+                                    showlaws=request.form['showlaws'],
+                                    sid=create_session_id()))
 
         if "clear" in request.form:
             previous_data = form.data
@@ -241,7 +254,7 @@ def solve():
         for i, step in enumerate(form.steps):
             # NOTE: Adding this here because we only want to perform the check for the last step
             if i != len(form.steps) - 1:
-                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
+                step_data.append([req_ip, t, usr_agent, form.question.text, session_id, i, step.data['law'], step.data['step'], 1])
                 continue
 
             if not step_input_check(step):
@@ -256,14 +269,14 @@ def solve():
             elif form.data['mode'] == 'practice' and i == 0 and not check_correct_operation(form.question.text.split('Prove that ')[-1].split(' is')[0], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
-                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
+                step_data.append([req_ip, t, usr_agent, form.question.text, session_id, i, step.data['law'], step.data['step'], 0])
             elif form.data['mode'] == 'practice' and i != 0 and not check_correct_operation(form.steps[i-1].data['step'], step.data['step'], ops=[step.data['law']], num_ops=3):
                 has_error = True
                 step.error = 'Did NOT apply %s correctly!' % step.data['law']
-                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 0])
+                step_data.append([req_ip, t, usr_agent, form.question.text, session_id, i, step.data['law'], step.data['step'], 0])
             else:
                 step.error = None
-                step_data.append([req_ip, t, usr_agent, form.question.text, i, step.data['law'], step.data['step'], 1])
+                step_data.append([req_ip, t, usr_agent, form.question.text, session_id, i, step.data['law'], step.data['step'], 1])
 
         gc.collect()
 
