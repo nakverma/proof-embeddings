@@ -176,6 +176,8 @@ def solve():
         return redirect(url_for('login'))
     """
 
+    global completed_question
+
     form = WireForm(request.form, steps=steps_init)
     form.question.text = request.args['question_text']
     form.difficulty = request.args['question_difficulty']
