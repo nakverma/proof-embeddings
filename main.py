@@ -302,7 +302,7 @@ def solve():
 
                     ans_data_csv = open('local_answer_data.csv', 'a')
 
-                    ans_data = req_ip+","+t+","+usr_agent+","
+                    ans_data = req_ip+","+t+","+usr_agent+","+session_id+","
                     ans_data += form.question.text + ",1," + str(len(form.steps) - 1) + "\n"
 
 
