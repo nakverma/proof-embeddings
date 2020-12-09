@@ -26,7 +26,7 @@ ANSWER_KEY = 'answer_data.csv' # replace with your object key
 STEP_KEY = 'step_data.csv'
 QUESTIONS_DOC = 'questions.txt'
 
-S3_LOGGING = False
+S3_LOGGING = True
 
 # TODO: Slider hardcoded change that!
 steps_init = [{"label": "Step 1"}, {"label": "Step 2"}, {"label": "Step 3"}][0:1]
