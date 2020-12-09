@@ -10,6 +10,7 @@ from create_expressions_mistakes import LogicTree
 
 from datetime import datetime
 import random
+import string
 import ast
 import gc
 
@@ -93,6 +94,11 @@ def step_syntax_check(step):
     return True
 
 
+def create_session_id():
+    length = 10
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
+
+
 def select_a_question(difficulty='mild', current_question_text=None):
     questions_ = [question for question in questions if question['difficulty'] == difficulty and question['question'] != current_question_text]
     question = random.choice(questions_)
@@ -131,7 +137,8 @@ def main():
                             question_text=question_text,
                             question_answer=question_answer,
                             question_difficulty='mild',
-                            showlaws=False))
+                            showlaws=False,
+                            sid=create_session_id()))
 
 
 """
@@ -175,8 +182,11 @@ def solve():
     form.showlaws = request.args['showlaws']
     has_error = False
 
+    session_id = request.args['sid']
+    # TODO: Michel
+
     req_ip = str(request.access_route[-1])
-    usr_agent = str(request.user_agent.string).replace(",","")
+    usr_agent = str(request.user_agent.string).replace(",", "")
     t = str(datetime.now())
 
     if request.method == 'POST':
@@ -226,7 +236,8 @@ def solve():
                                     question_text=question_text,
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
-                                    showlaws=request.form['showlaws']))
+                                    showlaws=request.form['showlaws'],
+                                    sid=create_session_id()))
 
         if "clear" in request.form:
             previous_data = form.data
