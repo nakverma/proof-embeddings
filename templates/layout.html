@@ -48,8 +48,8 @@
     .switch {
       position: relative;
       display: inline-block;
-      width: 105px;
-      height: 45px;
+      width: 60px;
+      height: 34px;
     }
 
     .switch input {display:none;}
@@ -61,7 +61,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #ca2222;
+      background-color: #cccccc;
       -webkit-transition: .4s;
       transition: .4s;
     }
@@ -69,17 +69,17 @@
     .slidershowlaws:before {
       position: absolute;
       content: "";
-      height: 40px;
-      width: 40px;
-      left: 2.5px;
-      bottom: 2px;
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
       background-color: white;
       -webkit-transition: .4s;
       transition: .4s;
     }
 
     input:checked + .slidershowlaws {
-      background-color: #2ab934;
+      background-color: #2196F3;
     }
 
     input:focus + .slidershowlaws {
@@ -87,9 +87,18 @@
     }
 
     input:checked + .slidershowlaws:before {
-      -webkit-transform: translateX(89px);
-      -ms-transform: translateX(89px);
-      transform: translateX(89px);
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slidershowlaws.round {
+        border-radius: 34px;
+    }
+
+    .slidershowlaws.round:before {
+        border-radius: 50%;
     }
 
     fieldset.inlineLabels ul {list-style:none}
