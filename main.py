@@ -139,7 +139,8 @@ def main():
                             question_answer=question_answer,
                             question_difficulty='mild',
                             showlaws=False,
-                            sid=create_session_id()))
+                            sid=create_session_id(),
+                            completed_question=completed_question))
 
 
 """
@@ -203,7 +204,7 @@ def solve():
                 return render_template("form.html", form=form)
 
         if "skip" in request.form or ("clear" not in request.form and "next" not in request.form and "end" not in request.form):
-            if not completed_question and S3_LOGGING:
+            if not request.args['completed_question'] and S3_LOGGING:
                 try:
                     s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
                 except botocore.exceptions.ClientError as e:
@@ -239,7 +240,8 @@ def solve():
                                     question_answer=question_answer,
                                     question_difficulty=request.form['difficulty'],
                                     showlaws=request.form['showlaws'],
-                                    sid=create_session_id()))
+                                    sid=create_session_id()),
+                                    completed_question=completed_question)
 
         if "clear" in request.form:
             previous_data = form.data
