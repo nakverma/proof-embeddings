@@ -2148,8 +2148,19 @@ class NotNode(UnaryNode):
         if isinstance(self.arg, AndNode) and len(self.arg.operands) == 2:
             andnode = self.arg
             ornode = OrNode(self.parent)
-            ornode.set_operands([NotNode(ornode, andnode.operands[0].copy()),\
-                                NotNode(ornode, andnode.operands[1].copy())])
+
+            if isinstance(andnode.operands[0], NotNode):
+                left_arg = andnode.operands[0].arg.copy()
+            else:
+                left_arg = NotNode(ornode, andnode.operands[0].copy())
+
+            if isinstance(andnode.operands[1], NotNode):
+                right_arg = andnode.operands[1].arg.copy()
+            else:
+                right_arg = NotNode(ornode, andnode.operands[1].copy())
+
+            ornode.set_operands([left_arg, right_arg])
+
             return ornode
         else:
             return False
@@ -2158,8 +2169,19 @@ class NotNode(UnaryNode):
         if isinstance(self.arg, OrNode) and len(self.arg.operands) == 2:
             ornode = self.arg
             andnode = AndNode(self.parent)
-            andnode.set_operands([NotNode(andnode, ornode.operands[0].copy()),\
-                                NotNode(andnode, ornode.operands[1].copy())])
+
+            if isinstance(ornode.operands[0], NotNode):
+                left_arg = ornode.operands[0].arg.copy()
+            else:
+                left_arg = NotNode(andnode, ornode.operands[0].copy())
+
+            if isinstance(ornode.operands[1], NotNode):
+                right_arg = ornode.operands[1].arg.copy()
+            else:
+                right_arg = NotNode(andnode, ornode.operands[1].copy())
+
+            andnode.set_operands([left_arg, right_arg])
+
             return andnode
         else:
             return False
@@ -3623,7 +3645,6 @@ class LogicTreeTrainer():
             ret_mistks += str_mistks
             return ret_mistks
         return (str_mistks, node_mistks)
-
 
 
 
