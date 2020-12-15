@@ -9,11 +9,12 @@ import sys
 class LogicLexer(Lexer):
     # Set of token names.   This is always required
 
-    tokens = {P,Q,R,TRUE,FALSE,AND,OR,NOT,IMP,D_IMP,R_PAREN,L_PAREN}
+    tokens = {P,Q,R,S,TRUE,FALSE,AND,OR,NOT,IMP,D_IMP,R_PAREN,L_PAREN}
 
     P = 'p'
     Q = 'q'
     R = 'r'
+    S = 's'
     TRUE = 'T'
     FALSE = 'F'
     AND = '\\^|∧'
@@ -217,6 +218,10 @@ class LogicParser(Parser):
         return Var(p[0])
 
     @_('R')
+    def term(self, p):
+        return Var(p[0])
+
+    @_('S')
     def term(self, p):
         return Var(p[0])
 
