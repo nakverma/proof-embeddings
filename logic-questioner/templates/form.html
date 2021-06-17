@@ -9,8 +9,8 @@
 
 {% from "includes/formhelpers.html" import render_field %}
 
-<form id="form" action="" method="POST" style="width: 75%; margin: 0 auto;">
-    <div style="width: 100%; margin: 0 auto; padding-bottom: 20%;">
+<form id="form" action="" method="POST" style="width: 85%; margin: 0 auto;"> 
+    <div style="width: 100%; padding-bottom: 20%; margin: 0 auto; ">
 
         <div style="width: 15%; margin-left: 5%; float: left;">
             <p class="btn btn-primary" data-toggle="tooltip" title="Toggle this button to show the law table for assistance during your practice."
@@ -27,6 +27,20 @@
                 <span class="slidershowlaws round"></span>
             </label>
         </div>
+        
+        <!--ADDING A TOGGLE FOR SOLUTIONS, INSTEAD ADDING A BUTTON BELOW
+            <div style="width: 15%; margin-left: 5%; float: left;">
+            <p class="btn btn-primary" data-toggle="tooltip" title="Toggle this to reveal the solution."
+               style="float:left; border-radius: 100%; font-size: 0.5%;">
+                <i class="fa fa-info"></i>
+            </p>
+            <p style="margin-left: 35px;"> Show Solution </p>
+            <label class="switch">
+                <input type="checkbox" id="tog_btn_show_laws">
+
+                <span class="slidershowlaw round"></span>
+            </label>
+        </div>-->
 
         <div style="width: 20%; margin-left: 5%; float: left;">
             <p class="btn btn-primary" data-toggle="tooltip" title='Choose the difficulty of the questions using "Next Question" button. Left-most is the mildest, and right-most is the most spicy!'
@@ -114,6 +128,9 @@
     {% endif %}
     <br/>
     <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
+        <!--CHANGE: SHOW SOL BUTTON HERE-->
+        <button onclick="showSolution()" type="button" class="btn btn-danger" name="solution" value="SOLUTION" style="width: 20%;">SHOW SOLUTION</button>
+        <span style="width: 10px"></span>
         <button onclick="openForm()" type="button" class="btn btn-danger" name="skip" value="SKIP" style="width: 20%;">NEXT QUESTION</button>
         <span style="width: 10px"></span>
         <button type="submit" class="btn btn-danger" name="clear" value="CLEAR" style="width: 20%;">CLEAR ALL</button>
@@ -129,9 +146,58 @@
     <br />
     <br />
     <br />
+    <!--ADDING DIVS (container and floats), CHANGE IN PROGRESS HERE-->
+    <div style="padding: 20px;">
+        <div style="width: 50%; margin: 0 auto; display: flex; justify-content: center; float: left; padding: 20px;">
+            <img src="{{url_for('static', filename='laws_table.png')}}" alt="Laws Table Image" class="toggleoff" id="laws_table" style="width:100%;"/>
+        </div>
+        <!--<div id="showsol" style="width: 50%; margin: 0 auto; display: flex; justify-content: center; float: left; padding: 20px;">
+            <p>Solution goes here.</p>
+        </div>-->
+    </div>
+    <div id="showsol" style="width: 50%; margin: 0 auto; display: none; justify-content: center; float: left; padding: 20px;">
+        <!--<p>Solution goes here.</p>-->
+        <h5>Step-by-Step Solution</h5>
+        <p style="text-align: center;">Note: This is just one of many possible solutions.</p>
+        <p id="sol_here_from_js"></p>
+        <script>
+            console.log('{{form.solution}}')
+            var solution = JSON.parse('{{form.solution | tojson}}');
+            //var len = solution.length;
+            //console.log(len)
+            var steps = solution.slice(10,solution.length-3); //start from beginning of first step and go to end of last step
+            
+            console.log( typeof solution);
+            console.log(solution);
+            console.log(steps)
 
-    <img src="{{url_for('static', filename='laws_table.png')}}" alt="Laws Table Image" class="toggleoff" id="laws_table" style="width:100%;"/>
+            var steps_ar = steps.split("', '");
+            console.log(steps_ar); //YAAAAAYYYY IT WORKS TIL HEREEHEHEHEHEEEEE. finally have a list of all the steps
+            
+            var step_to_add;
+            document.getElementById("sol_here_from_js").innerHTML = "<ol>";
+            for (var i = 0; i < steps_ar.length; i++){
+                step_to_add = "<li>" + steps_ar[i] + "</li>";
+                document.getElementById("sol_here_from_js").innerHTML += step_to_add;
+            }
+            document.getElementById("sol_here_from_js").innerHTML += "</ol>";
+            
+            
 
+            //var sol_steps = solution.sol;
+            //console.log(sol_steps)
+            
+            //document.getElementById("sol_here_from_js").innerHTML = steps;
+        </script>
+        
+        
+        <!--<p style="text-align: center;">{{(form.solution)['sol']}}</p>
+        <p style="text-align: center;">{{ form.solution }}</p>
+        <ol>{% for item in form.solution['sol'] %}
+            <li>{{item}}</li>
+            {% endfor %}
+        </ol>-->
+    </div>
 </form>
 
 
@@ -143,6 +209,7 @@
     </div>
     <button type="button" class="btn btn-danger" style="margin: 0 auto; display: block; margin-bottom:5%;" onclick="closeForm()">CLOSE</button>
 </div>
+
 <script type="text/javascript">
     function captureEnter(e){
         var key = e.keyCode || e.which;
@@ -225,6 +292,18 @@
           updateValue(target, ui.value);
         }
     });
+</script>
+
+<script>
+    /*function to turn solution on, based on W3 schools*/
+    function showSolution() {
+        var x = document.getElementById("showsol");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
 </script>
 
 <script>
@@ -371,6 +450,16 @@
             }
         }
 
+        /*function to turn solution on
+        function showSolution() {
+            var x = document.getElementById("showsol");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }*/
+    
 /* Execute a function when someone clicks in the document: */
 document.addEventListener("click", function (e) {
     closeAllLists(e.target);
