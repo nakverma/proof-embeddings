@@ -22,7 +22,7 @@
     {'question': "Prove that (p^q)v(~pv(p^~q)) is a tautology.",
      'answer': 'T',
      'difficulty': 'medium',
-     'solution': ['Solution not yet available.']},
+     'solution': ['(p^q)v((~pvp)^(~pv~q))','(p^q)v(T^(~pv~q))','((p^q)vT)^((p^q)v(~pv~q))','T^((p^q)v(~pv~q))','T^T','T']},
     {'question': "Prove that ((pvq)^(rv~q))->(pvr) is a tautology.",
      'answer': 'T',
      'difficulty': 'spicy',
@@ -50,7 +50,7 @@
     {'question': "Prove that ~r^((~pvp)^r)^(p->r) is a fallacy.",
      'answer': 'F',
      'difficulty': 'medium',
-     'solution': ['Solution not yet available.']},
+     'solution': ['~r^((~pvp)^r)^(p->r)','~r^(T^r)^(rv~p)','~r^r^T^(rv~p)','F^T^(rv~p)','F']},
     {'question': "Prove that s^((~s^~q)v(~s^~T))^p is a fallacy.",
      'answer': 'F',
      'difficulty': 'spicy',
@@ -70,7 +70,7 @@
     {'question': "Prove that ~(~(((~p^s)v((~p^T)^~s))^p)^~p) is logically equivalent to p.",
      'answer': 'p',
      'difficulty': 'spicy',
-     'solution': ['Solution not yet available.']},
+     'solution': ['~(~(((~p^s)v((~p^T)^~s))^p)^~p)','(((~p^s)v((~p^T)^~s))^p)vp','(((~p^s)v(~p^T^~s))^p)vp','((p^(~p^s))v(p^(~p^~s)))vp','(FvF)vp','Fvp','p']},
     {'question': "Prove that ~(q^~p)^(qv~p) is logically equivalent to p<->q.",
      'answer': 'p↔q',
      'difficulty': 'mild',
@@ -98,9 +98,5 @@
     {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
      'answer': 'p',
      'difficulty': 'medium',
-     'solution': ['(pvq)^(~(~p)v~q)','(pvq)^(pv~q)','pv(q^~q)','pvF','p']},
-    {'question': "Prove that ((p^~q)->r)->(p->(qvr)) is a tautology.",
-     'answer': 'T',
-     'difficulty': 'medium',
-     'solution': ['Solution not yet available.']}
+     'solution': ['(pvq)^(~(~p)v~q)','(pvq)^(pv~q)','pv(q^~q)','pvF','p']}
 ]
