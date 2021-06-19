@@ -98,5 +98,5 @@
     {'question': "Prove that (pvq)^(~p->~q) is logically equivalent to p.",
      'answer': 'p',
      'difficulty': 'medium',
-     'solution': ['(pvq)^(~(~p)v~q)','(pvq)^(pv~q)','pv(q^~q)','pvF','p']}
+     'solution': ['(pvq)^(~(~p)v~q)','(pvq)^(pv~q)','pv(q^~q)','pvF','p ']}
 ]
