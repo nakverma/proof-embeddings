@@ -52,9 +52,7 @@ else:
     questions = ast.literal_eval(q_file.read())
     q_file.close()
 
-#cur_sol = [] #filled with the solution to the current question in select_a_question 
 questions_ = []
-#sol = []
 for question in questions:
     #build question to be printed
     question['answer'] = raw2latex(question['answer'])
@@ -69,38 +67,24 @@ for question in questions:
     else:
         q += last
     question['question'] = q
-    #questions_.append(question)
-
-    # #build solutions to be printed
-    # sol.append(raw2latex(question['solution']))
-    # question['solution'] = sol
-
-    # questions_.append(question)
-
 
     #build solutions to be printed
-    #sol.append(raw2latex(question['solution']))
     sol = []
     for step in question['solution']:
         sol.append(raw2latex(step))
     question['solution'] = sol
 
-    #print(question)
-
     questions_.append(question)
 
 questions = questions_
 
-#print(questions)
-#print(questions['solutions'])
 
 
 
-# print("QUESTIONS: ", questions)
+
 
 laws = list(LogicTree().op_optns_diict.keys())
 laws.remove('ALL')
-# print('Using LAWS=', laws)
 
 
 def step_input_check(step):
@@ -131,13 +115,8 @@ def select_a_question(difficulty='mild', current_question_text=None):
     questions_ = [question for question in questions if question['difficulty'] == difficulty and question['question'] != current_question_text]
     question = random.choice(questions_)
     question_text, question_answer = question['question'], question['answer']
-    #print(question)
     question_solution = question['solution']
-    print("THIS IS WHAT I NEED TO CHECK PART 2:")
-    print("when pulled 3: ")
-    print(question_solution)
-    print("_________")
-    #print(question_solution)
+    #added question_solution here, so we pick a question randomly and pull out all the data from questions.txt that we need
     return question_text, question_answer, question_solution
 
 
@@ -172,7 +151,6 @@ def main():
     #MADE A GLOBAL VAR HERE TO TRY TO FIX - is this too messy? hm
     global q_sol
     q_sol = {'sol': question_solution }
-    #q_sol = question_solution
 
     print("THIS IS WHAT I NEED TO CHECK PART 2:")
     print("when pulled 2 - global made here: ")
@@ -229,13 +207,8 @@ def solve():
     form.question.text = request.args['question_text']
     form.difficulty = request.args['question_difficulty']
     form.showlaws = request.args['showlaws']
-    #print(request.args['solution'])
-    #form.solution = cur_sol
-    print("THIS IS WHAT I NEED TO CHECK:")
-    print(request.args['question_solution']) #this holds only the first step. this is where the bug is.
-    #print(request.args['q_sol'])
-    #print(q_sol)
-    print("___________")
+    #create form object that stores all the data we send to the client through the URL
+    
     form.solution = request.args['question_solution']
     
 
@@ -258,10 +231,7 @@ def solve():
                     previous_data['steps'].append({"step": "", "csrf_token": ""})
                 form.__init__(data=previous_data)
                 form.showlaws = request.form['showlaws']
-                #CHANGE HERE!!!!!
-                #print(form)
-                #print("solution: ")
-                #print(form.solution)
+                
                 return render_template("form.html", form=form)
                 
 
@@ -297,12 +267,8 @@ def solve():
             completed_question = False
 
             question_text, question_answer, question_solution = select_a_question(request.form['difficulty'], current_question_text=request.args['question_text'])
-            #print("when pulled: ")
-            #print(question_solution)
-            print("THIS IS WHAT I NEED TO CHECK PART 2:")
-            print("when pulled 1: ")
-            print(question_solution)
-            print("_________")
+          
+            #make q_sol a dictionary, so it can be passed through the URL and stay in tact
             q_sol = {'sol': question_solution }
             return redirect(url_for('solve',
                                     question_text=question_text,
@@ -317,8 +283,6 @@ def solve():
             previous_data['steps'] = [{"step": "", "csrf_token": ""}]
             form.__init__(data=previous_data)
             form.showlaws = request.form['showlaws']
-            #print("solution: ")
-            #print(form.solution)
             return render_template("form.html", form=form)
 
         step_data = []
@@ -421,8 +385,7 @@ def solve():
 
         # NOTE: We do this to make sure that `showlaws` is always updated after the NEXT request
         form.showlaws = request.form['showlaws']
-    #print("solution: ")
-    #print(form.solution) 
+
     return render_template("form.html", form=form)
 
 

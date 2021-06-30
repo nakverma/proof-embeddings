@@ -20,27 +20,11 @@
             <p style="margin-left: 35px;"> Show Laws </p>
             <label class="switch">
                 <input type="checkbox" id="tog_btn_show_laws">
-                <!--<div class="slidershowlaws round">-->
-                    <!--<span class="on" style="font-size: 85%; text-align: center;">ON</span>-->
-                    <!--<span class="off" style="font-size: 85%; text-align: center;">OFF</span>-->
-                <!--</div>-->
+                
                 <span class="slidershowlaws round"></span>
             </label>
         </div>
         
-        <!--ADDING A TOGGLE FOR SOLUTIONS, INSTEAD ADDING A BUTTON BELOW
-            <div style="width: 15%; margin-left: 5%; float: left;">
-            <p class="btn btn-primary" data-toggle="tooltip" title="Toggle this to reveal the solution."
-               style="float:left; border-radius: 100%; font-size: 0.5%;">
-                <i class="fa fa-info"></i>
-            </p>
-            <p style="margin-left: 35px;"> Show Solution </p>
-            <label class="switch">
-                <input type="checkbox" id="tog_btn_show_laws">
-
-                <span class="slidershowlaw round"></span>
-            </label>
-        </div>-->
 
         <div style="width: 20%; margin-left: 5%; float: left;">
             <p class="btn btn-primary" data-toggle="tooltip" title='Choose the difficulty of the questions using "Next Question" button. Left-most is the mildest, and right-most is the most spicy!'
@@ -134,10 +118,7 @@
         <button onclick="openForm()" type="button" class="btn btn-danger" name="skip" value="SKIP" style="width: 20%;">NEXT QUESTION</button>
         <span style="width: 10px"></span>
         <button type="submit" class="btn btn-danger" name="clear" value="CLEAR" style="width: 20%;">CLEAR ALL</button>
-        <!-- <span style="width: 10px"></span> -->
-        <!-- <button type="submit" class="btn btn-success" name="next" value="NEXT" style="width: 20%;">CHECK / NEW STEP</button> -->
-        <!-- <span style="width: 10px"></span> -->
-        <!-- <button type="submit" class="btn btn-success" name="end" value="END" style="width: 20%;">CHECK</button> -->
+        
     </div>
 
     <input style="display: none;" type="text" id="difficulty" name="difficulty" value={{ form.difficulty }} />
@@ -151,9 +132,7 @@
         <div style="width: 50%; margin: 0 auto; display: flex; justify-content: center; float: left; padding: 20px;">
             <img src="{{url_for('static', filename='laws_table.png')}}" alt="Laws Table Image" class="toggleoff" id="laws_table" style="width:100%;"/>
         </div>
-        <!--<div id="showsol" style="width: 50%; margin: 0 auto; display: flex; justify-content: center; float: left; padding: 20px;">
-            <p>Solution goes here.</p>
-        </div>-->
+        
     </div>
     <div id="showsol" style="width: 50%; margin: 0 auto; display: none; justify-content: center; float: left; padding: 20px;">
         <!--<p>Solution goes here.</p>-->
@@ -163,16 +142,15 @@
         <script>
             console.log('{{form.solution}}')
             var solution = JSON.parse('{{form.solution | tojson}}');
-            //var len = solution.length;
-            //console.log(len)
+            
             var steps = solution.slice(10,solution.length-3); //start from beginning of first step and go to end of last step
             
-            console.log( typeof solution);
-            console.log(solution);
-            console.log(steps)
+            //console.log( typeof solution);
+            //console.log(solution);
+            //console.log(steps)
 
             var steps_ar = steps.split("', '");
-            console.log(steps_ar); //YAAAAAYYYY IT WORKS TIL HEREEHEHEHEHEEEEE. finally have a list of all the steps
+            console.log(steps_ar); 
             
             var step_to_add;
             document.getElementById("sol_here_from_js").innerHTML = "<ol>";
@@ -191,12 +169,7 @@
         </script>
         
         
-        <!--<p style="text-align: center;">{{(form.solution)['sol']}}</p>
-        <p style="text-align: center;">{{ form.solution }}</p>
-        <ol>{% for item in form.solution['sol'] %}
-            <li>{{item}}</li>
-            {% endfor %}
-        </ol>-->
+        
     </div>
 </form>
 
@@ -450,7 +423,7 @@
             }
         }
 
-        /*function to turn solution on
+        /*function to turn solution on----CHANGED HOW THIS IS DONE but might be useful later
         function showSolution() {
             var x = document.getElementById("showsol");
             if (x.style.display === "none") {
