@@ -2631,6 +2631,8 @@ class LogicTreeTrainer():
 
     def __init__(self, first_tree=None, expand=True, op_seq=None, op_pairs=True):
 
+        print("LogicTreeTrainer made")
+
         if first_tree != None:
             first_tree = first_tree.replace('->','→')
             self.starting_expr = first_tree
@@ -2639,6 +2641,7 @@ class LogicTreeTrainer():
             # tree = LogicTree(tree_postfix)
             tree = LogicTree(self.starting_expr, op_seq=self.op_seq, op_pairs=op_pairs)
             self.trees = {1 : (tree, [(tree.copy(), 0)])}
+            #print("first print in LogicTreeTrainer")
             print(self.trees[1][0].parse_tree())
 
         else:

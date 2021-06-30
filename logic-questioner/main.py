@@ -152,11 +152,6 @@ def main():
     global q_sol
     q_sol = {'sol': question_solution }
 
-    print("THIS IS WHAT I NEED TO CHECK PART 2:")
-    print("when pulled 2 - global made here: ")
-    print(q_sol)
-    print("_________")
-
     return redirect(url_for('solve',
                             question_text=question_text,
                             question_answer=question_answer,
