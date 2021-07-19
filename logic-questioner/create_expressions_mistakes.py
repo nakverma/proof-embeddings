@@ -41,9 +41,10 @@ NOTE:
 
 
 
-class LogicNode(object):
+class LogicNode(object): #the superclass of all the other node types
 
     def __init__(self, parent):
+        #print("making a logic node")
         self.parent = parent
         self.most_recent_op = -1
 
@@ -158,12 +159,15 @@ class LogicNode(object):
         return not1
 
 class LeafNode(LogicNode):
+    #print("made a LeafNode")
 
     def __init__(self, parent):
+        #print("leaf Node")
         LogicNode.__init__(self, parent)
 
 class UnaryNode(LogicNode):
     def __init__(self, parent, arg=None):
+        #print("unary Node")
         LogicNode.__init__(self, parent)
         self.arg = arg
 
@@ -173,6 +177,7 @@ class UnaryNode(LogicNode):
 
 class BinaryNode(LogicNode):
     def __init__(self, parent, left=None, right=None):
+        #("binary Node")
         LogicNode.__init__(self, parent)
         self.left = left
         self.right = right
@@ -185,6 +190,7 @@ class BinaryNode(LogicNode):
 
 class N_aryNode(LogicNode):
     def __init__(self, parent, operands=None):
+        #print("n_ary Node")
         LogicNode.__init__(self, parent)
         self.operands = operands
 
@@ -201,9 +207,10 @@ class N_aryNode(LogicNode):
 class TrueNode(LeafNode):
 
     def __init__(self, parent):
+        #print("true Node")
         LeafNode.__init__(self, parent)
         self.token = "T"
-
+        #THIS IS WHAT THOSE NUMBERS MEAN!!?
         self.node_ops_dict.update({1:self.new_var_p,\
                                 2:self.new_var_q,\
                                 3:self.new_var_r,\
@@ -362,9 +369,10 @@ class TrueNode(LeafNode):
 class FalseNode(LeafNode):
 
     def __init__(self, parent):
+        #print("false Node")
         LeafNode.__init__(self, parent)
         self.token = "F"
-
+        #some opcodes defined here
         self.node_ops_dict.update({31:self.new_var_p_f,\
                                 32:self.new_var_q_f,\
                                 33:self.new_var_r_f,\
@@ -388,7 +396,7 @@ class FalseNode(LeafNode):
         f.set_most_recent_op(self.most_recent_op)
         return f
 
-    def neg_f(self):
+    def neg_f(self): #this is ~F
         notnode = NotNode(self.parent)
         truenode = TrueNode(notnode)
         notnode.set_arg(truenode)
@@ -413,8 +421,8 @@ class FalseNode(LeafNode):
         return andnode
 
     def new_var_s_f(self):
-        andnode = AndNode(self.parent)
-        snode = SNode(andnode)
+        andnode = AndNode(self.parent) #for example, the rest of the expression(=parent) ^ s
+        snode = SNode(andnode) 
         andnode.set_operands([self, snode])
         return andnode
 
@@ -514,6 +522,7 @@ class FalseNode(LeafNode):
 class PNode(LeafNode):
 
     def __init__(self, parent):
+        #print("P Node")
         LeafNode.__init__(self, parent)
         self.token = "p"
 
@@ -565,6 +574,7 @@ class PNode(LeafNode):
 class QNode(LeafNode):
 
     def __init__(self, parent):
+        #print("Q Node")
         LeafNode.__init__(self, parent)
         self.token = "q"
         self.node_ops_dict.update({13:self.identity,\
@@ -611,6 +621,7 @@ class QNode(LeafNode):
 class RNode(LeafNode):
 
     def __init__(self, parent):
+        #print("R Node")
         LeafNode.__init__(self, parent)
         self.token = "r"
         self.node_ops_dict.update({14:self.identity,\
@@ -658,6 +669,7 @@ class RNode(LeafNode):
 class SNode(LeafNode):
 
     def __init__(self, parent):
+        #print("S Node")
         LeafNode.__init__(self, parent)
         self.token = "s"
         self.node_ops_dict.update({69:self.identity,\
@@ -684,7 +696,7 @@ class SNode(LeafNode):
         return ornode
 
 
-    def do_ops(self, allowed_ops, op_pair_dict):
+    def do_ops(self, allowed_ops, op_pair_dict): #take the pairs of opcodes set earlier
 
         todo_ops = self.nodeOps.intersection(allowed_ops)
         if not self.most_recent_op == -1:
@@ -709,6 +721,7 @@ class SNode(LeafNode):
 class AndNode(N_aryNode):
 
     def __init__(self, parent, operands=None):
+        #print("and Node")
         N_aryNode.__init__(self, parent, operands)
         self.token = "∧"
 
@@ -1391,12 +1404,13 @@ class AndNode(N_aryNode):
 class OrNode(N_aryNode):
 
     def __init__(self, parent, operands=None):
+        #print("or Node")
         N_aryNode.__init__(self, parent, operands)
         self.token = "∨"
         self.node_ops_dict.update({20:self.commutative2,
                                 21:self.associative1,
                                 22:self.associative2,
-                                23:self.logic_equiv,
+                                23:self.logic_equiv, 
                                 24:self.demorgan3,
                                 43:self.flatten2,
                                 25:self.identity,
@@ -1409,7 +1423,9 @@ class OrNode(N_aryNode):
                                 50:self.negation,
                                 77:self.absorption,
                                 72:self.remove_false,
-                                44:self.expand2})
+                                44:self.expand2,
+                                84:self.logic_equiv_2,
+                                85:self.logic_equiv_3})
 
         # complex ops: the return value is a list of replacement nodes
         self.complexOps = set([20,44])
@@ -1565,7 +1581,8 @@ class OrNode(N_aryNode):
         inds = [i for i in range(len(self.operands))]
         groups = op_groups(inds)
 
-        def to_or(inds):
+        def to_or(inds): #26
+            #print("possibility 1")
             new_or = OrNode(None)
             new_ops = []
             for i in inds:
@@ -1615,17 +1632,59 @@ class OrNode(N_aryNode):
 
         return ret_ors
 
-    def logic_equiv(self):
+    def logic_equiv(self): #23: qv~p to p->q, and ~qvp to q->p
+        '''notes:
+        - self.operands[0] and [1] are the data being ORed (on the left and right of the or (v) symbol)
+        - isinstance is a python method, checks if the input is the right Node type
+        '''
+        # print("---------trying to figure out logic_equiv, 23 ------------")
+        # print("self.operands " , self.operands[0], self.operands[1])
+
+        # print(isinstance(self.operands[1], LogicNode)) 
+
         if (isinstance(self.operands[0], NotNode) and not isinstance(self.operands[1], NotNode)):
             implies = ImplicationNode(self.parent)
             condition = self.operands[0].arg.copy()
             implication = self.operands[1].copy()
             implies.set_lr(condition, implication)
+            print("inside first if")
             return implies
         elif (isinstance(self.operands[1], NotNode) and not isinstance(self.operands[0], NotNode)):
             implies = ImplicationNode(self.parent)
             condition = self.operands[1].arg.copy()
             implication = self.operands[0].copy()
+            implies.set_lr(condition, implication)
+            print("inside second if")
+            return implies
+        elif (isinstance(self.operands[1], LeafNode) and isinstance(self.operands[0], LeafNode)):
+            #print("tom and jerry")
+            implies = ImplicationNode(self.parent) #operator
+            #not node with the below in it make 
+            condition = NotNode(self, self.operands[1].copy()) #left side (operand)
+            implication = self.operands[0].copy() #right side (operatand)
+            implies.set_lr(condition, implication)
+            print("inside third if: ", implies)
+            return implies
+        else:
+            return False
+
+    def logic_equiv_2(self): #84: qvp to ~p->q
+        if (isinstance(self.operands[1], LogicNode) and isinstance(self.operands[0], LogicNode)):
+            implies = ImplicationNode(self.parent) #operator
+            #not node with the below in it make 
+            condition = NotNode(self, self.operands[1].copy()) #left side (operand)
+            implication = self.operands[0].copy() #right side (operatand)
+            implies.set_lr(condition, implication)
+            return implies
+        else:
+            return False
+
+    def logic_equiv_3(self): #85: qvp to ~q->p
+        if (isinstance(self.operands[1], LogicNode) and isinstance(self.operands[0], LogicNode)):
+            implies = ImplicationNode(self.parent) #operator
+            #not node with the below in it make 
+            condition = NotNode(self, self.operands[0].copy()) #left side (operand)
+            implication = self.operands[1].copy() #right side (operatand)
             implies.set_lr(condition, implication)
             return implies
         else:
@@ -2002,6 +2061,7 @@ class OrNode(N_aryNode):
 class ImplicationNode(BinaryNode):
 
     def __init__(self, parent, left=None, right=None):
+        #print("implication Node")
         BinaryNode.__init__(self, parent, left, right)
         self.token = "→"
         self.node_ops_dict.update({26:self.to_or,\
@@ -2023,7 +2083,8 @@ class ImplicationNode(BinaryNode):
         andnode.set_operands([self, truenode])
         return andnode
 
-    def to_or(self):
+    def to_or(self): #implication to disjunction?
+        #print("possibility 2")
         ornode = OrNode(self.parent)
         notnode = NotNode(ornode)
         notnode.set_arg(self.left.copy())
@@ -2036,6 +2097,7 @@ class ImplicationNode(BinaryNode):
 
 
     def do_ops(self, allowed_ops, op_pair_dict):
+        #print("possibility 3")
 
         todo_ops = self.nodeOps.intersection(allowed_ops)
         todo_ops -= self.complexOps
@@ -2064,9 +2126,10 @@ class ImplicationNode(BinaryNode):
         return new_nodes
 
 
-class DblimplicationNode(BinaryNode):
+class DblimplicationNode(BinaryNode): #double implication, iff
 
     def __init__(self, parent, left=None, right=None):
+        #print("Dblimplication Node")
         BinaryNode.__init__(self, parent, left, right)
         self.token = "↔"
         self.node_ops_dict.update({61:self.to_and,\
@@ -2104,7 +2167,7 @@ class DblimplicationNode(BinaryNode):
 
 
     def do_ops(self, allowed_ops, op_pair_dict):
-
+        #print("possibility 4")
         todo_ops = self.nodeOps.intersection(allowed_ops)
         if not self.most_recent_op == -1:
             if self.most_recent_op in op_pair_dict:
@@ -2132,6 +2195,7 @@ class DblimplicationNode(BinaryNode):
 class NotNode(UnaryNode):
 
     def __init__(self, parent, arg=None):
+        #print("not Node")
         UnaryNode.__init__(self, parent, arg)
         self.token = "~"
         self.node_ops_dict.update({28:self.demorgan1,\
@@ -2239,6 +2303,7 @@ class LogicTree():
 
 
     def __init__(self, postfix_tree=None, blowup_control=True, op_seq=None, op_pairs=True):
+        #print("now is logic tree class")
         if postfix_tree != None:
             self.construct_tree(postfix_tree)
             self.set_computed_ops(0)
@@ -2248,12 +2313,14 @@ class LogicTree():
 
         self.blowup_control=blowup_control
 
-        cur_max_op_id = 83
+        #opcodes defined here
+        cur_max_op_id = 85
         self.all_ops = set([i for i in range(1,cur_max_op_id+1)])
 
+        #the opcodes that are currently available ways to apply each of these laws
         self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]
         self.BOOLEAN_EQUIVALENCE = [51,40,52,53]
-        self.IMP_TO_DISJ = [23,26]
+        self.IMP_TO_DISJ = [23,26,84,85] 
         self.IFF_TO_IMPLICATION = [61,63]
         self.DOMINATION = [1,2,3,4,5,6,10,31,32,33,34,35,36,48,65,66,68,71,74]
         self.DOMINATION.extend([75])
@@ -2267,7 +2334,7 @@ class LogicTree():
         self.ABSORPTION = [64,77]
         self.ALL = [i for i in range(1, cur_max_op_id+1)]
 
-        self.op_optns_diict = {
+        self.op_optns_diict = { #dictionary of opcode names
             'Identity': self.IDENTITY,
             'Domination': self.DOMINATION,
             'Idempotence': self.INDEMPOTENCE,
@@ -2287,16 +2354,16 @@ class LogicTree():
 
         self.op_seq = op_seq
 
-
-        self.expansive_ops = set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,19,69])
+        #expansive operations make the expression bigger, reductive ones make the expression smaller
+        self.expansive_ops = set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,19,69]) #reductive is implication to disjuction, expansive is disjunction to implication (for example)
         self.expansive_ops = self.expansive_ops.union(set([31,32,33,34,35,36]))
-        self.expansive_ops = self.expansive_ops.union(set([27,25,23,30,47,51]))
+        self.expansive_ops = self.expansive_ops.union(set([27,25,23,30,47,51])) #23 is disjunction to implication
         self.expansive_ops = self.expansive_ops.union(set([37,38,39,40,45,46]))
         self.expansive_ops = self.expansive_ops.union(set([62,65,66,67,70,74]))
-        self.expansive_ops = self.expansive_ops.union(set([75,76]))
-        self.reductive_ops = set([26,48,49,50,52,53,58,59,62,60,64,71,73,77])
+        self.expansive_ops = self.expansive_ops.union(set([75,76, 84, 85]))
+        self.reductive_ops = set([26,48,49,50,52,53,58,59,62,60,64,71,73,77]) #implication to disjunction is 26
 
-
+        #pair 23 and 26 are implication to disjunction
         self.op_pairs_dict = {}
         if op_pairs:
             op_tups_lst=[(15,15),(20,20),(16,17),(21,22),(41,42),(43,44),
@@ -2516,7 +2583,7 @@ class LogicTree():
         deep_ops_helper(self, self)
         return new_trees
 
-    def parse_tree(self):
+    def parse_tree(self): #try to use this to print the tree?
         if isinstance(self.root, BinaryNode) or isinstance(self.root, N_aryNode):
             tmp_str = self.root.parse()
             if tmp_str[0] == '(' and tmp_str[-1] == ')':
@@ -2639,13 +2706,16 @@ class LogicTreeTrainer():
             self.op_seq = op_seq
             # tree_postfix = self.inToPostFix(first_tree)
             # tree = LogicTree(tree_postfix)
+            print("got here 1")
             tree = LogicTree(self.starting_expr, op_seq=self.op_seq, op_pairs=op_pairs)
+            #also undstand op_seq
             self.trees = {1 : (tree, [(tree.copy(), 0)])}
-            #print("first print in LogicTreeTrainer")
+            print("first print in LogicTreeTrainer")
             print(self.trees[1][0].parse_tree())
 
         else:
             self.starting_expr = 'T'
+            print("got here 2")
             tree = LogicTree(self.starting_expr, op_seq=self.op_seq, op_pairs=op_pairs)
             self.trees = {1 : (tree, [(tree.copy(), 0)])}
 
@@ -2735,7 +2805,10 @@ class LogicTreeTrainer():
 
             self.ops += 1
             self.trees = new_tree_dict
-            print(len(self.trees))
+            #print(len(self.trees))
+
+            global treesMade
+            treesMade = self.trees #added this for debugging from main
 
             gc.collect()
             # print("Doing increment_ops, deleted",deleted,"objects")
@@ -3668,25 +3741,55 @@ class LogicTreeTrainer():
 
 if __name__ == '__main__':
 
-    trainer = LogicTreeTrainer('T', expand=None)
+    seed = 'qvp'
+    trainer = LogicTreeTrainer(seed, expand=None)
     trainer.increment_ops(1)
-    #
-    # save = '../data/unduped/T_unduped_mistakes.pkl'
-    # pkl.dump(trainer, open(save,'wb'))
 
-    """
+    print("seed: ", seed)
+    print("giving:")
+    print(type(treesMade)) #global var defined in lin 2765, is self.trees
+                            #i think this will hold all the possible next steps but i need to print to see what it is
+    print(len(treesMade))
+    #print(treesMade)
+    for key in treesMade.keys():
+        #print(key) #key is just number counting up, starting with 1
+        #print(treesMade[key]) #each value is an array holding [LogicTree Object, [ (some parent LT object, 0),(that same object, opcode) ] ]
+        # if key > 1:
+        #     print()
+        if key > 1: #1 is just the input
+            #we are printing out the possible next steps, and the op codes for the laws used to get that next step
+            print(treesMade[key][1][1][1], " : ", treesMade[key][0]) #YAAAA WE DID IT, no need to use parse_trees to print out the logic tree objects,
+
+
+    '''   
+    print("-------------")
+    for key in treesMade.keys():
+        if key > 1:
+            print(treesMade[key][1][0][0])#just holds the original expression
+    print("-------------")
+    for key in treesMade.keys():
+        if key > 1:
+            print(treesMade[key][1][1][0]) #holds the same as treesMade[key][0]
+    '''
+
+
+    '''
+    #save = 'data.pkl'
+    #pkl.dump(trainer, open(save,'wb'))
+
     trainers = []
-    starting_exprs = ['~(~p)↔p']
+    starting_exprs = ['qv(p^~q)']
     for expr in starting_exprs:
         print("building trees from " + expr)
         trainer = LogicTreeTrainer(expr,expand=None)
-        trainer.increment_ops(4)
+        trainer.increment_ops(1)
         trainers.append(trainer)
     for i in range(len(trainers)):
         trainer = trainers[i]
         seed = starting_exprs[i]
         save = '../data/unduped/' + seed + '_unduped_mistakes.pkl'
         pkl.dump(trainer, open(save, 'wb'))
-    """
+    '''
+    
 
 # comment
