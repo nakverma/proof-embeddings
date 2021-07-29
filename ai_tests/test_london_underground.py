@@ -1,3 +1,6 @@
+#same source as other testers
+#run with python test_london_underground.py Chesham Beckton
+
 import astar
 import os
 import sys
@@ -65,6 +68,7 @@ def get_path(s1, s2):
         return math.hypot(x, y)
 
     return astar.find_path(s1, s2, neighbors_fnct=lambda s: s.links, heuristic_cost_estimate_fnct=distance, distance_between_fnct=distance)
+    #the distance, neighbors, and heuristic are all built in here rather than making actual new 
 
 class LondonTests(unittest.TestCase):
     def test_solve_underground(self):

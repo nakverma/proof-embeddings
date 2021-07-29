@@ -1647,14 +1647,14 @@ class OrNode(N_aryNode):
             condition = self.operands[0].arg.copy()
             implication = self.operands[1].copy()
             implies.set_lr(condition, implication)
-            print("inside first if")
+            #print("inside first if")
             return implies
         elif (isinstance(self.operands[1], NotNode) and not isinstance(self.operands[0], NotNode)):
             implies = ImplicationNode(self.parent)
             condition = self.operands[1].arg.copy()
             implication = self.operands[0].copy()
             implies.set_lr(condition, implication)
-            print("inside second if")
+            #print("inside second if")
             return implies
         elif (isinstance(self.operands[1], LeafNode) and isinstance(self.operands[0], LeafNode)):
             #print("tom and jerry")
@@ -1663,7 +1663,7 @@ class OrNode(N_aryNode):
             condition = NotNode(self, self.operands[1].copy()) #left side (operand)
             implication = self.operands[0].copy() #right side (operatand)
             implies.set_lr(condition, implication)
-            print("inside third if: ", implies)
+            #print("inside third if: ", implies)
             return implies
         else:
             return False
@@ -2698,7 +2698,7 @@ class LogicTreeTrainer():
 
     def __init__(self, first_tree=None, expand=True, op_seq=None, op_pairs=True):
 
-        print("LogicTreeTrainer made")
+        #print("LogicTreeTrainer made")
 
         if first_tree != None:
             first_tree = first_tree.replace('->','→')
@@ -2706,16 +2706,16 @@ class LogicTreeTrainer():
             self.op_seq = op_seq
             # tree_postfix = self.inToPostFix(first_tree)
             # tree = LogicTree(tree_postfix)
-            print("got here 1")
+            #print("got here 1")
             tree = LogicTree(self.starting_expr, op_seq=self.op_seq, op_pairs=op_pairs)
             #also undstand op_seq
             self.trees = {1 : (tree, [(tree.copy(), 0)])}
-            print("first print in LogicTreeTrainer")
-            print(self.trees[1][0].parse_tree())
+            #print("first print in LogicTreeTrainer")
+            #print(self.trees[1][0].parse_tree())
 
         else:
             self.starting_expr = 'T'
-            print("got here 2")
+            #print("got here 2")
             tree = LogicTree(self.starting_expr, op_seq=self.op_seq, op_pairs=op_pairs)
             self.trees = {1 : (tree, [(tree.copy(), 0)])}
 
