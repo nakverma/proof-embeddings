@@ -8,6 +8,9 @@ from check_syntax import checkSyntax, raw2latex, latex2raw
 from deterministic import check_correct_operation
 from create_expressions_mistakes import LogicTree
 
+import simplifier
+from bs4 import BeautifulSoup
+
 from datetime import datetime
 import random
 import string
