@@ -422,7 +422,7 @@ class FalseNode(LeafNode):
 
     def new_var_s_f(self):
         andnode = AndNode(self.parent) #for example, the rest of the expression(=parent) ^ s
-        snode = SNode(andnode) 
+        snode = SNode(andnode)
         andnode.set_operands([self, snode])
         return andnode
 
@@ -1410,7 +1410,7 @@ class OrNode(N_aryNode):
         self.node_ops_dict.update({20:self.commutative2,
                                 21:self.associative1,
                                 22:self.associative2,
-                                23:self.logic_equiv, 
+                                23:self.logic_equiv,
                                 24:self.demorgan3,
                                 43:self.flatten2,
                                 25:self.identity,
@@ -1640,7 +1640,7 @@ class OrNode(N_aryNode):
         # print("---------trying to figure out logic_equiv, 23 ------------")
         # print("self.operands " , self.operands[0], self.operands[1])
 
-        # print(isinstance(self.operands[1], LogicNode)) 
+        # print(isinstance(self.operands[1], LogicNode))
 
         if (isinstance(self.operands[0], NotNode) and not isinstance(self.operands[1], NotNode)):
             implies = ImplicationNode(self.parent)
@@ -1659,7 +1659,7 @@ class OrNode(N_aryNode):
         elif (isinstance(self.operands[1], LeafNode) and isinstance(self.operands[0], LeafNode)):
             #print("tom and jerry")
             implies = ImplicationNode(self.parent) #operator
-            #not node with the below in it make 
+            #not node with the below in it make
             condition = NotNode(self, self.operands[1].copy()) #left side (operand)
             implication = self.operands[0].copy() #right side (operatand)
             implies.set_lr(condition, implication)
@@ -1671,7 +1671,7 @@ class OrNode(N_aryNode):
     def logic_equiv_2(self): #84: qvp to ~p->q
         if (isinstance(self.operands[1], LogicNode) and isinstance(self.operands[0], LogicNode)):
             implies = ImplicationNode(self.parent) #operator
-            #not node with the below in it make 
+            #not node with the below in it make
             condition = NotNode(self, self.operands[1].copy()) #left side (operand)
             implication = self.operands[0].copy() #right side (operatand)
             implies.set_lr(condition, implication)
@@ -1682,7 +1682,7 @@ class OrNode(N_aryNode):
     def logic_equiv_3(self): #85: qvp to ~q->p
         if (isinstance(self.operands[1], LogicNode) and isinstance(self.operands[0], LogicNode)):
             implies = ImplicationNode(self.parent) #operator
-            #not node with the below in it make 
+            #not node with the below in it make
             condition = NotNode(self, self.operands[0].copy()) #left side (operand)
             implication = self.operands[1].copy() #right side (operatand)
             implies.set_lr(condition, implication)
@@ -2320,7 +2320,7 @@ class LogicTree():
         #the opcodes that are currently available ways to apply each of these laws
         self.IDENTITY = [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]
         self.BOOLEAN_EQUIVALENCE = [51,40,52,53]
-        self.IMP_TO_DISJ = [23,26,84,85] 
+        self.IMP_TO_DISJ = [23,26,84,85]
         self.IFF_TO_IMPLICATION = [61,63]
         self.DOMINATION = [1,2,3,4,5,6,10,31,32,33,34,35,36,48,65,66,68,71,74]
         self.DOMINATION.extend([75])
@@ -3761,7 +3761,7 @@ if __name__ == '__main__':
             print(treesMade[key][1][1][1], " : ", treesMade[key][0]) #YAAAA WE DID IT, no need to use parse_trees to print out the logic tree objects,
 
 
-    '''   
+    '''
     print("-------------")
     for key in treesMade.keys():
         if key > 1:
@@ -3790,6 +3790,6 @@ if __name__ == '__main__':
         save = '../data/unduped/' + seed + '_unduped_mistakes.pkl'
         pkl.dump(trainer, open(save, 'wb'))
     '''
-    
+
 
 # comment

@@ -4,6 +4,8 @@ import os
 import sys
 import csv
 import math
+import json
+import time
 from difflib import SequenceMatcher
 import unittest
 from create_expressions_mistakes import LogicTreeTrainer
@@ -30,7 +32,7 @@ def get_path(s1, s2):
     #     y = latB - latA
     #     return math.hypot(x, y)
 
-    
+
     # def neighbors(node):
     #     def convert_to_logic_symbols(expr):
     #         logic_symbols = ['∧', '∨', '→', '↔', '~']
@@ -51,12 +53,53 @@ def get_path(s1, s2):
     #     trees = trainer.get_trees()
     #     tree_strs = [t.parse_tree() for t in trees]
     #     return tree_strs
-    
-    
+
+
 
     def distance_between(n1, n2):
-        #print("RIGHT HERE" , str(n1))
-        return abs(len(str(n1)) - len(str(n2)))
+        start_time = time.time()
+        next = []
+
+        seed = n1
+        trainer = LogicTreeTrainer(seed, expand=None)
+        trainer.increment_ops(1)
+
+        for key in trainer.trees.keys():
+            if key > 1:
+                if str(trainer.trees[key][0]) == n2:
+                    op_code = trainer.trees[key][1][1][1]
+
+        if op_code in [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]:
+            weight = 7 #'Identity'
+        elif op_code in [51,40,52,53]:
+            weight = 6 # Boolean Equivalence / Literal Negation
+        elif op_code in [23,26,84,85]:
+            weight = 2 #'Impl to Disj'
+        elif op_code in [61,63]:
+            weight = 1 #'iff to Impl'
+        elif op_code in [1,2,3,4,5,6,10,31,32,33,34,35,36,48,65,66,68,71,74,75]:
+            weight = 7 #'Domination'
+        elif op_code in [45,46,47,49,60,70]:
+            weight = 7 #'Idemptotence'
+        elif op_code in [58,83]:
+            weight = 6 #'Double Negation'
+        elif op_code in [15,20]:
+            weight = 8 #'Commutativity'
+        elif op_code in [16,17,41,42,21,22,43,44]:
+            weight = 8 #'Associativity'
+        elif op_code in [54,56,55,57,78,79,80,81]:
+            weight = 4 #'Distributivity'
+        elif op_code in [7,8,9,37,38,39,50,67,76,82]:
+            weight = 7 #'Negation'
+        elif op_code in [18,24,28,29]:
+            weight = 3 # 'DeMorgan'
+        elif op_code in [64,77]:
+            weight = 5 #'Absorption'
+
+        end_time = time.time()
+        print('Cost Function Search Time: ', end_time - start_time)
+
+        return weight
 
     def heuristic_cost_estimate(current, goal):
         return abs(len(str(current)) - len(str(goal)))
@@ -81,25 +124,22 @@ def get_path(s1, s2):
             #print("----") #for debugging, to see each round
             trainer = LogicTreeTrainer(seed, expand=None)
             trainer.increment_ops(1)
-            
+
             #print("Right here " , trainer.trees[key][0])
 
-            for key in trainer.trees.keys(): #WORKING ON THIS PART
-                if key > 1: #1 is just the input
-                    #print(trainer.trees[key][1][1][1], " : ", trainer.trees[key][0])
-                    #print(type(trainer.trees[key][0]))
+            for key in trainer.trees.keys():
+                if key > 1:
                     next.append(str(trainer.trees[key][0]))
 
-            #print(next)
             return next
 
-    
+
     s1 = convert_to_logic_symbols(s1)
     s2 = convert_to_logic_symbols(s2)
 
-    #the distance, neighbors, and heuristic are all built in here 
+    #the distance, neighbors, and heuristic are all built in here
     return astar.find_path(s1, s2, neighbors_fnct=neighbors, heuristic_cost_estimate_fnct=heuristic_cost_estimate, distance_between_fnct=distance_between, is_goal_reached_fnct=is_goal_reached)
-    
+
 
 # class LondonTests(unittest.TestCase):
 #     def test_solve_underground(self):
@@ -121,17 +161,40 @@ if __name__ == '__main__':
 
     #station1 = get_station_by_name(sys.argv[1])
     #start = sys.argv[1]
-    start = '(pvq)v(pv~q)'
-    print('Start Expression : ' + start)
-    #station2 = get_station_by_name(sys.argv[2])
-    #ans = sys.argv[2]
-    ans = 'T'
-    print('Answer : ' + ans)
-    #print('-' * 80)
-    path = get_path(start, ans)
-    print("------**-------")
-    if path:
-        for s in path:
-            print(s)
-    else:
-        raise Exception('path not found!')
+
+    with open('questions.txt') as file:
+        questions = json.load(file)
+    print("Used Heuristic: abs(length of possible step - length of answer)")
+    total_time = 0
+
+    for i, question in enumerate(questions):
+        start = question['question'].split('that ')[1].split(' is')[0]
+        print('Start: ', start)
+        ans = question['answer']
+        print('Answer: ', ans)
+        start_time = time.time()
+        path = get_path(start, ans)
+        end_time = time.time()
+        completion_time = end_time - start_time
+        print("------**-------")
+        if path:
+            for s in path:
+                print(s)
+        else:
+            raise Exception('path not found!')
+
+        print('Question ' + str(i+1) + ' Time:\t' + str(completion_time))
+        total_time += completion_time
+        print('\n*************************************\n')
+    print('Total Completion Time: ' + str(total_time))
+
+
+#
+#            print("------**-------")
+#            if path:
+#                for s in path:
+#                    print(s)
+#            else:
+#                raise Exception('path not found!')
+#            print('\n*************************************\n')
+#
