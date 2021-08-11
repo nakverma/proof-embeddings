@@ -77,7 +77,7 @@ def get_path(s1, s2):
     #     y = latB - latA
     #     return math.hypot(x, y)
 
-    
+
     def neighbors(node):
         def convert_to_logic_symbols(expr):
             logic_symbols = ['∧', '∨', '→', '↔', '~']
@@ -98,7 +98,7 @@ def get_path(s1, s2):
         trees = trainer.get_trees()
         tree_strs = [t.parse_tree() for t in trees]
         return tree_strs
-    
+
     # s1 = convert_to_logic_symbols(s1)
     # s2 = convert_to_logic_symbols(s2)
 
@@ -116,18 +116,18 @@ def get_path(s1, s2):
     #         seed = node
     #         trainer = LogicTreeTrainer(seed, expand=None)
     #         trainer.increment_ops(1)
-            
+
     #         for key in treesMade.keys(): #WORKING ON THIS PART
-        
+
     #             if key > 1: #1 is just the input
     #             print(treesMade[key][1][1][1], " : ", treesMade[key][0])
 
-    
-    
 
-    #the distance, neighbors, and heuristic are all built in here 
+
+
+    #the distance, neighbors, and heuristic are all built in here
     return astar.find_path(s1, s2, neighbors_fnct=neighbors, heuristic_cost_estimate_fnct=heuristic_cost_estimate, distance_between_fnct=distance_between)
-    
+
 
 # class LondonTests(unittest.TestCase):
 #     def test_solve_underground(self):

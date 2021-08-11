@@ -9,7 +9,7 @@
 
 {% from "includes/formhelpers.html" import render_field %}
 
-<form id="form" action="" method="POST" style="width: 85%; margin: 0 auto;"> 
+<form id="form" action="" method="POST" style="width: 85%; margin: 0 auto;">
     <div style="width: 100%; padding-bottom: 20%; margin: 0 auto; ">
 
         <div style="width: 15%; margin-left: 5%; float: left;">
@@ -20,11 +20,11 @@
             <p style="margin-left: 35px;"> Show Laws </p>
             <label class="switch">
                 <input type="checkbox" id="tog_btn_show_laws">
-                
+
                 <span class="slidershowlaws round"></span>
             </label>
         </div>
-        
+
 
         <div style="width: 20%; margin-left: 5%; float: left;">
             <p class="btn btn-primary" data-toggle="tooltip" title='Choose the difficulty of the questions using "Next Question" button. Left-most is the mildest, and right-most is the most spicy!'
@@ -112,13 +112,14 @@
     {% endif %}
     <br/>
     <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
-        <!--CHANGE: SHOW SOL BUTTON HERE-->
+        <button type="submit" class="btn btn-danger" name="getHint" value="GET HINT" style="width: 20%;">GET HINT</button>
+        <span style="width: 10px"></span>
         <button onclick="showSolution()" type="button" class="btn btn-danger" name="solution" value="SOLUTION" style="width: 20%;">SHOW SOLUTION</button>
         <span style="width: 10px"></span>
         <button onclick="openForm()" type="button" class="btn btn-danger" name="skip" value="SKIP" style="width: 20%;">NEXT QUESTION</button>
         <span style="width: 10px"></span>
         <button type="submit" class="btn btn-danger" name="clear" value="CLEAR" style="width: 20%;">CLEAR ALL</button>
-        
+
     </div>
 
     <input style="display: none;" type="text" id="difficulty" name="difficulty" value={{ form.difficulty }} />
@@ -132,7 +133,7 @@
         <div style="width: 50%; margin: 0 auto; display: flex; justify-content: center; float: left; padding: 20px;">
             <img src="{{url_for('static', filename='laws_table.png')}}" alt="Laws Table Image" class="toggleoff" id="laws_table" style="width:100%;"/>
         </div>
-        
+
     </div>
     <div id="showsol" style="width: 50%; margin: 0 auto; display: none; justify-content: center; float: left; padding: 20px;">
         <!--<p>Solution goes here.</p>-->
@@ -142,16 +143,16 @@
         <script>
             console.log('{{form.solution}}')
             var solution = JSON.parse('{{form.solution | tojson}}');
-            
+
             var steps = solution.slice(10,solution.length-3); //start from beginning of first step and go to end of last step
-            
+
             //console.log( typeof solution);
             //console.log(solution);
             //console.log(steps)
 
             var steps_ar = steps.split("', '");
-            console.log(steps_ar); 
-            
+            console.log(steps_ar);
+
             var step_to_add;
             document.getElementById("sol_here_from_js").innerHTML = "<ol>";
             for (var i = 0; i < steps_ar.length; i++){
@@ -159,17 +160,17 @@
                 document.getElementById("sol_here_from_js").innerHTML += step_to_add;
             }
             document.getElementById("sol_here_from_js").innerHTML += "</ol>";
-            
-            
+
+
 
             //var sol_steps = solution.sol;
             //console.log(sol_steps)
-            
+
             //document.getElementById("sol_here_from_js").innerHTML = steps;
         </script>
-        
-        
-        
+
+
+
     </div>
 </form>
 
@@ -228,7 +229,7 @@
     }
 
     // Init the number of item with the initial value settings
-    for (i = 0; i < max; i++) { 
+    for (i = 0; i < max; i++) {
         var picto = "<i class='fas "+ icon +"'></i>";
         $(".labels").append(picto);
     }
@@ -258,10 +259,10 @@
     $( "#range-slider" ).slider({
         range: "min",
         value: initvalue,
-        min: 1, 
-        max: max, 
+        min: 1,
+        max: max,
 
-        slide: function( event, ui ) {                     
+        slide: function( event, ui ) {
           updateValue(target, ui.value);
         }
     });
@@ -276,6 +277,31 @@
         } else {
             x.style.display = "none";
         }
+    }
+
+    function getHint() {
+        hasNextInputField = true;
+        i = 0;
+        while (hasNextInputField) {
+            idName = "steps-" + i + "-step";
+            field = document.getElementById(idName);
+            if (field == null) {
+                hasNextInputField = false;
+            }
+            i ++;
+        }
+        i -= 2; // At this point i represents the index (from 0) the current entry field is
+        currentInputField = document.getElementById("steps-" + i + "-step");
+        var prevInputField;
+        var prevStep;
+        if (i > 0) {
+            prevInputField = document.getElementById("steps-" + (i-1) + "-step");
+            prevStep = prevInputField.value;
+        } else {
+            prevInputField = document.getElementById("originalQuestion");
+            prevStep = prevInputField.textContent;
+        }
+        window.alert("Previous Step: " + prevStep);
     }
 </script>
 
@@ -432,7 +458,7 @@
                 x.style.display = "none";
             }
         }*/
-    
+
 /* Execute a function when someone clicks in the document: */
 document.addEventListener("click", function (e) {
     closeAllLists(e.target);
@@ -444,18 +470,18 @@ document.addEventListener("click", function (e) {
     var toggle_button = document.getElementById("tog_btn_show_laws");
     var laws_table_image = document.getElementById("laws_table");
 
-    if (document.getElementById('showlaws').value == 1) { 
+    if (document.getElementById('showlaws').value == 1) {
         document.getElementById("tog_btn_show_laws").click();
         document.getElementById("laws_table").classList.toggle("toggleon");
     }
 
     toggle_button.onclick = function() {
-        if (document.getElementById('showlaws').value == 1) { 
+        if (document.getElementById('showlaws').value == 1) {
             document.getElementById('showlaws').value = 0;
         }
         else {
             document.getElementById('showlaws').value = 1;
-        }   
+        }
         laws_table_image.classList.toggle("toggleon");
     };
 
@@ -469,4 +495,3 @@ document.addEventListener("click", function (e) {
 
 
 {% endblock body %}
-

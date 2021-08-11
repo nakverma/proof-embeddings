@@ -203,9 +203,9 @@ def solve():
     form.difficulty = request.args['question_difficulty']
     form.showlaws = request.args['showlaws']
     #create form object that stores all the data we send to the client through the URL
-    
+
     form.solution = request.args['question_solution']
-    
+
 
     has_error = False
 
@@ -226,11 +226,11 @@ def solve():
                     previous_data['steps'].append({"step": "", "csrf_token": ""})
                 form.__init__(data=previous_data)
                 form.showlaws = request.form['showlaws']
-                
-                return render_template("form.html", form=form)
-                
 
-        if "skip" in request.form or ("clear" not in request.form and "next" not in request.form and "end" not in request.form):
+                return render_template("form.html", form=form)
+
+
+        if "skip" in request.form or ("clear" not in request.form and "next" not in request.form and "end" not in request.form and "getHint" not in request.form):
             if not completed_question and S3_LOGGING:
                 try:
                     s3.Bucket(BUCKET_NAME).download_file(ANSWER_KEY, 'local_answer_data.csv')
@@ -262,7 +262,7 @@ def solve():
             completed_question = False
 
             question_text, question_answer, question_solution = select_a_question(request.form['difficulty'], current_question_text=request.args['question_text'])
-          
+
             #make q_sol a dictionary, so it can be passed through the URL and stay in tact
             q_sol = {'sol': question_solution }
             return redirect(url_for('solve',
@@ -276,6 +276,47 @@ def solve():
         if "clear" in request.form:
             previous_data = form.data
             previous_data['steps'] = [{"step": "", "csrf_token": ""}]
+            form.__init__(data=previous_data)
+            form.showlaws = request.form['showlaws']
+            return render_template("form.html", form=form)
+
+        if "getHint" in request.form:
+
+            # Stores data from during the request
+            previous_data = form.data
+
+            hasNextInputField = True;
+            i = 0;
+            while hasNextInputField:
+                idName = "steps-" + str(i) + "-step"
+                field = request.form.get(idName)
+                if field == None:
+                    hasNextInputField = False
+                i += 1
+            i -= 2; # At this point i represents the index (from 0) the current entry field is
+            idName = "steps-" + str(i) + "-step"
+            currentField = request.form.get(idName)
+            if i > 0:
+                idName = "steps-" + str(i-1) + "-step"
+                prevStep = request.form.get(idName)
+            else:
+                prevStep = request.args['question_text'].split('Prove that ')[-1].split(' is')[0]
+            if 'to ' in request.args['question_text']:
+                final_answer = request.args['question_text'].split('to ')[-1][:-1]
+            else:
+                final_answer = request.args['question_text'].split('is a ')[-1][:-1]
+            if final_answer == 'fallacy':
+                final_answer = 'F'
+            elif final_answer == 'tautology':
+                final_answer = 'T'
+            else:
+                final_answer = raw2latex(final_answer)
+
+
+            hint = simplifier.get_hint(prevStep, final_answer)
+            previous_data['steps'][-1]['law'] = hint[0]
+            previous_data['steps'][-1]['step'] = hint[1]
+
             form.__init__(data=previous_data)
             form.showlaws = request.form['showlaws']
             return render_template("form.html", form=form)
