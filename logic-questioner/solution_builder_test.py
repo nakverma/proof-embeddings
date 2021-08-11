@@ -57,7 +57,6 @@ def get_path(s1, s2):
 
 
     def distance_between(n1, n2):
-        start_time = time.time()
         next = []
 
         seed = n1
@@ -95,9 +94,6 @@ def get_path(s1, s2):
             weight = 3 # 'DeMorgan'
         elif op_code in [64,77]:
             weight = 5 #'Absorption'
-
-        end_time = time.time()
-        print('Cost Function Search Time: ', end_time - start_time)
 
         return weight
 
