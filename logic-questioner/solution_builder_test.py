@@ -59,7 +59,9 @@ def get_path(s1, s2):
         return abs(len(str(n1)) - len(str(n2)))
 
     def heuristic_cost_estimate(current, goal):
-        return abs(len(str(current)) - len(str(goal)))
+        tom = abs(len(str(current)) - len(str(goal)))
+        #print("h: ", tom)
+        return tom
 
     def is_goal_reached(current, goal):
         return current == goal
@@ -101,16 +103,6 @@ def get_path(s1, s2):
     return astar.find_path(s1, s2, neighbors_fnct=neighbors, heuristic_cost_estimate_fnct=heuristic_cost_estimate, distance_between_fnct=distance_between, is_goal_reached_fnct=is_goal_reached)
     
 
-# class LondonTests(unittest.TestCase):
-#     def test_solve_underground(self):
-#         for n1,n2 in [('Chesham', 'Wimbledon'), ('Uxbridge','Upminster'), ('Heathrow Terminal 4','Epping')]:
-#             s1 = get_station_by_name(n1)
-#             s2 = get_station_by_name(n2)
-#             path = get_path(s1, s2)
-#             self.assertTrue(not path is None)
-
-# if __name__ == '__main__':
-# 	print(solve_maze())
 
 if __name__ == '__main__':
 
@@ -121,7 +113,7 @@ if __name__ == '__main__':
 
     #station1 = get_station_by_name(sys.argv[1])
     #start = sys.argv[1]
-    start = '(pvq)v(pv~q)'
+    start = '(p^q)v(pv~p)'
     print('Start Expression : ' + start)
     #station2 = get_station_by_name(sys.argv[2])
     #ans = sys.argv[2]
@@ -129,7 +121,7 @@ if __name__ == '__main__':
     print('Answer : ' + ans)
     #print('-' * 80)
     path = get_path(start, ans)
-    print("------**-------")
+    print("------chosen path-------")
     if path:
         for s in path:
             print(s)

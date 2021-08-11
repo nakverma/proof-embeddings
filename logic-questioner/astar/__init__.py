@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#resource: https://github.com/jrialland/python-astar
 """ generic A-Star path searching algorithm """
 
 from abc import ABCMeta, abstractmethod
@@ -84,12 +85,15 @@ class AStar:
         openSet = []
         heappush(openSet, startNode)
         while openSet:
+            print("----NEXT STEP----")
+
             current = heappop(openSet)
             if self.is_goal_reached(current.data, goal):
                 return self.reconstruct_path(current, reversePath)
             current.out_openset = True
             current.closed = True
             for neighbor in map(lambda n: searchNodes[n], self.neighbors(current.data)):
+                print("----next neighbor----")
                 if neighbor.closed:
                     continue
                 tentative_gscore = current.gscore + \
@@ -100,6 +104,10 @@ class AStar:
                 neighbor.gscore = tentative_gscore
                 neighbor.fscore = tentative_gscore + \
                     self.heuristic_cost_estimate(neighbor.data, goal)
+                print(neighbor.data)
+                print("h: ", self.heuristic_cost_estimate(neighbor.data, goal))
+                print("g: ", neighbor.gscore)
+                print("f: ", neighbor.fscore)
                 if neighbor.out_openset:
                     neighbor.out_openset = False
                     heappush(openSet, neighbor)
