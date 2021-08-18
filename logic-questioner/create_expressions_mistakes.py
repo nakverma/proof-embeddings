@@ -3741,7 +3741,7 @@ class LogicTreeTrainer():
 
 if __name__ == '__main__':
 
-    seed = 'qvp'
+    seed = 'F->T'
     trainer = LogicTreeTrainer(seed, expand=None)
     trainer.increment_ops(1)
 

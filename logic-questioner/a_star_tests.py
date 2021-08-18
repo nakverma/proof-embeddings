@@ -8,6 +8,8 @@ import time
 from difflib import SequenceMatcher
 import unittest
 from create_expressions_mistakes import LogicTreeTrainer
+from levenshtein import distance #distance(string1, string2) 
+#https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html
 
 def big_change_favored_weight(n1, n2):
     next = []
@@ -50,34 +52,52 @@ def big_change_favored_weight(n1, n2):
         weight = 5 #'Absorption'
     return weight
 
+#_____original h functions
 def small_change_favored_weight(n1, n2):
     return 9 - big_change_favored_weight(n1, n2)
 
-def h1(start, next, ans):
+def h_dist_to_end(start, next, ans):
     return abs(len(next)-len(ans))
 
-def h2(start, next, ans):
+def h_proportion_change(start, next, ans):
     return abs(len(next)-len(ans)) / abs(len(start)-len(ans))
 
-def h3(start, next, ans):
-    return abs(len(start)-len(ans)) - abs(len(next)-len(ans))
+#eliminated per last week's meeting
+# def h_difference_left(start, next, ans):
+#     return abs(len(start)-len(ans)) - abs(len(next)-len(ans))
 
-def h4(start, next, ans):
-    return abs(len(start)-len(ans)) - big_change_favored_weight(start, next) * abs(len(next)-len(ans))
+# def h_w2_difference_left(start, next, ans):
+#     return abs(len(start)-len(ans)) - big_change_favored_weight(start, next) * abs(len(next)-len(ans))
 
-def h5(start, next, ans):
+def h_w1_difference_left(start, next, ans):
     return big_change_favored_weight(start, next) * abs(len(next)-len(ans)) / abs(len(start)-len(ans))
 
-def h6(start, next, ans):
-    return abs(len(start)-len(ans)) - abs(len(next)-len(ans))
+def h_abs_difference_left(start, next, ans): #was h6, fixed per last week's meeting
+    return abs(abs(len(start)-len(ans)) - abs(len(next)-len(ans)))
 
-def g1(n1, n2):
+#_______edit distance h functions
+
+def h_edit_dist_to_end(start, next, ans):
+    return distance(next, ans)
+
+def h_edit_proportion_change(start, next, ans):
+    return distance(next, ans) / distance(start, ans)
+
+def h_edit_w1_difference_left(start, next, ans):
+    return big_change_favored_weight(start, next) * distance(next, ans) / distance(start, ans)
+
+def h_edit_abs_difference_left(start, next, ans): #was h6, fixed per last week's meeting
+    return abs(distance(start, ans) - distance(next, ans))
+
+#______
+# #g's were not dependant on disntance, so we don't need to add new ones for edit distance
+def g_big(n1, n2):
     return big_change_favored_weight(n1, n2)
 
-def g2(n1, n2):
+def g_small(n1, n2):
     return small_change_favored_weight(n1, n2)
 
-def g3(n1, n2,  ans, h):
+def g_combo(n1, n2,  ans, h):
     CUTOFF = 4 # Needs to be tested and changed
     if h(n1, n2, ans) > CUTOFF:
         return big_change_favored_weight(n1, n2)
@@ -120,7 +140,7 @@ def sample_questions(question_file):
 def __main__():
     start = 'qvp'
     ans = '~p->q'
-    nxt = '~p->q'
+    nxt = ' ~T→T'
     print("g:")
     print(g1(start,nxt))
     print(g2(start,nxt))
