@@ -10,6 +10,8 @@ from difflib import SequenceMatcher
 import unittest
 from create_expressions_mistakes import LogicTreeTrainer
 
+from Levenshtein._levenshtein import distance
+
 
 #this is where the actual stuff for the algorithm is
 def get_path(s1, s2):
@@ -57,6 +59,7 @@ def get_path(s1, s2):
 
 
     def distance_between(n1, n2):
+        return 1
         next = []
 
         seed = n1
@@ -69,37 +72,36 @@ def get_path(s1, s2):
                     op_code = trainer.trees[key][1][1][1]
 
         if op_code in [10,11,12,13,14,19,25,27,62,30,59,68,69,72,73]:
-            weight = 7 #'Identity'
+            weight = 1.7 #'Identity'
         elif op_code in [51,40,52,53]:
-            weight = 6 # Boolean Equivalence / Literal Negation
+            weight = 1.6 # Boolean Equivalence / Literal Negation
         elif op_code in [23,26,84,85]:
-            weight = 2 #'Impl to Disj'
+            weight = 1.2 #'Impl to Disj'
         elif op_code in [61,63]:
-            weight = 1 #'iff to Impl'
+            weight = 1.1 #'iff to Impl'
         elif op_code in [1,2,3,4,5,6,10,31,32,33,34,35,36,48,65,66,68,71,74,75]:
-            weight = 7 #'Domination'
+            weight = 1.7 #'Domination'
         elif op_code in [45,46,47,49,60,70]:
-            weight = 7 #'Idemptotence'
+            weight = 1.7 #'Idemptotence'
         elif op_code in [58,83]:
-            weight = 6 #'Double Negation'
+            weight = 1.6 #'Double Negation'
         elif op_code in [15,20]:
-            weight = 8 #'Commutativity'
+            weight = 1.8 #'Commutativity'
         elif op_code in [16,17,41,42,21,22,43,44]:
-            weight = 8 #'Associativity'
+            weight = 1.8 #'Associativity'
         elif op_code in [54,56,55,57,78,79,80,81]:
-            weight = 4 #'Distributivity'
+            weight = 1.4 #'Distributivity'
         elif op_code in [7,8,9,37,38,39,50,67,76,82]:
-            weight = 7 #'Negation'
+            weight = 1.7 #'Negation'
         elif op_code in [18,24,28,29]:
-            weight = 3 # 'DeMorgan'
+            weight = 1.3 # 'DeMorgan'
         elif op_code in [64,77]:
-            weight = 5 #'Absorption'
+            weight = 1.5 #'Absorption'
 
         return weight
 
     def heuristic_cost_estimate(current, goal):
-        tom = abs(len(str(current)) - len(str(goal)))
-        #print("h: ", tom)
+        tom = distance(current, goal)
         return tom
 
     def is_goal_reached(current, goal):
@@ -122,13 +124,9 @@ def get_path(s1, s2):
             #print("----") #for debugging, to see each round
             trainer = LogicTreeTrainer(seed, expand=None)
             trainer.increment_ops(1)
-
-            #print("Right here " , trainer.trees[key][0])
-
             for key in trainer.trees.keys():
                 if key > 1:
                     next.append(str(trainer.trees[key][0]))
-
             return next
 
 
@@ -156,20 +154,26 @@ if __name__ == '__main__':
     total_time = 0
 
     for i, question in enumerate(questions):
-        start = question['question'].split('that ')[1].split(' is')[0]
-        print('Start: ', start)
-        ans = question['answer']
-        print('Answer: ', ans)
-        start_time = time.time()
-        path = get_path(start, ans)
-        end_time = time.time()
-        completion_time = end_time - start_time
-        print("------**-------")
-        if path:
-            for s in path:
-                print(s)
-        else:
-            raise Exception('path not found!')
+        try:
+            start = question['question'].split('that ')[1].split(' is')[0]
+            print('Start: ', start)
+            ans = question['answer']
+            print('Answer: ', ans)
+            start_time = time.time()
+            path = get_path(start, ans)
+            end_time = time.time()
+            completion_time = end_time - start_time
+            print("------**-------")
+            if path:
+                for s in path:
+                    print(s)
+            else:
+                raise Exception('path not found!')
+            with open('results.txt','a') as file:
+                file.write('Question {}: {}\n'.format(i, completion_time))
+        except:
+            with open('results.txt','a') as file:
+                file.write('Question {}: Error\n'.format(i))
 
         print('Question ' + str(i+1) + ' Time:\t' + str(completion_time))
         total_time += completion_time

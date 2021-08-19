@@ -8,7 +8,7 @@ import time
 from difflib import SequenceMatcher
 import unittest
 from create_expressions_mistakes import LogicTreeTrainer
-from levenshtein import distance #distance(string1, string2) 
+from levenshtein import distance #distance(string1, string2)
 #https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html
 
 def big_change_favored_weight(n1, n2):
@@ -158,7 +158,7 @@ def __main__():
     print(h5(start, nxt, ans))
     print(h6(start, nxt, ans))
     #sample_questions('questions.txt')
-    
+
 
 if __name__ == '__main__':
     __main__()
