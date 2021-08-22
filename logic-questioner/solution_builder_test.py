@@ -102,7 +102,7 @@ def get_path(s1, s2):
 
     def heuristic_cost_estimate(current, goal):
         tom = distance(current, goal)
-        return tom
+        return tom/10
 
     def is_goal_reached(current, goal):
         return current == goal

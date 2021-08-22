@@ -43,3 +43,17 @@ Total Completion Time: 196.97548127174377
 
 Errors in questions 3,6,9,10,14,20,36 (0-indexed)
 Long algorithm times in questions 1,5,32,33 (0-indexed)
+Question 0: 2.2734031677246094
+Question 1: Error
+Question 2: 214.9548921585083
+Question 3: 19980.116724967957
+Question 4: 1.7428810596466064
+Question 5: Error
+Question 6: Error
+Question 7: Error
+Question 8: 423.03739404678345
+Question 9: Error
+Question 10: Error
+Question 11: 4.658911943435669
+Question 12: Error
+Question 13: 5.503064155578613
