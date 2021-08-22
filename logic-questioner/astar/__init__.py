@@ -122,6 +122,11 @@ def find_path(start, goal, neighbors_fnct, reversePath=False, heuristic_cost_est
     """A non-class version of the path finding algorithm"""
     class FindPath(AStar):
 
+        def __init__(self):
+            self.considered_nodes = 0
+            self.bailouts = 0
+            self.prev_considered = None
+
         def heuristic_cost_estimate(self, current, goal):
             return heuristic_cost_estimate_fnct(current, goal)
 
@@ -129,11 +134,18 @@ def find_path(start, goal, neighbors_fnct, reversePath=False, heuristic_cost_est
             return distance_between_fnct(n1, n2)
 
         def neighbors(self, node):
+            self.considered_nodes += 1
+            if self.prev_considered is not None and node not in neighbors_fnct(self.prev_considered):
+                self.bailouts += 1
+            self.prev_considered = node
             return neighbors_fnct(node)
 
         def is_goal_reached(self, current, goal):
             return is_goal_reached_fnct(current, goal)
-    return FindPath().astar(start, goal, reversePath)
+
+    object = FindPath()
+    path = object.astar(start, goal, reversePath)
+    return path, object.considered_nodes, object.bailouts
 
 
 __all__ = ['AStar', 'find_path']
