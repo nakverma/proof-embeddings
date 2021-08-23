@@ -146,7 +146,7 @@
     {"question": "Prove that ~((~p->~q)^(~q->s)) is logically equivalent to (~p^q)v(~q^~s).",
      "answer": "(~p^q)v(~q^~s)",
      "difficulty": "medium",
-     "solution": ["~((~p->~q)^(~q->s))","~((~~pv~q)^(~~qvs))","~((pv~q)^(qvs))","~(pv~q)v~(qvs)","(~p^~~q)v(~q^~k)","(~p^q)v(~q^~k)"]},
+     "solution": ["~((~p->~q)^(~q->s))","~((~~pv~q)^(~~qvs))","~((pv~q)^(qvs))","~(pv~q)v~(qvs)","(~p^~~q)v(~q^~s)","(~p^q)v(~q^~s)"]},
     {"question": "Prove that (p^q)->(pvq) is a tautology.",
      "answer": "T",
      "difficulty": "medium",
