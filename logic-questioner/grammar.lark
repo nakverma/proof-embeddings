@@ -1,0 +1,33 @@
+start : eqn
+?eqn : (dbl_expr _DBLIMPL)* dbl_expr
+?dbl_expr: (expr _IMPL)* expr
+?expr : (term _OR)* term
+?term : (literal _AND)* literal
+?literal : NOT literal
+         | variable
+?variable : ID
+          | paren_expr
+          | TRUE
+          | FALSE
+paren_expr: _LPAR eqn _RPAR
+
+%ignore WHITESPACE
+
+_LPAR : "("
+_RPAR : ")"
+NOT : "~"
+_AND : "^"
+_OR : "v"i
+_IMPL : "->"
+_DBLIMPL : "<->"
+         | "<=>"
+
+TRUE : "true"i
+     | "T"
+     | "1"
+FALSE : "false"i
+      | "F"
+      | "0"
+ID : "a".."z"
+
+WHITESPACE : /[ \t]/

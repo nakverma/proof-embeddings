@@ -1,0 +1,250 @@
+{
+    "questions": [
+        {
+            "premise": "~(~p)",
+            "target": "p",
+            "difficulty": "mild",
+            "solution": [{"statement": "~(~p)", "rule": "Start)"},{"statement": "p", "rule": "Double Negation"}]
+        },
+        {
+            "premise": "qv(r^q)",
+            "target": "q",
+            "difficulty": "mild",
+            "solution": [{"statement": "qv(r^q)", "rule": "Start"},{"statement": "q", "rule": "Absorption"}]
+        },
+        {
+            "premise": "p->(q->r)",
+            "target": "(p^q)->r",
+            "difficulty": "mild",
+            "solution": [
+                {"statement": "p->(q->r)", "rule": "Start"},{"statement": "p->(~qvr)", "rule": "Implication to Disjunction"},
+                {"statement": "~pv(~qvr)", "rule": "Implication to Disjunction"},{"statement": "~pv~qvr", "rule": "Associativity"},
+                {"statement": "~(p^q)vr", "rule": "De Morgan's Law"},{"statement": "(p^q)->r", "rule": "Implication to Disjunction"}
+            ]
+        },
+        {
+            "premise": "~((p->q)vq)",
+            "target": "~q^p",
+            "difficulty": "mild",
+            "solution": [
+                {"statement": "~((p->q)vq", "rule": "Start"},{"statement": "~((~pvq)vq)", "rule": "Implication to Disjunction"},
+                {"statement": "~(~pvqvq)", "rule": "Associativity"},{"statement": "~(~pvq)", "rule": "Idempotence"},{"statement": "p^~q", "rule": "De Morgan's Law"},
+                {"statement": "~q^p", "rule": "Commutativity"}
+            ]
+        },
+        {
+            "premise": "qv(p^~q)",
+            "target": "~p->q",
+            "difficulty": "mild",
+            "solution": [
+                {"statement": "qv(p^~q)", "rule": "Start"},{"statement": "(qvp)^(qv~q)", "rule": "Distributivity"},{"statement": "(qvp)^T", "rule": "Negation"},
+                {"statement": "qvp", "rule": "Identity"}, {"statement": "pvq", "rule": "Commutativity"},{"statement": "~p->q", "rule": "Implication to Disjunction"}
+            ]
+        },
+        {
+            "premise": "~p^~q",
+            "target": "~(pvq)",
+            "difficulty": "mild",
+            "solution": [{"statement": "~p^~q", "rule": "Start"},{"statement": "~(pvq)", "rule": "De Morgan's Law"}]
+        },
+        {
+            "premise": "~(p^~q)vq",
+            "target": "~pvq",
+            "difficulty": "mild",
+            "solution": [
+                {"statement": "~(p^~q)vq", "rule": "Start"},{"statement": "(~pvq)vq)", "rule": "De Morgan's Law"},{"statement": "~pvqvq", "rule": "Associativity"},
+                {"statement": "~pvq", "rule": "Idempotence"}
+            ]
+        },
+        {
+            "premise": "p->(qvr)",
+            "target": "(p^~r)->q",
+            "difficulty": "mild",
+            "solution": [{"statement": "p->(qvr)", "rule": "Start"},{"statement": "~pv(qvr)", "rule": "Implication to Disjunction"},
+                {"statement": "~pvqvr", "rule": "Associativity"},{"statement": "~pvrvq", "rule": "Commutativity"},{"statement": "~(p^~r)vq", "rule": "De Morgan's Law"},
+                {"statement": "(p^~r)->q", "rule": "Implication to Disjunction"}
+            ]
+        },
+        {
+            "premise": "(pvq)^(pvr)",
+            "target": "pv(q^r)",
+            "difficulty": "mild",
+            "solution": [{"statement": "(pvq)^(pvr)", "rule": "Start"},{"statement": "pv(q^r)", "rule": "Distributivity)"}]
+        },
+        {
+            "premise": "(pvq)v(pv~q)",
+            "target": "T",
+            "difficulty": "mild",
+            "solution": [{"statement": "(pvq)v(pv~q)", "rule": "Start"},{"statement": "pvqvpv~q", "rule": "Associativity"},{"statement": "T", "rule": "Negation"}]
+        },
+        {
+            "premise": "(pvq)->r",
+            "target": "(p->r)^(q->r)",
+            "difficulty": "mild",
+            "solution": [{"statement": "(pvq)->r", "rule": "Start"},{"statement": "~(pvq)vr", "rule": "Implication to Disjunction"},
+                {"statement": "(~p^~q)vr)", "rule": "De Morgan's Law"},{"statement": "(~pvr)^(~qvr)", "rule": "Distributivity"},
+                {"statement": "(p->r)^(~qvr)", "rule": "Implication to Disjunction"},{"statement": "(p->r)^(q->r)", "rule": "Implication to Disjunction"}]
+        },
+        {
+            "premise": "~p->(q^~q)",
+            "target": "p",
+            "difficulty": "mild",
+            "solution": [
+                {"statement": "~p->(q^~q)", "rule": "Start"},{"statement": "~p->F", "rule": "Negation"},{"statement": "~~pvF", "rule": "Implication to Disjunction"},
+                {"statement": "~~p", "rule": "Identity"},{"statement": "p", "rule": "Double Negation"}
+            ]
+        },
+        {
+            "premise": "F->T",
+            "target": "T",
+            "difficulty": "mild",
+            "solution": [
+                {"statement": "F->T", "rule": "Start"},{"statement": "~FvT", "rule": "Implication to Disjunction"},{"statement": "TvT", "rule": "Negation"}, {"statement": "T", "rule": "Identity"}
+            ]
+        },
+        {
+            "premise": "q->(p->q)",
+            "target": "T",
+            "difficulty": "mild",
+            "solution": ["q->(p->q)","~qv(p->q)","~qv(~pvq)","~qv~pvq","T"]
+        },
+        {
+            "premise": "(~(~p))<->p",
+            "target": "T",
+            "difficulty": "mild",
+            "solution": [
+                {"statement": "(~(~p))<->p", "rule": "Start"},{"statement": "p<->p", "rule": "Double Negation"},{"statement": "(p->p)^(p->p)", "rule": "Iff to Implication"},
+                {"statement": "p->p", "rule": "Idempotence"},{"statement": "~pvp", "rule": "Implication to Disjunction"},{"statement": "T", "rule": "Negation"}
+            ]
+        },
+        {
+            "premise": "(p^q)->(pvq)",
+            "target": "T",
+            "difficulty": "mild",
+            "solution": ["(p^q)->(pvq)","(pvq)v~(p^q)","(pvq)v(~pv~q)","pvqv~pv~q","T"]
+        },
+        {
+            "premise": "~(q^~p)^(qv~p)",
+            "target": "p<=>q",
+            "difficulty": "mild",
+            "solution": ["~(q^~p)^(qv~p)","(~qvp)^(qv~p)","(q->p)^(qv~p)","(q->p)^(p->q)","p<=>q"]
+        },
+        {
+            "premise": "~(p^q)^(pv~q)",
+            "target": "~q",
+            "difficulty": "mild",
+            "solution": ["~(p^q)^(pv~q)","(~pv~q)^(pv~q)","~qv(~p^p)","~qvF","~q"]
+        },{
+            "premise": "(p^q)v(~pv(p^~q))",
+            "target": "T",
+            "difficulty": "medium",
+            "solution": ["(p^q)v(~pv(p^~q))","(p^q)v((~pvp)^(~pv~q))","(p^q)v(T^(~pv~q))","((p^q)vT)^((p^q)v(~pv~q))","T^((p^q)v(~pv~q))","T^T","T"]
+        },
+        {
+            "premise": "(p^q)->(pvq)",
+            "target": "T",
+            "difficulty": "medium",
+            "solution": ["(p^q)->(pvq)","~(p^q)v(pvq)","(~pv~q)v(pvq)","~pv~qvpvq","~pvpv~qv~q","(~pvp)v(~qvq)","TvT","T"]
+        },
+        {
+            "premise": "(p^~q)v(q^~p)",
+            "target": "~(p<=>q)",
+            "difficulty": "medium",
+            "solution": ["(p^~q)v(q^~p)","~((~pvq)^(~qvp))","~((p->q)^(q->p))","~(p<=>q)"]
+        },
+        {
+            "premise": "(pvq)^(pv~q)",
+            "target": "p",
+            "difficulty": "medium",
+            "solution": ["(pvq)^(pv~q)","pv(q^~q)","pvF","p"]
+        },
+        {
+            "premise": "~r^((~pvp)^r)^(p->r)",
+            "target": "F",
+            "difficulty": "medium",
+            "solution": ["~r^((~pvp)^r)^(p->r)","~r^((~pvp)^r)^(p->r)","~r^(T^r)^(rv~p)","~r^r^T^(rv~p)","F^T^(rv~p)","F"]
+        },
+        {
+            "premise": "(pvq)^(~p->~q)",
+            "target": "p",
+            "difficulty": "medium",
+            "solution": ["(pvq)^(~p->~q)","(pvq)^(~(~p)v~q)","(pvq)^(pv~q)","pv(q^~q)","pvF","p"]
+        },
+        {
+            "premise": "(~qvq)^~r^p^r",
+            "target": "F",
+            "difficulty": "medium",
+            "solution": ["(~qvq)^~r^p^r","T^~r^p^r","T^p^~r^r","T^p^(~r^r)","T^p^F","F"]
+        },
+        {
+            "premise": "(p->q)->((p->q)->q)",
+            "target": "(pvq)",
+            "difficulty": "medium",
+            "solution": ["(p->q)->((p->q)->q)","~(p->q)v((p->q)->q)","~(p->q)v(~(p->q)vq)","~(p->q)v~(p->q)vq","~(p->q)vq","~(~pvq)vq","(p^~q)vq","qv(p^~q)","(qvp)^(qv~q)","(qvp)^T","qvp","pvq"]
+        },
+        {
+            "premise": "~((~p^q)v~(rv~s))",
+            "target": "(pv~q)^(rv~s)",
+            "difficulty": "medium",
+            "solution": ["~((~p^q)v~(rv~s))","~(~p^q)^~(~(rv~s))","~(~p^q)^(rv~s)","(~(~p)v~q)^(rv~s)","(pv~q)^(rv~s)"]
+        },
+        {
+            "premise": "~((~p->~q)^(~q->s))",
+            "target": "(~p^q)v(~q^~s)",
+            "difficulty": "medium",
+            "solution": ["~((~p->~q)^(~q->s))","~((~~pv~q)^(~~qvs))","~((pv~q)^(qvs))","~(pv~q)v~(qvs)","(~p^~~q)v(~q^~s)","(~p^q)v(~q^~s)"]
+        },
+        {
+            "premise": "s^((~s^~q)v(~s^~T))^p",
+            "target": "F",
+            "difficulty": "spicy",
+            "solution": ["s^((~s^~q)v(~s^~T))^p","s^((~s^~q)vF)^p","s^(~s^~q)^p","(s^~s)^~q^p","F^~q^p","F"]
+        },
+        {
+            "premise": "~(~(((~p^s)v((~p^T)^~s))^p)^~p)",
+            "target": "p",
+            "difficulty": "spicy",
+            "solution": ["~(~(((~p^s)v((~p^T)^~s))^p)^~p)","(((~p^s)v((~p^T)^~s))^p)vp","(((~p^s)v(~p^T^~s))^p)vp","((p^(~p^s))v(p^(~p^~s)))vp","(FvF)vp","Fvp","p"]
+        },
+        {
+            "premise": "((p->r)^(q->r)^(pvq))->r",
+            "target": "T",
+            "difficulty": "spicy",
+            "solution": [
+                {"statement": "((p->r)∧(q->r)∧(pVq))->r", "rule": "Start"},{"statement": "((~pVr)∧(q->r)∧(pVq))->r", "rule": "Implication to Disjunction"},
+                {"statement": "((~pVr)∧(~qVr)∧(pVq))->r", "rule": "Implication to Disjunction"},{"statement": "(rV(~p∧~q)∧(pVq))->r", "rule": "Distributivity"},
+                {"statement": "(rV~(pVq)∧(pVq))->r", "rule": "De Morgan's Law"},{"statement": "(rVF)->r", "rule": "Negation"},{"statement": "r->r", "rule": "Identity"},
+                {"statement": "~rVr", "rule": "Implication to Disjunction"},{"statement": "T", "rule": "Negation"}
+            ]
+        },
+        {
+            "premise": "p^~(p^~q)<=>(p^q)",
+            "target": "T",
+            "difficulty": "spicy",
+            "solution": [
+                {"statement": "p^~(p^~q)<=>(p^q)", "rule": "Start"},{"statement": "p^(~pvq))<=>(p^q)", "rule": "De Morgan's Law"},
+                {"statement": "(p^~p)v(p^q)<=>(p^q)", "rule": "Distributivity"},{"statement": "Fv(p^q))<=>(p^q)", "rule": "Negation"},
+                {"statement": "(p^q)<=>(p^q)", "rule": "Identity"},{"statement": "((p^q)->(p^q))^((p^q)->(p^q))", "rule": "Iff to Implication"},
+                {"statement": "(p^q)->(p^q)", "rule": "Idempotence"},{"statement": "~(p^q)v(p^q)", "rule": "Implication to Disjunction"},{"statement": "T", "rule": "Negation"}
+            ]
+        },
+        {
+            "premise": "~(~r^~(~(p^(qvq))))",
+            "target": "(p^q)->r",
+            "difficulty": "spicy",
+            "solution": [{"statement": "~(~r^~(~(p^(qvq))))", "rule": "Start"}, {"statement": "~(~r^~~(p^q))", "rule": "Idempotence"},
+                {"statement": "~(~r^(p^q))", "rule": "Double Negation"},{"statement": "rv~(p^q)", "rule": "De Morgan's Law"},{"statement": "~(p^q)vr)", "rule": "Comutativity"},
+                {"statement": "(p^q)->r", "rule": "Implication to Disjunction"}
+            ]
+        },
+        {
+            "premise": "~(~((q^r)v(q^~r))^p)",
+            "target": "p->q",
+            "difficulty": "spicy",
+            "solution": [{"statement": "~(~((q^r)v(q^~r))^p)", "rule": "Start"},{"statement": "~(~(q^(rv~r))^p)", "rule": "Distributivity"},
+                {"statement": "~(~(q^T)^p)", "rule": "Negation"},{"statement": "~(~q^p)", "rule": "Identity"},{"statement": "qv~p", "rule": "De Morgan's Law"},
+                {"statement": "~pvq", "rule": "Commutativity"},{"statement": "p->q", "rule": "Implication to Disjunction"}
+            ]
+        }
+    ]
+}

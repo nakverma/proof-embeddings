@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<br/>
+<h1 class="latex" style="text-align: center">Propositional Logic Practice</h1>
+<br/>
+
+{% from "includes/formhelpers.html" import render_field %}
+
+<form action="" method="POST" style="width: 25%; margin: 0 auto;">
+    <input type="text" class="form-control" placeholder="Class No." name="username" value="{{request.form.username }}">
+    <input type="password" class="form-control" placeholder="Password" name="password" value="{{request.form.password }}">
+
+    <br/>
+    {% if error %}
+        <p class="error" style="text-align: center; color: red;"><strong>Error:</strong> {{ error }}
+    {% endif %}
+    <br/>
+    <div style="width: 100%; margin: 0 auto; display: flex; justify-content: center;">
+        <button type="submit" class="btn btn-primary" name="login" value="LOGIN" style="width: 50%;">LOGIN</button>
+    </div>
+
+</form>
+
+{% endblock body %}
+
+style="border-color: red", class="form-control"
