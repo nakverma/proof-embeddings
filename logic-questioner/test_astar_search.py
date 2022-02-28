@@ -4,6 +4,7 @@ from astar_heuristics import *
 from time import time, localtime, asctime
 from multiprocessing import Process, Queue
 import json
+import os
 
 
 def search_func(start, goal, distance_func, heuristic, queue):  # could use decorator to time+queue it, but why bother?
@@ -14,7 +15,9 @@ def search_func(start, goal, distance_func, heuristic, queue):  # could use deco
 
 
 def test_search(distance_func, heuristic, max_timeout=5, question_file="questions.json"):
-    results_file = f'astar_results_d_{distance_func.__name__}_h_{heuristic.__name__}.txt'
+    results_file = os.path.join(
+        'heuristic_test_results', f'astar_results_d_{distance_func.__name__}_h_{heuristic.__name__}.txt'
+    )
     with open(question_file, "r") as qf:
         questions = json.load(qf)['questions']
     queue = Queue()
@@ -48,4 +51,10 @@ def test_search(distance_func, heuristic, max_timeout=5, question_file="question
 
 
 if __name__ == "__main__":
-    test_search(levenshtein_distance, levenshtein_distance)
+    # test_search(random_weight, random_weight)
+    # test_search(random_weight, levenshtein_distance)
+    # test_search(levenshtein_distance, levenshtein_distance)
+    # test_search(big_change_favored_weight, levenshtein_distance)
+    # test_search(small_change_favored_weight, levenshtein_distance)
+    # test_search(combo_weight, levenshtein_distance)
+    pass

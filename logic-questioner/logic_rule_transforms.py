@@ -61,6 +61,7 @@ def identity(tree: Tree):
     assert tree.data == "expr" or tree.data == "term"
     if tree.data == "expr":
         new_children = list(filter(lambda x: not is_token(x, "FALSE"), tree.children))
+        new_children = new_children if len(new_children) > 0 else [Token("FALSE", "F")]
     elif tree.data == "term":
         new_children = list(filter(lambda x: not is_token(x, "TRUE"), tree.children))
         new_children = new_children if len(new_children) > 0 else [Token("TRUE", "T")]
