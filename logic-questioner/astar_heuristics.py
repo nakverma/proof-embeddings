@@ -10,6 +10,7 @@ def levenshtein_distance(n1, n2):
 def unitary_distance(n1, n2):
     return 1
 
+
 heuristic_list = [
     levenshtein_distance, unitary_distance
 ]
