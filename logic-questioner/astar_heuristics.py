@@ -21,7 +21,6 @@ if __name__ == "__main__":
     print(levenshtein_distance(n1, n2))
     print(unitary_distance(n1, n2))
 
-
 """
 OLD (to replicate heuristics)
 
