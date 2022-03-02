@@ -101,16 +101,19 @@ def commutativity(tree: Tree):  # p^q^r == q^p^r == ... r^p^q, returns list of p
 def associativity_LR(tree: Tree):  # only for (a^b)^c or with V, i.e. 2-node 3-var ops. Somewhat Hacky. Expand later
     assert tree.data == "expr" or tree.data == "term"
     ch = tree.children
-    if len(ch) == 2 and type(ch[0]) == Tree and ch[0].data == "paren_expr":
-        par = ch[0].children[0]
-        if is_tree(par, tree.data) and len(par.children) == 2:
-            tree.children = [
-                par.children[0],
-                Tree("paren_expr", [
-                    Tree(tree.data, [par.children[1], ch[1]])
-                ])
-            ]
-    return tree
+    new_trees = []
+    for i, c in enumerate(ch):
+        if is_tree(c, "paren_expr") and is_tree(c.children[0], tree.data):
+            swap_ch = c.children[0].children
+            if i > 0:
+                for j in range(len(swap_ch)-1):
+                    new_paren = parenthesize(Tree(tree.data, ch[:i] + swap_ch[:j+1]))
+                    new_trees.append(Tree(tree.data, [new_paren] + swap_ch[j+1:] + ch[i+1:]))
+            if i < len(ch)-1:
+                for j in range(1, len(swap_ch)):
+                    new_paren = parenthesize(Tree(tree.data, swap_ch[j:] + ch[i+1:]))
+                    new_trees.append(Tree(tree.data, ch[:i] + swap_ch[:j] + [new_paren]))
+    return new_trees
 
 
 def associativity_expand(tree: Tree):  # remove all parenthesized expressions
@@ -123,6 +126,16 @@ def associativity_expand(tree: Tree):  # remove all parenthesized expressions
             new_children.append(c)
     tree.children = new_children
     return tree
+
+
+def reverse_associativity_expand(tree: Tree):  # add parentheses around arbitrary sequences of expressions
+    assert tree.data == "expr" or tree.data == "term"
+    ch = tree.children
+    new_trees = []
+    for i in range(len(ch)-1):
+        for j in range(i+2, len(ch)+1):
+            new_trees.append(Tree(tree.data, ch[:i] + [parenthesize(Tree(tree.data, ch[i:j]))] + ch[j:]))
+    return new_trees
 
 
 def impl_to_disj(tree: Tree):  # p->q == ~pVq
@@ -378,11 +391,11 @@ if __name__ == "__main__":
     ep = ExpressionParser()
     tts = TreeToString()
 
-    tr1 = ep.parse('pvqvr').children[0]
-    tr2 = disj_to_impl(tr1)
+    tr1 = ep.parse('pvqvrvs').children[0]
+    tr2 = reverse_associativity_expand(tr1)
     print([tts.transform(t) for t in tr2])
-    tr1 = ep.parse('a->q->c').children[0]
-    tr2 = impl_to_disj(tr1)
+    tr1 = ep.parse('(pvq)v(c^b)').children[0]
+    tr2 = reverse_associativity_expand(tr1)
     print([tts.transform(t) for t in tr2])
 
     tr3 = ep.parse('(pvq)').children[0]

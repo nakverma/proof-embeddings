@@ -78,11 +78,12 @@ class TestExpressionManipulation(unittest.TestCase):
         print(commutativity(tr1), commutativity(tr2), sep="\n")
 
     def test_associativity_LR(self):
-        tr1 = ep.parse('(a^b)^(cvb)').children[0]
+        tr1 = ep.parse('pv(qvr)vsv(tvu)vw').children[0]
         tr2 = associativity_LR(tr1)
-        tr3 = ep.parse('(a^b)vc').children[0]
-        tr4 = associativity_LR(tr3)
-        print(tts.transform(tr2), tts.transform(tr4), sep="\n")
+        print([tts.transform(t) for t in tr2])
+        tr1 = ep.parse('(pvq)vr').children[0]
+        tr2 = associativity_LR(tr1)
+        print([tts.transform(t) for t in tr2])
 
     def test_associativity_expand(self):
         tr1 = ep.parse('(a^b)^(cvb)').children[0]
@@ -92,6 +93,14 @@ class TestExpressionManipulation(unittest.TestCase):
         tr5 = ep.parse('av(bvc)vd^e').children[0]
         tr6 = associativity_expand(tr5)
         print(tts.transform(tr2), tts.transform(tr4), tts.transform(tr6), sep="\n")
+
+    def test_reverse_associativity_expand(self):
+        tr1 = ep.parse('pvqvrvs').children[0]
+        tr2 = reverse_associativity_expand(tr1)
+        print([tts.transform(t) for t in tr2])
+        tr1 = ep.parse('(pvq)v(c^b)').children[0]
+        tr2 = reverse_associativity_expand(tr1)
+        print([tts.transform(t) for t in tr2])
 
     def test_impl_to_disj(self):
         tr1 = ep.parse('p->q').children[0]
