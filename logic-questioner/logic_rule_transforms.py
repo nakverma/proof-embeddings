@@ -251,15 +251,13 @@ def absorption(tree: Tree):  # pV(p^q) == p, p^(pVq) == p
     return tree
 
 
-def reverse_absorption(tree: Tree):  # pvq == pv(p^q), p^q == p^(pvq), consecutive pairs in order
-    assert tree.data == "expr" or tree.data == "term"
-    if len(tree.children) == 1:
-        return [tree]
-    dual = "expr" if tree.data == "term" else "term"
+def reverse_absorption(node, additional_ids=('p', 'q', 'r', 's')):  # p == pv(p^ID), p == p^(pvID)
     new_trees = []
-    for i, c in enumerate(tree.children[:-1]):
-        tr = parenthesize(Tree(dual, [c, tree.children[i+1]]))
-        new_trees.append(Tree(tree.data, tree.children[:i+1] + [tr] + tree.children[i+2:]))  # :i+1 keeps p in pv(p^q)
+    if is_token(node, "ID"):
+        additional_ids = [v for v in additional_ids if node.value != v]
+    for v in additional_ids:
+        new_trees.append(Tree("expr", [node, parenthesize(Tree("term", [node, v]))]))
+        new_trees.append(Tree("term", [node, parenthesize(Tree("expr", [node, v]))]))
     return new_trees
 
 
@@ -329,13 +327,13 @@ operation_names = {                       # change to Enum?
     "Double Negation": [double_negate, simplify_multiple_negation],
     "Implication as Disjunction": [impl_to_disj, disj_to_impl],
     "Iff as Implication": [dblimpl_to_impl, impl_to_dblimpl],
-    "Idempotence": [idempotence],
+    "Idempotence": [idempotence, reverse_idempotence],
     "Identity": [identity, reverse_identity],
     "Domination": [domination],
     "Commutativity": [commutativity],
-    "Associativity": [associativity_LR, associativity_expand],
+    "Associativity": [associativity_LR, associativity_expand, reverse_associativity_expand],
     "Negation": [negation, TF_negation],
-    "Absorption": [absorption],
+    "Absorption": [absorption, reverse_absorption],
     "Distributivity": [distributivity, reverse_distributivity],
     "De Morgan's Law": [demorgan, reverse_demorgan]
 }
@@ -371,10 +369,10 @@ allowed_operations = {
     ],
     'variable': [],
     'paren_expr': [
-        double_negate, reverse_identity, reverse_idempotence
+        double_negate, reverse_identity, reverse_idempotence, reverse_absorption
     ],
     'ID': [
-        reverse_identity, reverse_idempotence
+        reverse_identity, reverse_idempotence, reverse_absorption
     ],
     "TRUE": [],
     "FALSE": [],
@@ -399,10 +397,10 @@ if __name__ == "__main__":
     tts = TreeToString()
 
     tr1 = ep.parse('p').children[0]
-    tr2 = reverse_idempotence(tr1)
+    tr2 = reverse_absorption(tr1)
     print([tts.transform(t) for t in tr2])
-    tr1 = ep.parse('(pvq)v(c^b)').children[0]
-    tr2 = reverse_idempotence(tr1)
+    tr1 = ep.parse('(pvq)').children[0]
+    tr2 = reverse_absorption(tr1)
     print([tts.transform(t) for t in tr2])
 
     t1 = ep.parse('a^b^c^a^b^a').children[0]

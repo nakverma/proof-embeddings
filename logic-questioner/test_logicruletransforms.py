@@ -167,6 +167,14 @@ class TestExpressionManipulation(unittest.TestCase):
         tr6 = absorption(tr5)
         print(tts.transform(tr2), tr4, tts.transform(tr6), sep="\n")
 
+    def test_reverse_absorption(self):
+        tr1 = ep.parse('p').children[0]
+        tr2 = reverse_absorption(tr1)
+        print([tts.transform(t) for t in tr2])
+        tr1 = ep.parse('(pvq)').children[0]
+        tr2 = reverse_absorption(tr1)
+        print([tts.transform(t) for t in tr2])
+
     def test_literal_negation(self):
         tr1 = ep.parse('~F').children[0]
         tr2 = TF_negation(tr1)

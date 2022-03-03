@@ -4,14 +4,14 @@ from logic_rule_transforms import *
 
 
 reverse_rule_pairs = {
-    # identity: reverse_identity,
+    identity: reverse_identity,
     distributivity: reverse_distributivity,
     commutativity: commutativity,
     impl_to_disj: disj_to_impl,
     dblimpl_to_impl: impl_to_dblimpl,
     demorgan: reverse_demorgan,
     absorption: reverse_absorption,
-    # double_negate: simplify_multiple_negation,
+    double_negate: simplify_multiple_negation,
     associativity_LR: associativity_LR,
     associativity_expand: reverse_associativity_expand,
     idempotence: reverse_idempotence

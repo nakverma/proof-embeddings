@@ -14,7 +14,7 @@ def create_corpus(question_list, train_file="training_data.txt"):  # corpus of '
     print("Creating Corpus...")
     with open(train_file, "w") as tf:
         for q in question_list:
-            for s in range(2, 10):
+            for s in list(range(2, 6))*2:
                 qp, qt = qg.generate(q['premise'], max_depth=s), qg.generate(q['target'], max_depth=s)
                 qp, qt = qp["solution"], qt["solution"]
                 if len(qp) != 1:
