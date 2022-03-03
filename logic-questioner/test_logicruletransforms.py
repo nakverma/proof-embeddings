@@ -53,6 +53,14 @@ class TestExpressionManipulation(unittest.TestCase):
         t4 = next(ep.parse('a^b^c').find_data('term'))
         self.assertEqual(t4, idempotence(t3))
 
+    def test_reverse_idempotence(self):
+        tr1 = ep.parse('p^q^r^s').children[0]
+        tr2 = reverse_idempotence(tr1)
+        print([tts.transform(t) for t in tr2])
+        tr1 = ep.parse('(pvq)v(c^b)').children[0]
+        tr2 = reverse_idempotence(tr1)
+        print([tts.transform(t) for t in tr2])
+
     def test_simplify_multiple_negation(self):
         tr1 = ExpressionParser().parse('~~~a').children[0].children[0].children[0].children[0]
         tr2 = ExpressionParser().parse('~~a').children[0].children[0].children[0].children[0]

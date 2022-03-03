@@ -4,16 +4,17 @@ from logic_rule_transforms import *
 
 
 reverse_rule_pairs = {
-    identity: reverse_identity,
+    # identity: reverse_identity,
     distributivity: reverse_distributivity,
     commutativity: commutativity,
     impl_to_disj: disj_to_impl,
     dblimpl_to_impl: impl_to_dblimpl,
     demorgan: reverse_demorgan,
     absorption: reverse_absorption,
-    double_negate: simplify_multiple_negation,
+    # double_negate: simplify_multiple_negation,
     associativity_LR: associativity_LR,
-    associativity_expand: reverse_associativity_expand
+    associativity_expand: reverse_associativity_expand,
+    idempotence: reverse_idempotence
 }
 
 
@@ -23,9 +24,10 @@ class QuestionGenerator:
         self.variables = variables
         self.reverse = reverse_rule_pairs
         self.reverse.update({v: k for k, v in reverse_rule_pairs.items()})
+        self.allowed_ops = {k: [v for v in allowed_operations[k] if v in self.reverse] for k in allowed_operations}
 
     def _get_next_step(self, prev_expr, prev_rule):
-        frontier = get_frontier(prev_expr)
+        frontier = get_frontier(prev_expr, allowed_ops=self.allowed_ops)
         possible_next_rules = list({exp[1] for exp in frontier} - {prev_rule})
         if len(possible_next_rules) == 0:
             return None, None
@@ -58,6 +60,6 @@ class QuestionGenerator:
 
 if __name__ == "__main__":
     qg = QuestionGenerator()
-    q1 = qg.generate("pvq", max_depth=10)
+    q1 = qg.generate("p", max_depth=10)
     for k, v in q1.items():
         print("{}: {}".format(k, v))

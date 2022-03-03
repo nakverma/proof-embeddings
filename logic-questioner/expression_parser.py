@@ -68,17 +68,18 @@ class TreeToString(Transformer):
 
 class Frontier(Transformer):
 
-    def __init__(self, in_str):
+    def __init__(self, in_str, allowed_ops=allowed_operations):
         super().__init__()
         self.in_str = in_str
         self.frontier = set()
         self.checked_tokens = set()
         self.tts = TreeToString()
+        self.allowed_ops = allowed_ops
 
     def _get_token_variants(self, token: Token):  # necessary since Lark doesn't have meta for tokens. Ugh.
         sp, ep = token.start_pos, token.end_pos
         transforms = set()
-        for op in allowed_operations[token.type]:
+        for op in self.allowed_ops[token.type]:
             new_node = op(token)
             if type(new_node) is not list:
                 new_node = [new_node]
@@ -90,7 +91,7 @@ class Frontier(Transformer):
 
     def _get_transformations(self, node: Tree) -> set:
         transforms = set()
-        for op in allowed_operations[node.data]:
+        for op in self.allowed_ops[node.data]:
             new_node = deepcopy(node)             # necessary because some transformations are in-place. Change this.
             new_node = op(new_node)
             if type(new_node) is not list:
@@ -170,11 +171,11 @@ class SimplifyParentheses(Transformer):
         return tr
 
 
-def get_frontier(in_str: str, simplify_parentheses=True) -> list:
+def get_frontier(in_str: str, simplify_parentheses=True, allowed_ops=allowed_operations) -> list:
     ep, tts = ExpressionParser(), TreeToString()
     tree = ep.parse(in_str)
     linted_str = tts.transform(tree)
-    fr = Frontier(linted_str)
+    fr = Frontier(linted_str, allowed_ops=allowed_ops)
     fr.transform(tree)
     frontier = fr.frontier
     if simplify_parentheses:
