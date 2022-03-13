@@ -213,6 +213,18 @@ def negation(tree: Tree):  # pv~p=T, p^~p=F
     return tree
 
 
+def reverse_negation(token: Token, additional_ids=('p', 'q', 'r', 's')):
+    assert is_token(token, "TRUE") or is_token(token, "FALSE")
+    new_trees = []
+    for i in additional_ids:
+        tok = Token("ID", i)
+        if is_token(token, "TRUE"):
+            new_trees.append(parenthesize(Tree("expr", [tok, negate(tok)])))
+        else:
+            new_trees.append(parenthesize(Tree("term", [tok, negate(tok)])))
+    return new_trees
+
+
 def demorgan(tree: Tree):  # ~(pvq) == ~p^~q, ~(p^q) == ~pV~q
     assert tree.data == "literal"
     if is_tree(tree.children[1], "paren_expr"):
@@ -261,7 +273,7 @@ def reverse_absorption(node, additional_ids=('p', 'q', 'r', 's')):  # p == pv(p^
     return new_trees
 
 
-def TF_negation(tree: Tree):
+def TF_negation(tree: Tree):  # ~T == F, ~F == T
     assert tree.data == "literal"
     if len(tree.children) == 2:
         if is_token(tree.children[1], "TRUE"):
@@ -332,7 +344,7 @@ operation_names = {                       # change to Enum?
     "Domination": [domination],
     "Commutativity": [commutativity],
     "Associativity": [associativity_LR, associativity_expand, reverse_associativity_expand],
-    "Negation": [negation, TF_negation],
+    "Negation": [negation, TF_negation, reverse_negation],
     "Absorption": [absorption, reverse_absorption],
     "Distributivity": [distributivity, reverse_distributivity],
     "De Morgan's Law": [demorgan, reverse_demorgan]
@@ -374,8 +386,12 @@ allowed_operations = {
     'ID': [
         reverse_identity, reverse_idempotence, reverse_absorption
     ],
-    "TRUE": [],
-    "FALSE": [],
+    "TRUE": [
+        reverse_negation
+    ],
+    "FALSE": [
+        reverse_negation
+    ],
     "_LPAR": [],
     "_RPAR": [],
     "NOT": [],
@@ -396,11 +412,11 @@ if __name__ == "__main__":
     ep = ExpressionParser()
     tts = TreeToString()
 
-    tr1 = ep.parse('p').children[0]
-    tr2 = reverse_absorption(tr1)
+    tr1 = Token("TRUE", "True") #ep.parse('p').children[0]
+    tr2 = reverse_negation(tr1)
     print([tts.transform(t) for t in tr2])
-    tr1 = ep.parse('(pvq)').children[0]
-    tr2 = reverse_absorption(tr1)
+    tr1 = Token("FALSE", "F") #ep.parse('(pvq)').children[0]
+    tr2 = reverse_negation(tr1)
     print([tts.transform(t) for t in tr2])
 
     t1 = ep.parse('a^b^c^a^b^a').children[0]

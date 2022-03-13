@@ -14,7 +14,9 @@ reverse_rule_pairs = {
     double_negate: simplify_multiple_negation,
     associativity_LR: associativity_LR,
     associativity_expand: reverse_associativity_expand,
-    idempotence: reverse_idempotence
+    idempotence: reverse_idempotence,
+    TF_negation: TF_negation,
+    negation: reverse_negation
 }
 
 
@@ -60,6 +62,6 @@ class QuestionGenerator:
 
 if __name__ == "__main__":
     qg = QuestionGenerator()
-    q1 = qg.generate("p", max_depth=10)
+    q1 = qg.generate("p^~p", max_depth=3)
     for k, v in q1.items():
         print("{}: {}".format(k, v))
