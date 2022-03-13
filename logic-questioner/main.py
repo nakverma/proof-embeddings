@@ -44,7 +44,7 @@ def get_laws():
     return list(operation_names.keys())
 
 
-def get_question_list(filename='legacy_questions.json'):
+def get_question_list(filename='questions.json'):
     with open(filename, 'r') as qf:
         qs = json.load(qf)["questions"]
     for q in qs:
@@ -123,9 +123,9 @@ def solve():
     form.showlaws = request.args['showlaws']
     form.solution = request.args['question_solution']
 
-    print("\n", form.solution, "\n")
+    #print("\n", form.solution, "\n")
     q_sol = json.loads(form.solution)
-    print("\n", q_sol, "\n")
+    #print("\n", q_sol, "\n")
     
     has_error = False
 
@@ -177,7 +177,8 @@ def solve():
                 step_data.append([req_ip, t, usr_agent, form.question.text, session_id, i, step.data['law'],  latex2raw(step.data["step"]), 1])
                 continue
             prev_step = q_sol["premise"] if i == 0 else form.steps[i-1].data["step"]
-            print("\n", latex2raw(prev_step), latex2raw(step.data["step"]), step.data["law"], q_sol["sol"], "\n", sep="\n")
+            #print("\n", latex2raw(prev_step), latex2raw(step.data["step"]), step.data["law"], q_sol["sol"], "\n", sep="\n")
+            print(f"{{\"statement\": \"{latex2raw(step.data['step'])}\", \"rule\": \"{step.data['law']}\"}}")
             check = validate_and_get_frontier(latex2raw(prev_step), latex2raw(step.data["step"]), step.data["law"], q_sol["target"])
 
             if not check["isValid"]:

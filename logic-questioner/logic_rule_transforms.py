@@ -196,8 +196,9 @@ def impl_to_dblimpl(tree: Tree):  # (p->q)^(q->p) == p<=>q, any adjacent pair ca
                 if ch0 == c2.children[0].children[1] and ch1 == c2.children[0].children[0]:
                     pre_exclude = tree.children[:i]
                     post_exclude = tree.children[i+2:]
-                    tr = Tree("eqn", [ch0, ch1])
-                    new_trees.append(Tree("term", pre_exclude + [tr] + post_exclude))
+                    tr_fwd, tr_bkwd = Tree("eqn", [ch0, ch1]), Tree("eqn", [ch1, ch0])
+                    new_trees.append(Tree("term", pre_exclude + [tr_fwd] + post_exclude))
+                    new_trees.append(Tree("term", pre_exclude + [tr_bkwd] + post_exclude))
     return new_trees if len(new_trees) > 0 else [tree]
 
 

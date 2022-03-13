@@ -207,7 +207,6 @@ def validate(current_frontier: list, new_expr: str, new_rule: str) -> str:
 
 
 def check_success(new_linted: str, target: str) -> bool:
-    print("Expression: {}, Target: {}".format(new_linted, target), new_linted.casefold() == target.casefold())
     return new_linted.casefold() == target.casefold()
 
 
