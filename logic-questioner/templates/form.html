@@ -148,7 +148,9 @@
             document.getElementById("sol_here_from_js").innerHTML += solution.premise + "<br /><br/>"
             document.getElementById("sol_here_from_js").innerHTML += "<h6>Solution</h6>" + "<ol type='1'>"
             for(let i in solution.sol) {
-                document.getElementById("sol_here_from_js").innerHTML += "<li>" + solution.sol[i] + "</li>"
+                var step = "Statement: " + solution.sol[i]["statement"]
+                + "<br>Rule: " + solution.sol[i]["rule"] + "<br><br>"
+                document.getElementById("sol_here_from_js").innerHTML += "<li>" + step + "</li>"
             }
             document.getElementById("sol_here_from_js").innerHTML += "</ol>"
         </script>
