@@ -275,7 +275,6 @@
             "solution": [
                 {"statement": "s^((~s^~q)v(~s^~T))^p", "rule": "Start"},
                 {"statement": "s^((~s^~q)V(~s^F))^p", "rule": "Negation"},
-                {"statement": "s^((~s^~q)V~s)^p", "rule": "Identity"},
                 {"statement": "s^((~s^~q)VF)^p", "rule": "Domination"},
                 {"statement": "s^(~s^~q)^p", "rule": "Identity"},
                 {"statement": "s^~s^~q^p", "rule": "Associativity"},
