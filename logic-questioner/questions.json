@@ -289,12 +289,8 @@
             "solution": [
                 {"statement": "~(~(((~p^s)v((~p^T)^~s))^p)^~p)", "rule": "Start"},
                 {"statement": "~(~(((~p^s)V(~p^~s))^p)^~p)", "rule": "Identity"},
-                {"statement": "~(~(~p^(sV~s))^p)^~p)", "rule": "Distributivity"},
-                {"statement": "~(~(~p^(sV~s)^p)^~p)", "rule": "Distributivity"},
                 {"statement": "~(~((~p^(sV~s))^p)^~p)", "rule": "Distributivity"},
-                {"statement": "~(~F^~p)", "rule": "Negation"},
-                {"statement": "~(~((~p^T)^p)^~p)", "rule": "Negation"},
-                {"statement": "~(~(~p^p)^~p)", "rule": "Identity"},
+                {"statement": "~(~(~p^(sV~s)^p)^~p)", "rule": "Associativity"},
                 {"statement": "~(~F^~p)", "rule": "Negation"},
                 {"statement": "~(T^~p)", "rule": "Negation"},
                 {"statement": "~~p", "rule": "Identity"},
