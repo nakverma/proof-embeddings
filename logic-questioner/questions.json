@@ -52,7 +52,7 @@
             "target": "~pvq",
             "difficulty": "mild",
             "solution": [
-                {"statement": "~(p^~q)vq", "rule": "Start"},{"statement": "(~pvq)vq)", "rule": "De Morgan's Law"},{"statement": "~pvqvq", "rule": "Associativity"},
+                {"statement": "~(p^~q)vq", "rule": "Start"},{"statement": "(~pvq)vq", "rule": "De Morgan's Law"},{"statement": "~pvqvq", "rule": "Associativity"},
                 {"statement": "~pvq", "rule": "Idempotence"}
             ]
         },
@@ -82,7 +82,7 @@
             "target": "(p->r)^(q->r)",
             "difficulty": "mild",
             "solution": [{"statement": "(pvq)->r", "rule": "Start"},{"statement": "~(pvq)vr", "rule": "Implication as Disjunction"},
-                {"statement": "(~p^~q)vr)", "rule": "De Morgan's Law"},{"statement": "(~pvr)^(~qvr)", "rule": "Distributivity"},
+                {"statement": "(~p^~q)vr", "rule": "De Morgan's Law"},{"statement": "(~pvr)^(~qvr)", "rule": "Distributivity"},
                 {"statement": "(p->r)^(~qvr)", "rule": "Implication as Disjunction"},{"statement": "(p->r)^(q->r)", "rule": "Implication as Disjunction"}]
         },
         {
@@ -99,7 +99,7 @@
             "target": "T",
             "difficulty": "mild",
             "solution": [
-                {"statement": "F->T", "rule": "Start"},{"statement": "~FvT", "rule": "Implication as Disjunction"},{"statement": "TvT", "rule": "Negation"}, {"statement": "T", "rule": "Identity"}
+                {"statement": "F->T", "rule": "Start"},{"statement": "~FvT", "rule": "Implication as Disjunction"},{"statement": "TvT", "rule": "Negation"}, {"statement": "T", "rule": "Domination"}
             ]
         },
         {
