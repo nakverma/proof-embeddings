@@ -166,7 +166,7 @@
                 {"statement": "(p^q)v(~pv(p^~q))", "rule": "Start"},
                 {"statement": "(p^q)v((~pvp)^(~pv~q))", "rule": "Distributivity"},
                 {"statement": "(p^q)v(T^(~pv~q))", "rule": "Negation"},
-                {"statement": "(p^q)^(~pv~q)", "rule": "Identity"},
+                {"statement": "(p^q)v(~pv~q)", "rule": "Identity"},
                 {"statement": "(p^q)v~(p^q)", "rule": "De Morgan's Law"},
                 {"statement": "T", "rule": "Negation"}
             ]
