@@ -178,10 +178,9 @@
             "solution": [
                 {"statement": "(p^~q)v(q^~p)", "rule": "Start"},
                 {"statement": "~(~(p^~q)^~(q^~p))", "rule": "De Morgan's Law"},
-                {"statement": "~(~(p^~q)^~(q^~p))", "rule": "De Morgan's Law"},
                 {"statement": "~((~pVq)^~(q^~p))", "rule": "De Morgan's Law"},
                 {"statement": "~((~pVq)^(~qVp))", "rule": "De Morgan's Law"},
-                {"statement": "~((p->q)^(q->p))", "rule": "Implication as Disjunction"},
+                {"statement": " ~((p->q)^(~qVp))", "rule": "Implication as Disjunction"},
                 {"statement": "~((p->q)^(q->p))", "rule": "Implication as Disjunction"},
                 {"statement": "~(p<=>q)", "rule": "Iff as Implication"}
             ]
