@@ -251,11 +251,8 @@
             "difficulty": "medium",
             "solution": [
                 {"statement": "~((~p^q)v~(rv~s))", "rule": "Start"},
-                {"statement": "~((pV~q)^(~q->s))", "rule": "Start"},
-                {"statement": "~((pV~q)^(qVs))", "rule": "Implication as Disjunction"},
-                {"statement": "~(pV~q)V~(qVs)", "rule": "De Morgan's Law"},
-                {"statement": "(~p^q)V~(qVs)", "rule": "De Morgan's Law"},
-                {"statement": "(~p^q)V(~q^~s)", "rule": "De Morgan's Law"}
+                {"statement": "~(~p^q)^(rV~s)", "rule": "De Morgan's Law"},
+                {"statement": "(pV~q)^(rV~s)", "rule": "De Morgan's Law"}
             ]
         },
         {
