@@ -312,11 +312,9 @@ def reverse_distributivity(tree: Tree):  # (pvq)^(pvr) == pV(q^r) etc., assumes 
         return [tree]
 
     def is_viable_node(n):
-        return all([
-            is_tree(n, "paren_expr"),
-            (is_tree(n.children[0], "expr") or is_tree(n.children[0], "term")),
-            len(n.children[0].children) == 2
-        ])
+        return is_tree(n, "paren_expr") \
+               and (is_tree(n.children[0], "expr") or is_tree(n.children[0], "term")) \
+               and len(n.children[0].children) == 2
 
     new_trees = []
     viable_nodes = list(filter(lambda x: is_viable_node(x[1]), enumerate(tree.children)))
@@ -425,6 +423,9 @@ if __name__ == "__main__":
     tr2 = reverse_distributivity(tr1)
     print([tts.transform(t) for t in tr2])
     tr1 = ep.parse('(r^q)^(p^r)').children[0]
+    tr2 = reverse_distributivity(tr1)
+    print([tts.transform(t) for t in tr2])
+    tr1 = ep.parse('pvq').children[0]
     tr2 = reverse_distributivity(tr1)
     print([tts.transform(t) for t in tr2])
 

@@ -213,6 +213,12 @@ class TestExpressionManipulation(unittest.TestCase):
         tr1 = ep.parse('(pvq)^(pvr)').children[0]
         tr2 = reverse_distributivity(tr1)
         print([tts.transform(t) for t in tr2])
+        tr1 = ep.parse('(r^q)^(p^r)').children[0]
+        tr2 = reverse_distributivity(tr1)
+        print([tts.transform(t) for t in tr2])
+        tr1 = ep.parse('pvq').children[0]
+        tr2 = reverse_distributivity(tr1)
+        print([tts.transform(t) for t in tr2])
 
     def test_double_negate(self):
         tr1 = ep.parse('p^(pvq)').children[0]
