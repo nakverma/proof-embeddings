@@ -403,10 +403,6 @@ allowed_operations = {
 }
 
 
-token_operations = {
-
-}
-
 if __name__ == "__main__":
     from expression_parser import *
 

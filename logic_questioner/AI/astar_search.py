@@ -1,23 +1,28 @@
-from expression_parser import *
 from astar_heuristics import *
 import json
 from heapq import heappush, heappop
+import sys
+import os
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+import expression_parser as ep
+import logic_rule_transforms as lrt
 
 inf = float('inf')
 
 
 def frontier_func(x):
-    fr = get_frontier(x[0])
-    # print(fr)
+    fr = ep.get_frontier(x[0])
     return fr
 
 
 def goal_func(x, target):
-    # print(x, target)
-    return x[0] == target
+    return x[0] == target[0]
 
 
-def astar_search(start, goal, distance_func, heuristic):
+def astar_search(start, goal, distance_func, heuristic, *args, **kwargs):
 
     class SearchNode:
         def __init__(self, data, fscore=inf, gscore=inf):
@@ -39,12 +44,13 @@ def astar_search(start, goal, distance_func, heuristic):
             return value
 
     start = (start, "Start")
+    goal = (goal, None)
 
     if goal_func(start, goal):
         return [start]
 
     search_dict = NodeDict()
-    start_node = search_dict[start] = SearchNode(start, fscore=heuristic(start, goal), gscore=.0)
+    start_node = search_dict[start] = SearchNode(start, fscore=heuristic(start, goal, *args, **kwargs), gscore=.0)
     open_set = []
     heappush(open_set, start_node)
 
@@ -79,7 +85,7 @@ def astar_search(start, goal, distance_func, heuristic):
 
 
 if __name__ == "__main__":
-    with open('questions.json') as f:
+    with open('../questions.json') as f:
         questions = json.load(f)['questions']
     for q in questions[:1]:
         gp = astar_search(q['premise'], q['target'], levenshtein_distance, unitary_distance)

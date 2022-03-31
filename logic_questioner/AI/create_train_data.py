@@ -138,7 +138,7 @@ def create_contrastive_data(question_list, train_file="training_data_contrastive
             return
         for i, s1 in enumerate(q):
             for j, s2 in enumerate(q[i:]):
-                out = str((val(s1[0]), val(s2[0]), abs(max_depth-j)/max_depth))
+                out = str((val(s1[0]), val(s2[0]), 1 if abs(j-i) < 2 else 0))
                 if out not in seen:
                     seen.add(out)
                 tf.write(out + "\n")
@@ -146,12 +146,12 @@ def create_contrastive_data(question_list, train_file="training_data_contrastive
     qg = QuestionGenerator()
     print("Creating Corpus...")
     with open(train_file, "w") as tf:
-        for q in question_list:
+        for q in question_list[:5]:
             for s in range(3):
                 qp, qt = qg.generate(q['premise'], max_depth=10), qg.generate(q['target'], max_depth=10)
                 qp, qt = qp["solution"], qt["solution"]
-                write_sample(qp, tf, 5)
-                write_sample(qt, tf, 5)
+                write_sample(qp, tf, 10)
+                write_sample(qt, tf, 10)
             print(".", end="")
         print()
     print("Contrastive Corpus Created")
@@ -162,4 +162,5 @@ if __name__ == "__main__":
     #create_rule_corpus(ql)
     #create_step_data(ql)
     #create_dist_data(ql)
-    create_dist_data_small(ql)
+    #create_dist_data_small(ql)
+    create_contrastive_data(ql)
