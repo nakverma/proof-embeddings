@@ -171,16 +171,17 @@ class SimplifyParentheses(Transformer):
         return tr
 
 
-def get_frontier(in_str: str, simplify_parentheses=True, allowed_ops=allowed_operations) -> list:
+def get_frontier(in_str: str, simplify_paren=True, include_paren=True, allowed_ops=allowed_operations) -> list:
     ep, tts = ExpressionParser(), TreeToString()
     tree = ep.parse(in_str)
     linted_str = tts.transform(tree)
     fr = Frontier(linted_str, allowed_ops=allowed_ops)
     fr.transform(tree)
     frontier = fr.frontier
-    if simplify_parentheses:
+    if simplify_paren:
         sp = SimplifyParentheses()
-        frontier = map(lambda f: (sp.transform(ep.parse(f[0])), f[1]), frontier)
+        no_par_frontier = set(map(lambda f: (sp.transform(ep.parse(f[0])), f[1]), frontier))
+        frontier = frontier | no_par_frontier if include_paren else no_par_frontier
     return list(set(filter(lambda x: x[0] != linted_str, frontier)))  # tts transform so that tokens standardized
 
 
@@ -231,7 +232,7 @@ def validate_and_get_frontier(old_expr: str, new_expr: str, new_rule: str, targe
 
 
 if __name__ == "__main__":
-    old, new, rule, goal = "~(p^q)", "~pv~q", "de morgan's law", "~pV~q"
+    old, new, rule, goal = "~(p^q)", "(~pv~q)", "de morgan's law", "~pV~q"
     print(validate_and_get_frontier(old, new, rule, goal))
 
     print("\n", get_frontier("T^T"), "\n")

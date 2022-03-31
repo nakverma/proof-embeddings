@@ -75,7 +75,9 @@
             "premise": "(pvq)v(pv~q)",
             "target": "T",
             "difficulty": "mild",
-            "solution": [{"statement": "(pvq)v(pv~q)", "rule": "Start"},{"statement": "pvqvpv~q", "rule": "Associativity"},{"statement": "T", "rule": "Negation"}]
+            "solution": [
+                {"statement": "(pvq)v(pv~q)", "rule": "Start"},{"statement": "pvqvpv~q", "rule": "Associativity"},
+                {"statement": "pvpvT", "rule": "Negation"},{"statement": "T", "rule": "Domination"}]
         },
         {
             "premise": "(pvq)->r",
@@ -111,7 +113,8 @@
                 {"statement": "~qV(p->q)", "rule": "Implication as Disjunction"},
                 {"statement": "~qV(~pVq)", "rule": "Implication as Disjunction"},
                 {"statement": "~qV~pVq", "rule": "Associativity"},
-                {"statement": "T", "rule": "Negation"}
+                {"statement": "Tv~p", "rule": "Negation"},
+                {"statement": "T", "rule": "Domination"}
             ]
         },
         {
@@ -131,7 +134,8 @@
                 {"statement": "(p^q)->(pvq)", "rule": "Start"},
                 {"statement": "~(p^q)v(pvq)", "rule": "Implication as Disjunction"},
                 {"statement": "(~pv~q)v(pvq)", "rule": "De Morgan's Law"},
-                {"statement": "~pv~qvpvq", "rule":  "Associativity"},{"statement": "T", "rule": "Negation"}
+                {"statement": "~pv~qvpvq", "rule":  "Associativity"},{"statement": "Tv~qvq", "rule": "Negation"},
+                {"statement": "T", "rule": "Domination"}
             ]
         },
         {

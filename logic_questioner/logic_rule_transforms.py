@@ -206,12 +206,16 @@ def negation(tree: Tree):  # pv~p=T, p^~p=F
     assert tree.data == "expr" or tree.data == "term"
     if len(tree.children) == 1:
         return tree
-    ch_set = set(tree.children)
+    pos_dict = {c: i for i, c in enumerate(tree.children)}
+    new_trees = []
     for i, c in enumerate(tree.children):
-        if simplify_multiple_negation(negate(c)) in ch_set:
-            tree = Token("TRUE", "T") if tree.data == "expr" else Token("FALSE", "F")
-            break
-    return tree
+        neg_c = simplify_multiple_negation(negate(c))
+        if neg_c in pos_dict and i < pos_dict[neg_c]:                     # avoid duplicates
+            j = pos_dict[neg_c]
+            tok = Token("TRUE", "T") if tree.data == "expr" else Token("FALSE", "F")
+            new_trees.append(Tree(tree.data, tree.children[:i] + [tok] + tree.children[i+1:j] + tree.children[j+1:]))
+            new_trees.append(Tree(tree.data, tree.children[:i] + tree.children[i+1:j] + tree.children[j+1:] + [tok]))
+    return new_trees if len(new_trees) > 0 else [tree]
 
 
 def reverse_negation(token: Token, additional_ids=('p', 'q', 'r', 's')):
@@ -289,9 +293,8 @@ def distributivity(tree: Tree):  # pv(q^r) == (pvq)^(pvr) etc., assumes args in 
     if len(tree.children) == 1:
         return [tree]
     new_trees = []
-    dual = "expr" if tree.data == "term" else "term"
     for i, c in enumerate(tree.children):
-        if is_tree(c, "paren_expr") and is_tree(c.children[0], dual):
+        if is_tree(c, "paren_expr") and (is_tree(c.children[0], "expr") or is_tree(c.children[0], "term")):
             pre_exclude = tree.children[:i]
             post_exclude = tree.children[i+1:]  # These preserve the original order of arguments
             new_children = [
@@ -308,10 +311,12 @@ def reverse_distributivity(tree: Tree):  # (pvq)^(pvr) == pV(q^r) etc., assumes 
     if len(tree.children) == 1:
         return [tree]
 
-    dual = "expr" if tree.data == "term" else "term"
-
     def is_viable_node(n):
-        return is_tree(n, "paren_expr") and is_tree(n.children[0], dual) and len(n.children[0].children) == 2
+        return all([
+            is_tree(n, "paren_expr"),
+            (is_tree(n.children[0], "expr") or is_tree(n.children[0], "term")),
+            len(n.children[0].children) == 2
+        ])
 
     new_trees = []
     viable_nodes = list(filter(lambda x: is_viable_node(x[1]), enumerate(tree.children)))
@@ -325,7 +330,7 @@ def reverse_distributivity(tree: Tree):  # (pvq)^(pvr) == pV(q^r) etc., assumes 
                     idxs = (d1.children.index(ch), d2.children.index(ch))
                     factored = [c for k, c in enumerate(d1.children) if k != idxs[0]]  # accommodate (ch, ch) e.g. (p^p)
                     factored += [c for k, c in enumerate(d2.children) if k != idxs[1]]
-                    factored_tree = Tree(dual, [ch, parenthesize(Tree(tree.data, factored))])  # pV(q^r)
+                    factored_tree = Tree(d1.data, [ch, parenthesize(Tree(tree.data, factored))])  # pV(q^r)
                     new_trees.append(Tree(tree.data, [factored_tree] + exclude))
 
     return new_trees if len(new_trees) > 0 else [tree]
@@ -348,7 +353,8 @@ operation_names = {                       # change to Enum?
     "Negation": [negation, TF_negation, reverse_negation],
     "Absorption": [absorption, reverse_absorption],
     "Distributivity": [distributivity, reverse_distributivity],
-    "De Morgan's Law": [demorgan, reverse_demorgan]
+    "De Morgan's Law": [demorgan, reverse_demorgan],
+    "Simplify Parentheses": [simplify_paren_expr]
 }
 
 
@@ -404,16 +410,22 @@ allowed_operations = {
 
 
 if __name__ == "__main__":
-    from expression_parser import *
+    from expression_parser import ExpressionParser, TreeToString
 
     ep = ExpressionParser()
     tts = TreeToString()
 
-    tr1 = Token("TRUE", "True") #ep.parse('p').children[0]
-    tr2 = reverse_negation(tr1)
+    tr1 = ep.parse('(pvq)^(pvr)^(qvr)^(pvrvs)^(avb)^(avc)').children[0]
+    tr2 = reverse_distributivity(tr1)
     print([tts.transform(t) for t in tr2])
-    tr1 = Token("FALSE", "F") #ep.parse('(pvq)').children[0]
-    tr2 = reverse_negation(tr1)
+    tr1 = ep.parse('(pvq)^(rvq)').children[0]
+    tr2 = reverse_distributivity(tr1)
+    print([tts.transform(t) for t in tr2])
+    tr1 = ep.parse('(pvq)^(pvr)').children[0]
+    tr2 = reverse_distributivity(tr1)
+    print([tts.transform(t) for t in tr2])
+    tr1 = ep.parse('(r^q)^(p^r)').children[0]
+    tr2 = reverse_distributivity(tr1)
     print([tts.transform(t) for t in tr2])
 
     t1 = ep.parse('a^b^c^a^b^a').children[0]

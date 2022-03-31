@@ -113,5 +113,5 @@ if __name__ == "__main__":
     # test_search(mh.meta_dist, mh.meta_dist)
 
     gh = GeneHeuristic(None, None)
-    gh.load("gene_weights.txt")
+    gh.load("gene_weights_var.txt")
     test_search(gh.gene_meta_dist, gh.gene_meta_dist, max_timeout=5)

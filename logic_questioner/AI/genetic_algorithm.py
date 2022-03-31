@@ -127,14 +127,14 @@ def base_ga_train():
         questions = json.load(qf)['questions']
 
     ga = GeneticAlgorithm(heuristics, ranges)
-    gh = ga.train(population_size=10, questions=questions[:5], num_generations=10, max_timeout=1, elitism=1)
+    gh = ga.train(population_size=10, questions=questions[:10], num_generations=10, max_timeout=1, elitism=1)
     return gh
 
 
 if __name__ == "__main__":
     gh = base_ga_train()
     print(gh.weights)
-    gh.save("gene_weights_var.txt")
+    gh.save("gene_weights_var_2.txt")
 
 
 

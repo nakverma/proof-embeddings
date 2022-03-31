@@ -133,13 +133,18 @@ class TestExpressionManipulation(unittest.TestCase):
         print([tts.transform(t) for t in tr2])
 
     def test_negation(self):
-        tr1 = ep.parse('pvqv~p').children[0]
+        tr1 = ep.parse('pvq').children[0]
         tr2 = negation(tr1)
-        tr3 = ep.parse('p^~p^q').children[0]
-        tr4 = negation(tr3)
-        tr5 = ep.parse('p^q^r').children[0]
-        tr6 = negation(tr5)
-        print(tr2, tr4, tts.transform(tr6), sep="\n")
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
+        tr1 = ep.parse('~qvq').children[0]
+        tr2 = negation(tr1)
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
+        tr1 = ep.parse('~p^q^p^q').children[0]
+        tr2 = negation(tr1)
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
+        tr1 = ep.parse('~pvpvqv~qvr').children[0]
+        tr2 = negation(tr1)
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
 
     def test_demorgan(self):
         tr1 = ep.parse('~(pvq)').children[0]
@@ -185,13 +190,18 @@ class TestExpressionManipulation(unittest.TestCase):
         print(tr2, tr4, tr6, sep="\n")
 
     def test_distributivity(self):
-        tr1 = ep.parse('p^(pvq)').children[0]
+        tr1 = ep.parse('pv(q^r)').children[0]
         tr2 = distributivity(tr1)
-        tr3 = ep.parse('pvqv(p^r)').children[0]  # is this correct?
-        tr4 = distributivity(tr3)
-        tr5 = ep.parse('p^(q^r)').children[0]
-        tr6 = distributivity(tr5)
-        print(tts.transform(tr2), tts.transform(tr4), tts.transform(tr6), sep="\n")
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
+        tr1 = ep.parse('~qv(qvr)').children[0]
+        tr2 = distributivity(tr1)
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
+        tr1 = ep.parse('(~p^q)^r').children[0]
+        tr2 = distributivity(tr1)
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
+        tr1 = ep.parse('pvqv(p^r)v(s^r)').children[0]
+        tr2 = distributivity(tr1)
+        print([t if type(t) == Token else tts.transform(t) for t in tr2])
 
     def test_reverse_distributivity(self):
         tr1 = ep.parse('(pvq)^(pvr)^(qvr)^(pvrvs)^(avb)^(avc)').children[0]
