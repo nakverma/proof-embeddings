@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from random import random
 
@@ -24,6 +25,10 @@ def random_weight(n1, n2):
 
 def levenshtein_distance(n1, n2):
     return distance(n1[0], n2[0])
+
+
+def len_distance(n1, n2):
+    return abs(len(n1[0])-len(n2[0]))
 
 
 def unitary_distance(n1, n2):
@@ -86,25 +91,6 @@ class RuleDists:
         return 0 if n1[1] == "De Morgan's Law" else d
 
 
-class WeightedRuleDist:
-
-    def __init__(self, ops):
-        self.weights = np.random.random(len(ops))
-        self.ops = ops
-
-    def init_weights(self, weight_file):
-        with open(weight_file, "r") as wf:
-            for l in wf.readlines():
-                op, val = l.split(": ")
-                self.weights[self.ops.index(op)] = float(val)
-
-    def rule_dist(self, n1, n2):
-        return self.weights[self.ops.index(n1[1])]
-
-    def eps_rule_dist(self, n1, n2, eps=0.2):
-        return self.weights[self.ops.index(n1[1])] if random() < eps else random()
-
-
 class MetaHeuristic:
 
     def __init__(self, heuristics=()):
@@ -135,15 +121,21 @@ class GeneHeuristic:
     def __init__(self, heuristics, weights):
         self.heuristics = heuristics
         self.weights = weights
+        self.params = {}
 
     def gene_meta_dist(self, n1, n2):
         ds = np.array([x(n1, n2) for x in self.heuristics])
         return np.sum(ds * self.weights)
 
+    def set_params(self, params):
+        self.params = params
+
     def load(self, weight_file):
         self.heuristics, self.weights = [], []
         with open(weight_file, "r") as wf:
-            for l in wf.readlines():
+            lines = list(wf.readlines())
+            self.params = json.loads(lines[0].replace("'", "\""))
+            for l in lines[2:]:
                 heur, val = l.split(": ")
                 if heur in globals():
                     self.heuristics.append(globals()[heur])
@@ -153,6 +145,7 @@ class GeneHeuristic:
 
     def save(self, out_file):
         with open(out_file, "w") as f:
+            f.write(str(self.params)+"\n\n")
             for i, h in enumerate(self.heuristics):
                 f.write(f'{h.__name__}: {self.weights[i]}\n')
 
@@ -169,5 +162,6 @@ if __name__ == "__main__":
     mh = MetaHeuristic()
     mh.init_state("meta_weights.txt")
     print(mh.heuristics, mh.weights, mh.meta_dist(n1, n2))
-    print(RuleDists().all_dists)'''
-    print(variable_mismatch(n1, n2))
+    print(RuleDists().all_dists)
+    print(variable_mismatch(n1, n2))'''
+    gh = GeneHeuristic()

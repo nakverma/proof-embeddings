@@ -5,6 +5,7 @@ from test_astar_search import get_score_simple
 from astar_heuristics import *
 from time import time
 from multiprocessing.pool import ThreadPool
+import pickle
 
 
 class GeneticAlgorithm:
@@ -27,6 +28,12 @@ class GeneticAlgorithm:
             ) for _ in range(self.pop_size)
         ])
         return pop, np.zeros(pop.shape[0])
+
+    def save_state(self, save_file):
+        pickle.dump(self.__dict__, open(save_file, "wb"))
+
+    def load_state(self, save_file):
+        self.__dict__ = pickle.load(open(save_file, "rb"))
 
     def crossover(self, i1, i2, pc):
         if random() > pc:
@@ -84,10 +91,19 @@ class GeneticAlgorithm:
         self.scores = np.concatenate((sorted_scores[:elitism], self.scores[elitism:]))  # first few not reevaluated
         self.update_scores(questions, max_timeout)
 
-    def train(self, population_size, questions, num_generations=10, elitism=1, pc=0.8, pm=0.2, max_timeout=1):
+    def train(self, population_size, questions, num_generations=10, elitism=1, pc=0.8, pm=0.2, max_timeout=1,
+              save_file=None):
         begin_time = time()
 
-        if self.population is None:
+        if save_file is not None:
+            start = time()
+            self.load_state(save_file)
+            end = time()
+            print(f"\nPrevious State | {end-start:.4f} seconds | "
+                  f"\tAvg Score: {np.mean(self.scores)}\tBest Score: {self.best_score}")
+            print(f"Scores: {self.scores}")
+            print(f"Best Weights: {self.best_individual}\n")
+        elif self.population is None:
             start = time()
             self.pop_size = population_size
             self.population, self.scores = self.create_population()
@@ -111,30 +127,35 @@ class GeneticAlgorithm:
 
         end_time = time()
         print(f"Total running time: {end_time-begin_time:.4f} seconds.")
-        return GeneHeuristic(self.heuristics, self.best_individual)
 
-    def save(self):
-        pass
-
-    def load(self):
-        pass
+        gh = GeneHeuristic(self.heuristics, self.best_individual)
+        gh.set_params({
+            "pop_size": self.pop_size, "questions": len(questions), "generations": num_generations, "elitism": elitism,
+            "pc": pc, "pm": pm, "max_timeout": max_timeout
+        })
+        return gh
 
 
 def base_ga_train():
-    heuristics = [levenshtein_distance, unitary_distance, variable_mismatch] + RuleDists().all_dists
-    ranges = [(0, 10)] + [(-10, 10)] * (len(heuristics) - 1)
+    heuristics = [levenshtein_distance, len_distance, unitary_distance, variable_mismatch] + RuleDists().all_dists
+    ranges = [(0, 10)] * 4 + [(-10, 10)] * (len(heuristics)-4)
     with open("../questions.json", "r") as qf:
         questions = json.load(qf)['questions']
 
     ga = GeneticAlgorithm(heuristics, ranges)
-    gh = ga.train(population_size=10, questions=questions[:10], num_generations=10, max_timeout=1, elitism=1)
+    gh = ga.train(
+        population_size=20, questions=[questions[i] for i in (4, 14, 19, 24, 30)], num_generations=10,
+        max_timeout=1, elitism=3, pm=0.2, pc=0.8,
+        save_file=None#os.path.join("heuristics_and_results", "genetic_states", "genetic_tough_2.json")
+    )
+    ga.save_state(os.path.join("heuristics_and_results", "genetic_states", "genetic_tough_2.json"))
     return gh
 
 
 if __name__ == "__main__":
     gh = base_ga_train()
     print(gh.weights)
-    gh.save("gene_weights_var_2.txt")
+    gh.save(os.path.join("heuristics_and_results", "genetic_weights", "gene_weights_tough_2.txt"))
 
 
 

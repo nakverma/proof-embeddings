@@ -171,7 +171,7 @@ class SimplifyParentheses(Transformer):
         return tr
 
 
-def get_frontier(in_str: str, simplify_paren=True, include_paren=True, allowed_ops=allowed_operations) -> list:
+def get_frontier(in_str: str, simplify_paren=True, include_paren=False, allowed_ops=allowed_operations) -> list:
     ep, tts = ExpressionParser(), TreeToString()
     tree = ep.parse(in_str)
     linted_str = tts.transform(tree)
@@ -181,11 +181,12 @@ def get_frontier(in_str: str, simplify_paren=True, include_paren=True, allowed_o
     if simplify_paren:
         sp = SimplifyParentheses()
         no_par_frontier = set(map(lambda f: (sp.transform(ep.parse(f[0])), f[1]), frontier))
+        no_par_frontier = set(filter(lambda x: x[0] != sp.transform(ep.parse(linted_str)), no_par_frontier))
         frontier = frontier | no_par_frontier if include_paren else no_par_frontier
     return list(set(filter(lambda x: x[0] != linted_str, frontier)))  # tts transform so that tokens standardized
 
 
-def validate(current_frontier: list, new_expr: str, new_rule: str) -> str:
+def validate(current_frontier: list, new_expr: str, new_rule: str, extra_paren_allowed=True) -> str:
     ep, tts = ExpressionParser(), TreeToString()
 
     try:
@@ -196,7 +197,7 @@ def validate(current_frontier: list, new_expr: str, new_rule: str) -> str:
     new_rule = new_rule.casefold()
     current_frontier = [(i[0], i[1].casefold()) for i in current_frontier]  # make str comparisons case-insensitive
 
-    new_linted = tts.transform(new_tree)
+    new_linted = SimplifyParentheses().transform(new_tree) if extra_paren_allowed else tts.transform(new_tree)
     if new_linted not in [i[0] for i in current_frontier]:
         raise InvalidExpressionException(InvalidStates.INVALID_NEW_EXPR)
     elif new_rule not in [i[1] for i in current_frontier]:
@@ -232,10 +233,10 @@ def validate_and_get_frontier(old_expr: str, new_expr: str, new_rule: str, targe
 
 
 if __name__ == "__main__":
-    old, new, rule, goal = "~(p^q)", "(~pv~q)", "de morgan's law", "~pV~q"
+    old, new, rule, goal = "~p^~q", "~(pvq)", "de morgan's law", "~pV~q"
     print(validate_and_get_frontier(old, new, rule, goal))
 
-    print("\n", get_frontier("T^T"), "\n")
+    print("\n", get_frontier("~(~p)<->p"), "\n")
 
     tr = ExpressionParser().parse("T^T")
     print(SimplifyParentheses().transform(tr))

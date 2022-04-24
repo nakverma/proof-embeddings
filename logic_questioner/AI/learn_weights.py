@@ -66,7 +66,7 @@ def learn_rule_weights(data_file="questions.json", lr=1, epochs=10):  # sorta li
             wrd.weights = list(np.array(wrd.weights)+lr*imp)
             #print(imp, wrd.weights)
 
-    with open("rule_weights.txt", "w") as f:
+    with open("heuristics_and_results/randsearch_weights/rule_weights.txt", "w") as f:
         for i, op in enumerate(wrd.ops):
             f.write(f'{op}: {wrd.weights[i]}\n')
     return wrd
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         np.random.uniform(low=0, high=10, size=1),
         np.random.uniform(low=-10, high=10, size=len(heuristics)-1)
     )) for _ in range(10)]
-    bw, bs = search_meta_weights(heuristics, rand_grid=grid, grid_size=1, out_file="meta_rule_lev_wts.txt", parallel=False)
+    bw, bs = search_meta_weights(heuristics, rand_grid=grid, grid_size=1, out_file="heuristics_and_results/randsearch_weights/meta_rule_lev_wts.txt", parallel=False)
 
 '''
 [-4.72210198  6.53848175 -6.19700752  4.42757432 -2.366619   -3.27885157

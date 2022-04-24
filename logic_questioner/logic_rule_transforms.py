@@ -46,7 +46,7 @@ def reverse_idempotence(node):
         ]
     else:
         new_trees = [
-            Tree("expr", [node, node]), Tree("term", [node, node])
+            safe_paren(Tree("expr", [node, node])), safe_paren(Tree("term", [node, node]))
         ]
     return new_trees
 
@@ -234,7 +234,7 @@ def demorgan(tree: Tree):  # ~(pvq) == ~p^~q, ~(p^q) == ~pV~q
     assert tree.data == "literal"
     if is_tree(tree.children[1], "paren_expr"):
         ch = tree.children[1].children[0]
-        if is_tree(ch, "expr") or is_tree(ch, "term"):
+        if (is_tree(ch, "expr") or is_tree(ch, "term")) and len(ch.children) > 1:
             dual = "expr" if ch.data == "term" else "term"
             new_ch = [simplify_multiple_negation(negate(c)) for c in ch.children]
             tree = parenthesize(Tree(dual, new_ch))
@@ -390,6 +390,50 @@ allowed_operations = {
     ],
     'ID': [
         reverse_identity, reverse_idempotence, reverse_absorption
+    ],
+    "TRUE": [
+        reverse_negation
+    ],
+    "FALSE": [
+        reverse_negation
+    ],
+    "_LPAR": [],
+    "_RPAR": [],
+    "NOT": [],
+    "_AND": [],
+    "_OR": [],
+    "_IMPL": [],
+    "_DBLIMPL": []
+}
+
+
+search_operations = {
+    'start': [],
+    'eqn': [
+        dblimpl_to_impl, commutativity
+    ],
+    'dbl_expr': [
+        impl_to_disj
+    ],
+    'expr': [
+        idempotence, identity, domination, commutativity, associativity_LR, associativity_expand,
+        reverse_associativity_expand, negation, absorption, distributivity, reverse_distributivity, double_negate,
+        reverse_demorgan, disj_to_impl
+    ],
+    'term': [
+        idempotence, identity, domination, commutativity, associativity_LR, associativity_expand,
+        reverse_associativity_expand, negation, absorption, distributivity, reverse_distributivity, double_negate,
+        reverse_demorgan, impl_to_dblimpl
+    ],
+    'literal': [
+        simplify_multiple_negation, TF_negation, demorgan
+    ],
+    'variable': [],
+    'paren_expr': [
+        double_negate, reverse_absorption
+    ],
+    'ID': [
+        reverse_absorption
     ],
     "TRUE": [
         reverse_negation
